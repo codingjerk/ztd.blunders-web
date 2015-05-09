@@ -1,0 +1,74 @@
+body {
+    font-family: sans-serif;
+}
+
+div#mainBoard {
+    width: 400px;
+    height: 400px;
+}
+
+nav {
+    padding: 15px 35px 0px 0px;
+
+    max-width: 30%;
+    position: absolute;
+    top: 0; 
+    bottom: 0; 
+    left: 0;
+
+    background: #333333;
+}
+
+section {
+    margin-left: 30%;
+    margin-right: 30%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    width: 99%;
+    padding: 0px;
+    margin: 0px;
+
+    background: #333333;
+}
+
+a:link {
+    text-decoration: none;
+    color: #dedede;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #dedede;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #dedede;
+}
+
+a:active {
+    text-decoration: underline;
+    color: #dedede;
+}
+
+footer > ul > li {
+    display: inline;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+nav > ul > li > a {
+    font-size: 130%;
+}
+
+nav > ul > li > ul > li > a {
+    font-size: 100%;
+}
