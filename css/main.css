@@ -1,5 +1,6 @@
 body {
     font-family: sans-serif;
+    color: #333333;
 }
 
 div#mainBoard {
@@ -64,24 +65,39 @@ a:active {
 
 #moves {
     width: 360px;
-
     margin-top: 30px;
-    margin-left: auto;
-    margin-right: auto;
 
-    color: #333333;
+    margin-right: 20px;
+    margin-left: 20px;
 
-    text-align: center;
-
-    margin-bottom: 70px;
+    font-size: 90%;
 }
 
-#controls {
+table {
     width: 400px;
+    margin-left: -2px;
+}
 
+td#status {
+    text-align: left;
+
+    padding-left: 5px;
+}
+
+td#controlButtons {
+    text-align: right;
+    padding-right: 5px;
+}
+
+#boardControls {
+    width: 400px;
+    margin-top: 10px;
+}
+
+#blunderControls {
+    width: 400px;
     text-align: center;
-
-    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
 #help {
@@ -94,16 +110,91 @@ a:active {
     text-align: justify;
 }
 
+#failedStatus, #successStatus, #blackTurnStatus, #whiteTurnStatus {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+#failedStatus {
+    color: #ffffff;
+
+    border-color: rgb(212, 63, 58);
+    background-color: rgb(217, 83, 79);
+}
+
+#successStatus {
+    color: #ffffff;
+
+    border-color: #1b926c;
+    background-color: #1fa67a;
+}
+
+#blackTurnStatus {
+    color: #dedede;
+
+    border-color: #555555;
+    background-color: #333333;
+}
+
+#whiteTurnStatus {
+    color: #333333;
+
+    border-color: #dedede;
+    background-color: #ededed;
+}
+
+a.move:link, a.currentMove:link {
+    text-decoration: none;
+    padding: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+a.move:visited, a.currentMove:visited {
+    text-decoration: none;
+    padding: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+a.move:hover, a.currentMove:hover {
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 5px;
+    padding: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+a.move:active, a.currentMove:active {
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 5px;
+    padding: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
 .control {
-    margin-left: 30px;
-    margin-right: 30px;
+    margin: 5px;
 }
 
-.move {
-    margin-right: 20px;
+.blunderControl {
+    margin: 10px;
 }
 
-.move_active {
+.spacer {
+    margin-right: 5px;
+}
+
+.currentMove {
     font-weight: 600;
 }
 
