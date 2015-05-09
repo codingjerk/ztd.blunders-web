@@ -5,43 +5,61 @@
 		<title>ChessDB prototype</title>
 		<link rel="stylesheet" href="chessboardjs/css/chessboard.css">
 		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	</head>
 
 	<body>
 		<nav>
 			<ul>
-				<li><a href="#">Blunders</a>
+				<li><a href="#"><i class="fa fa-exclamation-circle"></i> Blunders</a>
 					<ul>
-						<li><a href="#">Solve!</a></li>
-						<li><a href="#">Add new...</a></li>
-						<li><a href="#">Search...</a></li>
-						<li><a href="#">Download</a></li>
-						<li><a href="#">API</a></li>
+						<li><a href="#"><i class="fa fa-check"></i> Solve!</a></li>
+						<li><a href="#"><i class="fa fa-plus"></i> Add new...</a></li>
+						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
+						<li><a href="#"><i class="fa fa-download"></i> Download</a></li>
+						<li><a href="#"><i class="fa fa-code"></i> API</a></li>
 					</ul>
 				</li>
-				<li><a href="#">Puzzles</a>
+				<li><a href="#"><i class="fa fa-puzzle-piece"></i> Puzzles</a>
 					<ul>
-						<li><a href="#">Solve!</a></li>
-						<li><a href="#">Add new...</a></li>
-						<li><a href="#">Search...</a></li>
-						<li><a href="#">Download</a></li>
-						<li><a href="#">API</a></li>
+						<li><a href="#"><i class="fa fa-check"></i> Solve!</a></li>
+						<li><a href="#"><i class="fa fa-plus"></i> Add new...</a></li>
+						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
+						<li><a href="#"><i class="fa fa-download"></i> Download</a></li>
+						<li><a href="#"><i class="fa fa-code"></i> API</a></li>
 					</ul>
 				</li>
-				<li><a href="#">Game Database</a>
+				<li><a href="#"><i class="fa fa-database"></i> Game Database</a>
 					<ul>
-						<li><a href="#">Solve!</a></li>
-						<li><a href="#">Add new...</a></li>
-						<li><a href="#">Search...</a></li>
-						<li><a href="#">Download</a></li>
-						<li><a href="#">API</a></li>
+						<li><a href="#"><i class="fa fa-check"></i> Solve!</a></li>
+						<li><a href="#"><i class="fa fa-plus"></i> Add new...</a></li>
+						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
+						<li><a href="#"><i class="fa fa-download"></i> Download</a></li>
+						<li><a href="#"><i class="fa fa-code"></i> API</a></li>
 					</ul>
 				</li>
 			</ul>
 		</nav>
 
 		<section>
+			<div id="help">
+				<p>Choose the best move(s). For help see the Tactics FAQ. 
+				The best move usually ends up at least 2 pawns worth of material.
+				Moves that win a pawn or less will likely fail the problem.</p>
+			</div>
+
 			<div id="board" style="width: 400px"></div>
+
+			<div id="controls">
+				<i class="control fa fa-arrow-left"></i>
+				<i class="control fa fa-arrow-right"></i>
+			<div>
+
+			<div id="moves">
+				<span class="move">1. <a href="#">e2e4</a> <a href="#">e7e6</a></span>
+				<span class="move">2. <a href="#">Rec</a> <a href="#">Qd8+</a></span>
+				<span class="move">3. <a href="#">N6</a> <a class="move_active" href="#">Kd4</a></span>
+			</div>
 		</section>
 
 		<footer>
