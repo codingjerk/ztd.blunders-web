@@ -224,7 +224,7 @@
 	function getRandomBlunder() {
 		$.ajax({
 			type: 'GET',
-			url: "http://localhost/grb", // TODO: FIX THIS
+			url: "http://localhost/grb" // TODO: FIX THIS
 		}).done(onBlunderRequest);
 	}
 
