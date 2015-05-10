@@ -2,17 +2,39 @@
 	var moveSpeed = 500;
 	var board;
 	var game;
-	var additionalHistory = [];
 	var animationLocked = false;
 	var blunder;
 	var firstMoveIndex = null;
+	var firstMoveTurn = null;
+	var visitedMoveCounter = 0;
+
+	var multiPv = null;
 
 	var finished = false;
+
+	function getPv(index) {
+		var result; 
+
+		if (index === 'user') {
+			result = game.history();
+			result.tag = 'moves';
+		} else if (index === 'original') {
+			result = multiPv[0];
+			result.tag = 'rightMoves';
+		} else {
+			result = multiPv[index];
+		}
+
+		result.index = index;
+
+		return result;
+	}
 
 	var setStatus = function(status) {
 		if (status === 'playing') {
 			finished = false;
 			$("#nextBlunder").html('<i class="fa fa-exclamation-circle"></i> Give up');
+			$("#rightMoves").html('');
 		} else if (status === 'failed') {
 			finished = true;
 			$("#nextBlunder").html('<i class="fa fa-lg fa-caret-right"></i> Next blunder');
@@ -21,6 +43,16 @@
 			finished = true;
 			$("#nextBlunder").html('<i class="fa fa-lg fa-caret-right"></i> Next blunder');
 			$("#status").html('<span id="successStatus"><i class="fa fa-check-circle"></i> Success!</span>');
+		}
+	}
+
+	var updateStatus = function() {
+		if (!finished) {
+			if (game.turn() == 'w') {
+				$('#status').html('<span id="whiteTurnStatus">White&nbspto&nbspmove</span>');
+			} else {
+				$('#status').html('<span id="blackTurnStatus">Black&nbspto&nbspmove</span>');
+			}
 		}
 	}
 
@@ -47,37 +79,145 @@
 
 	var onDrop = function(source, target) {
 		// see if the move is legal
-		var move = game.move({
+		var move = makeMove(board, {
 			from: source,
 			to: target,
 			promotion: 'q' // NOTE: always promote to a queen for example simplicity
-		});
+		}, false);
 
-		// illegal move
 		if (move === null) return 'snapback';
 
 		var bestMove = blunder.pv[game.history().length - 2];
 
 		if (move.san !== bestMove) {
 			setStatus('failed');
+
+			updatePv(getPv('original'));
 		} else if (game.history().length - 1 === blunder.pv.length) {
 			setStatus('finished');
 		} else {
 			var aiAnswer = blunder.pv[game.history().length - 1];
 			setTimeout(function() {
-				makeMove(board, aiAnswer);
+				makeMove(board, aiAnswer, true);
 				lockAnimation();
 			}, 400);
 		}
-
-		additionalHistory = [];
-
-		updateMoves();
 	};
 
-	var onSnapEnd = function() {
+	var onSnapEnd = function(source, target, piece) {
 		board.position(game.fen());
 	};
+
+	function updatePv(pv, cutMoveNumber) {
+		if (cutMoveNumber === undefined) {
+			cutMoveNumber = pv.length;
+		}
+
+		text = '';
+
+		for (var i = 0; i < cutMoveNumber && i < pv.length; ++i) {
+			var move = pv[i];
+
+			if (i !== 0 && i % 2 == 0) {
+				text += '<span class="spacer"></span> ';
+			}
+
+			var style = 'move';
+			if (i === game.history().length - 1 && multiPv.activeIndex === pv.index) {
+				style = 'currentMove';
+			}
+
+			console.log(multiPv.activeIndex);
+			console.log(pv.index);
+			
+			if (i % 2 == 0) {
+				var moveNumber = Math.floor(i / 2) + 1 + firstMoveIndex;
+				text += moveNumber + '.&nbsp';
+			}
+
+			var NAG = '';
+			if (i == 0) NAG = '?';
+			else if (i == 1) NAG = '!';
+
+			if (pv[i] !== getPv('original')[i]) NAG = "??";
+
+			if (i == 0 && firstMoveTurn === 'b') {
+				text += '...';
+			}
+
+			text += '<a class="' + style + '" id="' + pv.tag + "_child_" + i + '" href="#">' + move + NAG + '</a>';
+		}
+
+		$('#' + pv.tag).html(text);
+
+		for (var i = 0; i < cutMoveNumber; ++i) {
+			$('#' + pv.tag + "_child_" + i).on('click', (function(pv, cutter) {
+				return function() {
+					var previousPvIndex = multiPv.activeIndex;
+					multiPv.activeIndex = pv.index;
+
+					if (previousPvIndex !== pv.index) {
+						updatePv(getPv(previousPvIndex));
+					}
+
+					game.load(blunder.fenBefore);
+
+					for (var i = 0; i <= cutter; ++i) {
+						var move = pv[i];
+						game.move(move);
+					}
+
+					board.position(game.fen());
+
+					updatePv(pv, cutMoveNumber);
+				};
+			})(pv, i));
+		}
+	}
+
+	function makeMove(board, move, aiMove) {
+		pmove = game.move(move);
+		if (pmove !== null) {
+			++visitedMoveCounter;
+			
+			if (aiMove) {
+				board.position(game.fen());
+			}
+
+			updatePv(getPv('user'), visitedMoveCounter);
+			updateStatus();
+		}
+
+		return pmove;
+	}
+
+	function onBlunderRequest(data) {
+		setStatus('playing');
+		blunder = data;
+		blunder.pv = blunder.pv.slice(0, 3);
+		multiPv = [];
+		multiPv.push([blunder.blunderMove].concat(blunder.pv));
+		multiPv.activeIndex = 'user';
+
+		console.log(multiPv);
+		matches = data.fenBefore.match(/\d+/g);
+		firstMoveIndex = +matches[matches.length - 1];
+
+		visitedMoveCounter = 0;
+
+		board.position(data.fenBefore, false);
+		game.load(data.fenBefore);
+		firstMoveTurn = game.turn();
+
+		makeMove(board, data.blunderMove, true);
+	}
+
+	function getRandomBlunder() {
+		$.ajax({
+	        type: 'GET',
+	        url: "http://localhost/grb", // TODO: FIX THIS
+		}).done(onBlunderRequest);
+	}
 
 	board = new ChessBoard('board', {
 		draggable: true,
@@ -89,83 +229,6 @@
 	});
 	game = new Chess();
 
-	function updateMoves() {
-		if (!finished) {
-			if (game.turn() == 'w') {
-				$('#status').html('<span id="whiteTurnStatus">White&nbspto&nbspmove</span>');
-			} else {
-				$('#status').html('<span id="blackTurnStatus">Black&nbspto&nbspmove</span>');
-			}
-		}
-
-		var orig = game.history();
-		var moves = orig.concat(additionalHistory);
-
-		var moveNumber = firstMoveIndex;
-		var text = '';
-
-		var whiteMove = true;
-		if ((orig.length % 2 === 0) !== (game.turn() === 'w')) {
-			text = firstMoveIndex + '.&nbsp;...';
-			whiteMove = false;
-			++moveNumber;
-		}
-
-		var discardLevel = 1;
-		var discards = [];
-		moves.forEach(function(el) {
-			if (whiteMove) {
-				text += '<span class="spacer"></span> ' + moveNumber + '.&nbsp';
-				++moveNumber;				
-			}
-
-			var mclass = 'move';
-			if (discardLevel == orig.length) {
-				mclass = 'currentMove';
-			}
-
-			id = 'moveLink' + moveNumber + (whiteMove? 'w': 'b');
-			text += '<a id="' + id + '" class="' + mclass + '" href="#">' + el + '</a>';
-			discards.push({id: id, level: discardLevel});
-
-			whiteMove = !whiteMove;
-			++discardLevel;
-		});
-
-		$('#moves').html(text.replace(/^<span class="spacer"><\/span>/,""));
-
-		discards.forEach(function(e) {
-			$("#" + e.id).on('click', undoer(orig.length - e.level));
-		});
-	}
-
-	function makeMove(board, move) {
-		pmove = game.move(move);
-		board.move(pmove.from + '-' + pmove.to);
-
-		updateMoves();
-	}
-
-	function onBlunderRequest(data) {
-		setStatus('playing');
-		blunder = data;
-		matches = data.fen.match(/\d+/g);
-		firstMoveIndex = Math.round(matches[matches.length - 1] / 2);
-
-		additionalHistory = [];
-
-		board.position(data.fen, false);
-		game.load(data.fen);
-		makeMove(board, data.blunderMove);
-	}
-
-	function getRandomBlunder() {
-		$.ajax({
-	        type: 'GET',
-	        url: "http://localhost/grb", // TODO: FIX THIS
-		}).done(onBlunderRequest);
-	}
-
 	getRandomBlunder();
 
 	$('#nextBlunder').on('click', function() {
@@ -173,79 +236,30 @@
 	});
 
 	$('#goToGame').on('click', function() {
-		window.open('http://www.google.com/search?q=' + blunder.fen);
+		window.open('http://www.google.com/search?q=' + blunder.fenBefore);
 	});
 
-	function undoer(num) {
-		return function() {
-			if (animationLocked) return;
-			lockAnimation();
-
-			for (var i = 0; i < num; ++i) {
-				undoMove('no lock');
-			}
-
-			if (num < 0) {
-				for (var i = 0; i < -num; ++i) {
-					game.move(additionalHistory.shift());
-				}
-			}
-
-			updatePos();
-		}
-	}
-
-	function updatePos() {
-		board.position(game.fen());
-		updateMoves();
-	}
-
-	function undoMove(noLock) {
-		if (game.history().length <= 1) return;
-		if (noLock === undefined) {
-			if (animationLocked) return;
-			lockAnimation();
-		}
-
-		lastMove = game.history()[game.history().length - 1];
-		game.undo();
-		additionalHistory.unshift(lastMove);
-
-		if (noLock === undefined) {
-			updatePos();
-		}
-	}
-
-	$('#firstMove').on('click', function() {
-		undoer(game.history().length - 1)();
-	});
-
-	$('#previousMove').on('click', function(){undoMove();});
-
-	$('#flip').on('click', function(){board.flip();});
-
-	$('#nextMove').on('click', function() {
-		if (additionalHistory.length === 0) return;
-		if (animationLocked) return;
-		lockAnimation();
-		
-		var move = additionalHistory.shift();
-		makeMove(board, move);
-	});
-
-	$('#lastMove').on('click', function() {
-		if (additionalHistory.length === 0) return;
-		if (animationLocked) return;
-		lockAnimation();
-
-		while (additionalHistory.length != 0) {
-			game.move(additionalHistory.shift());
-		};
-
-		updatePos();
+	$('#flip').on('click', function(){
+		board.flip();
 	});
 
 	$('#getFen').on('click', function() {
 		window.prompt("Copy to clipboard: Ctrl+C, Enter", game.fen());
+	});
+
+	$('#firstMove').on('click', function() {
+		// TODO
+	});
+
+	$('#previousMove').on('click', function(){
+		// TODO
+	});
+
+	$('#nextMove').on('click', function() {
+		// TODO
+	});
+
+	$('#lastMove').on('click', function() {
+		// TODO
 	});
 })();

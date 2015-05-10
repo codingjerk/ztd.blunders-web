@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
 import flask
+import pymongo
+import random
 
 app = flask.Flask(__name__, static_folder='')
 
 @app.route('/grb')
 def grb():
-    return flask.jsonify({
-        'fen': '5qk1/2Q2pp1/6p1/1N1Bp3/pn2P3/3n1P2/6PP/6K1 w - - 2 35', 
-        'blunderMove': 'Nd6', 
-        'pv': ['Nxd5', 'Qc6', 'N3b4', 'Qxa4', 'Qxd6'],
-    })
+    randomIndex = random.randint(0, blunders.count())
+
+    data = blunders.find().skip(randomIndex).limit(1)[0]
+    data['_id'] = str(data['_id'])
+    data['pgn_id'] = str(data['pgn_id'])
+
+    return flask.jsonify(data)
     
 @app.route('/js/<path:path>')
 def send_js(path):
@@ -44,4 +48,15 @@ def send_chess_img(path):
 def root():
     return app.send_static_file('index.html')
 
-app.run(host='localhost', port=80)
+def startMongo():
+    global mongo
+    global blunders
+    global games_collection
+
+    mongo = pymongo.MongoClient('localhost', 27017)
+    db = mongo['chessdb']
+    games_collection = db['games']
+    blunders = db['blunders']
+
+startMongo()
+app.run(host='localhost', port=80, debug=True)
