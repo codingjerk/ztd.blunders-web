@@ -108,6 +108,26 @@
 		board.position(game.fen());
 	};
 
+	var gotoMove = function(pv, cutter, cutMoveNumber) {
+		var previousPvIndex = multiPv.activeIndex;
+		multiPv.activeIndex = pv.index;
+
+		if (previousPvIndex !== pv.index) {
+			updatePv(getPv(previousPvIndex));
+		}
+
+		game.load(blunder.fenBefore);
+
+		for (var i = 0; i <= cutter; ++i) {
+			var move = pv[i];
+			game.move(move);
+		}
+
+		board.position(game.fen());
+
+		updatePv(pv, cutMoveNumber);
+	};
+
 	function updatePv(pv, cutMoveNumber) {
 		if (cutMoveNumber === undefined) {
 			cutMoveNumber = pv.length;
@@ -126,9 +146,6 @@
 			if (i === game.history().length - 1 && multiPv.activeIndex === pv.index) {
 				style = 'currentMove';
 			}
-
-			console.log(multiPv.activeIndex);
-			console.log(pv.index);
 			
 			if (i % 2 == 0) {
 				var moveNumber = Math.floor(i / 2) + 1 + firstMoveIndex;
@@ -153,23 +170,7 @@
 		for (var i = 0; i < cutMoveNumber; ++i) {
 			$('#' + pv.tag + "_child_" + i).on('click', (function(pv, cutter) {
 				return function() {
-					var previousPvIndex = multiPv.activeIndex;
-					multiPv.activeIndex = pv.index;
-
-					if (previousPvIndex !== pv.index) {
-						updatePv(getPv(previousPvIndex));
-					}
-
-					game.load(blunder.fenBefore);
-
-					for (var i = 0; i <= cutter; ++i) {
-						var move = pv[i];
-						game.move(move);
-					}
-
-					board.position(game.fen());
-
-					updatePv(pv, cutMoveNumber);
+					gotoMove(pv, cutter, cutMoveNumber);
 				};
 			})(pv, i));
 		}
@@ -214,8 +215,8 @@
 
 	function getRandomBlunder() {
 		$.ajax({
-	        type: 'GET',
-	        url: "http://localhost/grb", // TODO: FIX THIS
+			type: 'GET',
+			url: "http://localhost/grb", // TODO: FIX THIS
 		}).done(onBlunderRequest);
 	}
 
@@ -248,18 +249,24 @@
 	});
 
 	$('#firstMove').on('click', function() {
-		// TODO
+		var activePv = getPv(multiPv.activeIndex);
+		gotoMove(activePv, 0, activePv.length);
 	});
 
-	$('#previousMove').on('click', function(){
-		// TODO
+	$('#previousMove').on('click', function() {
+		if (game.history().length <= 1) return;
+
+		var activePv = getPv(multiPv.activeIndex);
+		gotoMove(activePv, game.history().length - 2, activePv.length);
 	});
 
 	$('#nextMove').on('click', function() {
-		// TODO
+		var activePv = getPv(multiPv.activeIndex);
+		gotoMove(activePv, game.history().length, activePv.length);
 	});
 
 	$('#lastMove').on('click', function() {
-		// TODO
+		var activePv = getPv(multiPv.activeIndex);
+		gotoMove(activePv, activePv.length, activePv.length);
 	});
 })();
