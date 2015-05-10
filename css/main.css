@@ -74,6 +74,7 @@ a:active {
 }
 
 table {
+    margin-top: 20px;
     width: 400px;
     margin-left: -2px;
 }
