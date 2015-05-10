@@ -48,6 +48,10 @@ def send_chess_img(path):
 def root():
     return app.send_static_file('index.html')
 
+@app.route('/compressed')
+def compressedRoot():
+    return app.send_static_file('compressed.html')
+
 def startMongo():
     global mongo
     global blunders
