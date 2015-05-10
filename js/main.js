@@ -21,6 +21,8 @@
 		} else if (index === 'original') {
 			result = multiPv[0];
 			result.tag = 'rightMoves';
+		} else if (index === 'active') {
+			return getPv(multiPv.activeIndex);
 		} else {
 			result = multiPv[index];
 		}
@@ -109,12 +111,9 @@
 	};
 
 	var gotoMove = function(pv, cutter, cutMoveNumber) {
-		var previousPvIndex = multiPv.activeIndex;
+		var previousPv = getPv('active');
 		multiPv.activeIndex = pv.index;
-
-		if (previousPvIndex !== pv.index) {
-			updatePv(getPv(previousPvIndex));
-		}
+		updatePv(previousPv);
 
 		game.load(blunder.fenBefore);
 
@@ -249,24 +248,19 @@
 	});
 
 	$('#firstMove').on('click', function() {
-		var activePv = getPv(multiPv.activeIndex);
-		gotoMove(activePv, 0, activePv.length);
+		gotoMove(getPv('active'), 0, getPv('active').length);
 	});
 
 	$('#previousMove').on('click', function() {
 		if (game.history().length <= 1) return;
-
-		var activePv = getPv(multiPv.activeIndex);
-		gotoMove(activePv, game.history().length - 2, activePv.length);
+		gotoMove(getPv('active'), game.history().length - 2, getPv('active').length);
 	});
 
 	$('#nextMove').on('click', function() {
-		var activePv = getPv(multiPv.activeIndex);
-		gotoMove(activePv, game.history().length, activePv.length);
+		gotoMove(getPv('active'), game.history().length, getPv('active').length);
 	});
 
 	$('#lastMove').on('click', function() {
-		var activePv = getPv(multiPv.activeIndex);
-		gotoMove(activePv, activePv.length, activePv.length);
+		gotoMove(getPv('active'), getPv('active').length, getPv('active').length);
 	});
 })();
