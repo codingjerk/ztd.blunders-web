@@ -12,6 +12,15 @@
 
 	var finished = false;
 
+	String.prototype.format = function() {
+		var str = this;
+		for (var i = 0; i < arguments.length; i++) {
+			var reg = new RegExp("\\{" + i + "\\}", "gm");
+			str = str.replace(reg, arguments[i]);
+		}
+		return str;
+	}
+
 	function getPv(index) {
 		var result; 
 
@@ -161,7 +170,7 @@
 				text += '...';
 			}
 
-			text += '<a class="' + style + '" id="' + pv.tag + "_child_" + i + '" href="#">' + move + NAG + '</a>';
+			text += '<a class="{0}" id="{1}" href="#">{2}{3}</a>'.format(style, pv.tag + "_child_" + i, move, NAG);
 		}
 
 		$('#' + pv.tag).html(text);
