@@ -192,10 +192,19 @@
 		}
 	}
 
+	function hightlightMove(move) {
+		$('.highlight').removeClass('highlight');
+
+		$('#board').find('.square-' + move.from).addClass('highlight');
+		$('#board').find('.square-' + move.to).addClass('highlight');
+	}
+
 	function makeMove(board, move, aiMove) {
 		pmove = game.move(move);
 		if (pmove !== null) {
 			++visitedMoveCounter;
+
+			hightlightMove(pmove);
 			
 			if (aiMove) {
 				board.position(game.fen());
