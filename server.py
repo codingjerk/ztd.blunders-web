@@ -6,8 +6,8 @@ import random
 
 app = flask.Flask(__name__, static_folder='')
 
-@app.route('/grb')
-def grb():
+@app.route('/getRandomBlunder')
+def getRandomBlunder():
     randomIndex = random.randint(0, blunders.count())
 
     data = blunders.find().skip(randomIndex).limit(1)[0]

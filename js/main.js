@@ -1,11 +1,15 @@
 (function() {
 	var moveSpeed = 500;
+	
 	var board;
 	var game;
+	
 	var animationLocked = false;
 	var blunder;
+	
 	var firstMoveIndex = null;
 	var firstMoveTurn = null;
+	
 	var visitedMoveCounter = 0;
 
 	var multiPv = null;
@@ -25,7 +29,7 @@
 		var result; 
 
 		if (index === 'user') {
-			result = game.history();
+			result = multiPv[1];
 			result.tag = 'moves';
 		} else if (index === 'original') {
 			result = multiPv[0];
@@ -102,17 +106,21 @@
 
 		if (move.san !== bestMove) {
 			setStatus('failed');
-
 			updatePv(getPv('original'));
-		} else if (game.history().length - 1 === blunder.pv.length) {
-			setStatus('finished');
-		} else {
-			var aiAnswer = blunder.pv[game.history().length - 1];
-			setTimeout(function() {
-				makeMove(board, aiAnswer, true);
-				lockAnimation();
-			}, 400);
+
+			return;
 		}
+
+		if (game.history().length - 1 === blunder.pv.length) {
+			setStatus('finished');
+			return;
+		}
+
+		var aiAnswer = blunder.pv[game.history().length - 1];
+		setTimeout(function() {
+			makeMove(board, aiAnswer, true);
+			lockAnimation();
+		}, 400);
 	};
 
 	var onSnapEnd = function(source, target, piece) {
@@ -193,6 +201,10 @@
 				board.position(game.fen());
 			}
 
+			if (!finished) {
+				multiPv[1] = game.history();
+			}
+
 			updatePv(getPv('user'), visitedMoveCounter);
 			updateStatus();
 		}
@@ -202,15 +214,17 @@
 
 	function onBlunderRequest(data) {
 		setStatus('playing');
+
 		blunder = data;
-		blunder.pv = blunder.pv.slice(0, 3);
+
 		multiPv = [];
 		multiPv.push([blunder.blunderMove].concat(blunder.pv));
 		multiPv.activeIndex = 'user';
 
-		console.log(multiPv);
 		matches = data.fenBefore.match(/\d+/g);
 		firstMoveIndex = +matches[matches.length - 1];
+
+		console.log(multiPv[0])
 
 		visitedMoveCounter = 0;
 
@@ -224,7 +238,7 @@
 	function getRandomBlunder() {
 		$.ajax({
 			type: 'GET',
-			url: "http://localhost/grb" // TODO: FIX THIS
+			url: "http://localhost/getRandomBlunder" // TODO: Remove localhost from this
 		}).done(onBlunderRequest);
 	}
 
