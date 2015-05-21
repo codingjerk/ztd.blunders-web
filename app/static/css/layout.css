@@ -74,3 +74,53 @@ a {
 a:hover, a:active {
     text-decoration: underline;
 }
+
+@media screen and (max-width: 1024px) {
+    nav {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+
+        width: 100%;
+
+        line-height: 45px;
+        padding-bottom: 5px; 
+
+        border-right: none;
+        border-bottom: 1px solid #dedede;
+
+        font-size: 80%;
+    }
+
+    nav > ul, nav > ul > li, nav > ul > li > ul {
+        display: inline;
+    }
+
+    nav > ul > li > ul > li {
+        display: none;
+    }
+
+    #user-bar {
+        position: absolute;
+        bottom: auto;
+        right: 30px;
+        margin-top: 0;
+    }
+
+    #user-bar > li > ul {
+        display: none;
+    }
+
+    section, footer {
+        left: 0;
+    }
+
+    section {
+        margin-top: 50px;
+    }
+
+    #help {
+        display: none;
+    }
+}

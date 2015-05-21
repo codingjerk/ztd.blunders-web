@@ -1,11 +1,4 @@
 section {
-    position: relative;
-    left: 130px;
-    margin-left: auto;
-    margin-right: auto;
-
-    margin-top: 80px;
-
     width: 400px;
     max-width: auto;
 }
