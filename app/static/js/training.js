@@ -86,7 +86,8 @@
 		if (animationLocked === true ||
 			finished === true ||
 			game.game_over() === true ||
-		    game.turn() === firstMoveTurn) 
+		    game.history().length < visitedMoveCounter ||
+		    game.turn() !== piece[0]) 
 		{
 				return false;
 		}
