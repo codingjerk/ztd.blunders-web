@@ -128,6 +128,8 @@
 	};
 
 	var gotoMove = function(pv, cutter, cutMoveNumber) {
+		if (animationLocked === true) return;
+
 		var previousPv = getPv('active');
 		multiPv.activeIndex = pv.index;
 		updatePv(previousPv);
@@ -142,6 +144,7 @@
 
 		hightlightMove(lastMove);
 		
+		lockAnimation();
 		board.position(game.fen());
 
 		updatePv(pv, cutMoveNumber);
@@ -210,6 +213,7 @@
 			hightlightMove(pmove);
 			
 			if (aiMove) {
+				lockAnimation();
 				board.position(game.fen());
 			}
 
