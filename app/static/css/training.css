@@ -103,21 +103,21 @@ td#controlButtons {
     background-color: #ededed;
 }
 
-a.move:link, a.currentMove:link {
+a.move:link {
     text-decoration: none;
     padding: 4px;
     padding-top: 1px;
     padding-bottom: 1px;
 }
 
-a.move:visited, a.currentMove:visited {
+a.move:visited {
     text-decoration: none;
     padding: 4px;
     padding-top: 1px;
     padding-bottom: 1px;
 }
 
-a.move:hover, a.currentMove:hover {
+a.move:hover {
     text-decoration: none;
     border: solid 1px;
     border-radius: 5px;
@@ -126,7 +126,7 @@ a.move:hover, a.currentMove:hover {
     padding-bottom: 0px;
 }
 
-a.move:active, a.currentMove:active {
+a.move:active {
     text-decoration: none;
     border: solid 1px;
     border-radius: 5px;
@@ -149,6 +149,11 @@ a.move:active, a.currentMove:active {
 
 .currentMove {
     font-weight: 600;
+}
+
+.badMove {
+    font-weight: 600;
+    color: #E33;
 }
 
 .highlight {

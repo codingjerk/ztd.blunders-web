@@ -117,7 +117,7 @@
 			setStatus('finished');
 			return;
 		}
-		
+
 		var aiAnswer = getPv(0)[gameLength];
 		setTimeout(function() {
 			makeMove(board, aiAnswer, true);
@@ -168,7 +168,7 @@
 
 			var style = 'move';
 			if (i === game.history().length - 1 && multiPv.activeIndex === pv.index) {
-				style = 'currentMove';
+				style = 'move currentMove';
 			}
 			
 			if (i % 2 == 0) {
@@ -180,7 +180,10 @@
 			if (i == 0) NAG = '?';
 			else if (i == 1) NAG = '!';
 
-			if (pv[i] !== getPv('original')[i]) NAG = "??";
+			if (pv[i] !== getPv('original')[i]) {
+				NAG = "??";
+				style = 'move badMove';
+			}
 
 			if (i == 0 && firstMoveTurn === 'b') {
 				text += '...';
@@ -243,6 +246,7 @@
 		firstMoveIndex = +matches[matches.length - 1];
 
 		console.log(multiPv[0])
+		console.log('Elo:', blunder.elo)
 
 		visitedMoveCounter = 0;
 
