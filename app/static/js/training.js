@@ -134,11 +134,14 @@
 
 		game.load(blunder.fenBefore);
 
+		var lastMove;
 		for (var i = 0; i <= cutter; ++i) {
 			var move = pv[i];
-			game.move(move);
+			lastMove = game.move(move);
 		}
 
+		hightlightMove(lastMove);
+		
 		board.position(game.fen());
 
 		updatePv(pv, cutMoveNumber);
