@@ -86,8 +86,8 @@
 		if (animationLocked === true ||
 			finished === true ||
 			game.game_over() === true ||
-		   (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-		   (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+		    game.turn() === firstMoveTurn) 
+		{
 				return false;
 		}
 	};
