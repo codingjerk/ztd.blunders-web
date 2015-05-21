@@ -130,6 +130,15 @@
 		board.position(game.fen());
 	};
 
+	var gotoRoot = function() {
+		$('.highlight').removeClass('highlight');
+
+		game.load(blunder.fenBefore);
+		board.position(game.fen(), false);
+
+		updatePv(getPv('active'), getPv('active').length);
+	};
+
 	var gotoMove = function(pv, cursor, cutMoveNumber) {
 		if (animationLocked === true) return;
 
@@ -169,7 +178,7 @@
 
 			var style = 'move';
 			if (i === game.history().length - 1 && multiPv.activeIndex === pv.index) {
-				style = 'move currentMove';
+				style += ' currentMove';
 			}
 			
 			if (i % 2 == 0) {
@@ -183,7 +192,7 @@
 
 			if (pv[i] !== getPv('original')[i]) {
 				NAG = "??";
-				style = 'move badMove';
+				style += ' badMove';
 			}
 
 			if (i == 0 && firstMoveTurn === 'b') {
@@ -320,12 +329,12 @@
 	});
 
 	$('#firstMove').on('click', function() {
-		gotoMove(getPv('active'), 0, getPv('active').length);
+		gotoRoot();
 	});
 
 	$('#previousMove').on('click', function() {
-		if (game.history().length <= 1) return;
-		gotoMove(getPv('active'), game.history().length - 2, getPv('active').length);
+		if (game.history().length <= 1) gotoRoot();
+		else gotoMove(getPv('active'), game.history().length - 2, getPv('active').length);
 	});
 
 	$('#nextMove').on('click', function() {
