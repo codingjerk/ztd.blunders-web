@@ -1,13 +1,15 @@
 {% extends "layout.html" %}
 
 {% block section %}
+	<h1>About</h1>
+
 	<p>We are small team working on our spare time.</p>
 
 	<p>The idea behind this project is following.
 	We are interested in quality of games, which take place between a professional chess players.
 	To do this, we downloaded more than six million official games available in public domain.
 	For each of these games, we scanned all the moves on the existence of such,
-	which does not agree with the modern chess engines. We used the strongest to date Open Source engine Stockfish.</p>
+	which does not agree with the modern chess engines. We used the strongest to date open source engine <a href='https://stockfishchess.org/'>Stockfish</a>.</p>
 	
 	<p>When engine dissagre with game variation, for more, than 2 pawns, we register this move as tactical blunder.
 	To make it more interesting, we throw away those blunders, where player can get compensation with several
@@ -15,17 +17,16 @@
 	move and continue forced variation to get maximum advantage from stuation.</p>
 
 	<p>This project is designed to be free and always will be, because this is what we
-	believe in. All source code is available on Bitbucket and you can use it the way you want. We provide API to get access
-	to our database for research and fun, but we also provide raw data we used for this service.
-	Just contact us to get information how to get it.</p>
+	believe in. All source code is available on <a href='https://bitbucket.org/ziltoidteam'>Bitbucket</a> and you can use it the way you want. We provide API to get access
+	to our database for research and fun, but we also provide raw data we used for this service.</p>
 
 	<p>The service you see is running on hardware far from being the most powerful configuration, this is due to financial reasons.
 	We use Flask as server side web framework and MongoDB to store collections of blunders and games.
 	For user logins, comments and some more, PostgreSQL database is used.</p>
 
 	<p>We have a lot of ideas to where we can extend this service, but without any support those ideas will be left unimplemented.
-	If you like our work, you can Donate us. If you want to participate in our project, please contact us.</p>
+	If you like our work, you can <a href='/donate'>donate</a> us. If you want to participate in our project, please contact us.</p>
 
-	<p>jackalsh@gmail.com</p>
-	<p>domusfree@gmail.com</p>
+	<p><a href='mailto:jackalsh@gmail.com'>jackalsh@gmail.com</a></p>
+	<p><a href='mailto:domusfree@gmail.com'>domusfree@gmail.com</a></p>
 {% endblock %}
