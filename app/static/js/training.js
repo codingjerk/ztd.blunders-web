@@ -127,7 +127,7 @@
 		board.position(game.fen());
 	};
 
-	var gotoMove = function(pv, cutter, cutMoveNumber) {
+	var gotoMove = function(pv, cursor, cutMoveNumber) {
 		if (animationLocked === true) return;
 
 		var previousPv = getPv('active');
@@ -137,7 +137,7 @@
 		game.load(blunder.fenBefore);
 
 		var lastMove;
-		for (var i = 0; i <= cutter; ++i) {
+		for (var i = 0; i <= cursor; ++i) {
 			var move = pv[i];
 			lastMove = game.move(move);
 		}
@@ -291,7 +291,17 @@
 	});
 
 	$('#flip').on('click', function(){
+		highlighted = $('.highlight');
+		squares = [];
+		for (var i = 0; i < highlighted.length; ++i) {
+			squares.push(highlighted[i].getAttribute('data-square'));
+		}
+
 		board.flip();
+
+		squares.forEach(function(square) {
+			$('#board').find('.square-' + square).addClass('highlight');
+		});
 	});
 
 	$('#getFen').on('click', function() {
@@ -308,11 +318,12 @@
 	});
 
 	$('#nextMove').on('click', function() {
+		if (game.history().length >= getPv('active').length) return;
 		gotoMove(getPv('active'), game.history().length, getPv('active').length);
 	});
 
 	$('#lastMove').on('click', function() {
-		gotoMove(getPv('active'), getPv('active').length, getPv('active').length);
+		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
 	});
 
 	$('footer>ul>li>a,nav>ul>li>a,nav>ul>li>ul>li>a').on('click', function() {
