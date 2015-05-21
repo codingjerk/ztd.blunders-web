@@ -264,6 +264,17 @@
 
 	getRandomBlunder();
 
+	function updateRating() {
+		$.ajax({
+			type: 'GET',
+			url: "http://localhost/getRating" // TODO: Remove localhost from this
+		}).done(function(data) {
+			$('#rating').html('(' + data.rating + ')');
+		});
+	}
+
+	updateRating();
+
 	$('#nextBlunder').on('click', function() {
 		getRandomBlunder();	
 	});

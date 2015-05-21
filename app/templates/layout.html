@@ -22,6 +22,24 @@
 					</ul>
 				</li>
 			</ul>
+
+			{% if 'username' in session %}
+				<ul id='user-bar'>
+					<li><a href="#"><i class="fa fa-user"></i> {{session['username']}} <span id='rating'></span></a>
+						<ul>
+							<li><a href="/"><i class="fa fa-file-text"></i> Profile</a></li>
+							<li><a href="/"><i class="fa fa-line-chart"></i> Statistics</a></li>
+							<li><a href="/logout"><i class="fa fa-sign-out"></i> Log Out</a></li>
+						</ul>
+					</li>
+				</ul>
+			{% else %}
+				<ul id='user-bar'>
+					<li><a href="/login"><i class="fa fa-sign-in"></i> Log In</a></li>
+					<li><a href="/"><i class="fa fa-user-plus"></i> Register</a></li>
+				</ul>
+			{% endif %}
+
 		</nav>
 
 		<section>{% block section %}{% endblock %}</section>

@@ -26,6 +26,11 @@ nav > ul > li > ul > li > a {
     font-size: 100%;
 }
 
+#user-bar {
+    position: absolute;
+    bottom: 0;
+}
+
 section {
     position: relative;
     left: 130px;

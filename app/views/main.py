@@ -1,13 +1,7 @@
 from datetime import datetime
+
 from flask import render_template
-
 from app import app
-from app.api import getRandomBlunder
-
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_template('training.html', title = 'Ztd.Blunders')
 
 @app.route('/faq')
 def faq():
