@@ -254,6 +254,7 @@
 	board = new ChessBoard('board', {
 		draggable: true,
 		position: 'start',
+		pieceTheme: './static/third-party/chessboardjs/img/chesspieces/wikipedia/{piece}.png',
 		moveSpeed: moveSpeed,
 		onDrop: onDrop,
 		onDragStart: onDragStart,
@@ -294,5 +295,9 @@
 
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length, getPv('active').length);
+	});
+
+	$('footer>ul>li>a,nav>ul>li>a,nav>ul>li>ul>li>a').on('click', function() {
+        return confirm('Are you sure?');
 	});
 })();

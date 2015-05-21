@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block section %}
+	<div id="help">
+		<p>
+			The player has just made a fatal mistake.
+			Play the best moves to obtain advantage.
+			There's only one winning variation wins at least 2 pawns.
+		</p>
+	</div>
+
+	<div id="blunderControls">
+		<a href="#" id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Give up</a>
+		<a href="#" id="goToGame" class="blunderControl"><i class="fa fa-trophy"></i> Go to game</a>
+	</div>
+
+	<div id="board" style="width: 400px"></div>
+
+	<div id="boardControls">
+		<table>
+			<tr>
+				<td id="status">
+					White to move
+				</td>
+				<td id="controlButtons">
+					<a href="#" id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
+					<a href="#" id="previousMove" class="control"><i class="fa fa-backward"></i></a>
+					<a href="#" id="nextMove" class="control"><i class="fa fa-forward"></i></a>
+					<a href="#" id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
+					<span class="spacer"></span>
+					<a href="#" id="flip" class="control"><i class="fa fa-retweet"></i></a>
+					<a href="#" id="getFen" class="control"><i class="fa fa-file-text"></i></a>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="moves">
+	</div>
+
+	<div id="rightMoves">
+	</div>
+{% endblock %}
+
+{% block script %}
+	<script src="static/third-party/chessboardjs/js/jquery-1.10.1.min.js"></script>
+	<script src="static/third-party/chessboardjs/js/chessboard.js"></script>
+	<script src="static/third-party/chessboardjs/js/chess.js"></script>
+	<script src='static/js/training.js'></script>
+{% endblock %}
+
+{% block style %}
+	<link rel="stylesheet" href="static/third-party/chessboardjs/css/chessboard.css">
+	<link rel="stylesheet" href="static/css/training.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+{% endblock %}

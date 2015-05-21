@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang='en-US'>
+	<head>
+		<meta charset='utf-8'/>
+		<title>{{ title }}</title>
+		<link rel="stylesheet" href="static/css/layout.css">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+		{% block style %}{% endblock %}
+	</head>
+
+	<body>
+		<nav>
+			<ul>
+				<li><a href="#"><i class="fa fa-exclamation-circle"></i> Blunders</a>
+					<ul>
+						<li><a href="/"><i class="fa fa-check"></i> Training</a></li>
+						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
+						<li><a href="#"><i class="fa fa-download"></i> Download</a></li>
+						<li><a href="#"><i class="fa fa-code"></i> API</a></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+
+		<section>{% block section %}{% endblock %}</section>
+
+		<footer>
+			<ul>
+				<li><a href="faq">FAQ</a></li>
+				<li><a href="termsOfUse">Terms of Use</a></li>
+				<li><a href="donate">Donate</a></li>
+				<li><a href="about">About</a></li>
+				<li><a href="https://bitbucket.org/ziltoidteam">Ztd on Bitbucket</a></li>
+			</ul>
+		</footer>
+
+		{% block script %}{% endblock %}
+	</body>
+</html>
