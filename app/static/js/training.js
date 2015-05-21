@@ -102,7 +102,9 @@
 
 		if (move === null) return 'snapback';
 
-		var bestMove = blunder.pv[game.history().length - 2];
+		var gameLength = game.history().length;
+
+		var bestMove = getPv(0)[gameLength - 1];
 
 		if (move.san !== bestMove) {
 			setStatus('failed');
@@ -111,12 +113,12 @@
 			return;
 		}
 
-		if (game.history().length - 1 === blunder.pv.length) {
+		if (gameLength === getPv(0).length) {
 			setStatus('finished');
 			return;
 		}
-
-		var aiAnswer = blunder.pv[game.history().length - 1];
+		
+		var aiAnswer = getPv(0)[gameLength];
 		setTimeout(function() {
 			makeMove(board, aiAnswer, true);
 			lockAnimation();
@@ -234,7 +236,7 @@
 		blunder = data;
 
 		multiPv = [];
-		multiPv.push([blunder.blunderMove].concat(blunder.pv));
+		multiPv.push([blunder.blunderMove].concat(blunder.forcedLine));
 		multiPv.activeIndex = 'user';
 
 		matches = data.fenBefore.match(/\d+/g);

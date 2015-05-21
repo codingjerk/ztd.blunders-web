@@ -6,10 +6,21 @@ from app.db import mongo
 
 @app.route('/getRandomBlunder')
 def getRandomBlunder():
-    randomIndex = random.randint(0, mongo.db['blunders'].count())
+    randomIndex = random.randrange(0, mongo.db['filtered_blunders'].count())
 
-    data = mongo.db['blunders'].find().skip(randomIndex).limit(1)[0]
-    data['_id'] = str(data['_id'])
-    data['pgn_id'] = str(data['pgn_id'])
+    data = mongo.db['filtered_blunders'].find().skip(randomIndex).limit(1)[0]
+    
+    result = {
+        'pgn_id': str(data['pgn_id']),
+        'move_index': data['move_index'],
 
-    return flask.jsonify(data)
+        'forcedLine': data['forcedLine'],
+        'pv': data['pv'],
+
+        'fenBefore': data['fenBefore'],
+        'blunderMove': data['blunderMove'],
+
+        'elo': data['elo'],
+    }
+
+    return flask.jsonify(result)
