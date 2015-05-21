@@ -265,10 +265,14 @@
 		}).done(onBlunderRequest);
 	}
 
+	function pieceTheme(piece) {
+		return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
+	}
+
 	board = new ChessBoard('board', {
 		draggable: true,
 		position: 'start',
-		pieceTheme: './static/third-party/chessboardjs/img/chesspieces/wikipedia/{piece}.png',
+		pieceTheme: pieceTheme,
 		moveSpeed: moveSpeed,
 		onDrop: onDrop,
 		onDragStart: onDragStart,
