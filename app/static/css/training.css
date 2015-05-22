@@ -98,6 +98,11 @@ td#controlButtons {
     background-color: #ededed;
 }
 
+#rating {
+    font-size: 80%;
+    vertical-align: super;
+}
+
 a.move:link {
     text-decoration: none;
     padding: 4px;

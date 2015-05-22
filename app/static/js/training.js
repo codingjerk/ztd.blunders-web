@@ -45,6 +45,22 @@
 		return result;
 	}
 
+	var onResultAprooved = function(data) {
+		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
+	}
+
+	var sendResult = function() {
+		$.ajax({
+			type: 'POST',
+			url: "http://localhost/validateBlunder", // TODO: Remove localhost from this
+			contentType: 'application/json',
+			data: JSON.stringify({
+				id: blunder.id,
+				line: getPv('user')
+			})
+		}).done(onResultAprooved);
+	}
+
 	var setStatus = function(status) {
 		if (status === 'playing') {
 			finished = false;
@@ -108,6 +124,8 @@
 		var bestMove = getPv(0)[gameLength - 1];
 
 		if (move.san !== bestMove) {
+			sendResult();
+
 			setStatus('failed');
 			updatePv(getPv('original'));
 
@@ -115,6 +133,8 @@
 		}
 
 		if (gameLength === getPv(0).length) {
+			sendResult();
+
 			setStatus('finished');
 			return;
 		}
@@ -303,6 +323,8 @@
 	updateRating();
 
 	$('#nextBlunder').on('click', function() {
+		if (!finished) sendResult();
+
 		getRandomBlunder();	
 	});
 

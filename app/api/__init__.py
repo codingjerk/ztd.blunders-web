@@ -1,1 +1,1 @@
-from app.api import getRating, getRandomBlunder
+from app.api import getRating, getRandomBlunder, validateBlunder
