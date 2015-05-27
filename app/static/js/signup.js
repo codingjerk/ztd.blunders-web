@@ -1,10 +1,16 @@
 (function() {
     function onResultAprooved(data) {
-        // @TODO
+        console.log(data)
+
+        if (data.status !== 'ok') {
+            // TODO: Show notify
+            return;
+        }
+
+        window.location.href = '/'
     }
 
     $('#submit').on('click', function() {
-        console.log($('#username').val())
         $.ajax({
             type: 'POST',
             url: "/signup",

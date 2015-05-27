@@ -9,5 +9,12 @@ def signup_get():
 
 @app.route('/signup', methods=['POST'])
 def signup_post():
-    print(request.json)
-    return jsonify({})
+    username, password, email = request.json['username'], request.json['password'], request.json['email']
+
+    status = postgre.signupUser(username, password, email)
+
+    if status['status'] == 'ok':
+        if postgre.autentithicateUser(username, password):
+            session['username'] = username
+
+    return jsonify(status)

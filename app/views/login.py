@@ -9,11 +9,8 @@ def login_get():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-    autentithicateSuccessful = postgre.autentithicateUser(request.form['username'], request.form['password'])
-
-    if autentithicateSuccessful:
+    if postgre.autentithicateUser(request.form['username'], request.form['password']):
         session['username'] = request.form['username']
-        return redirect('/')
 
     return redirect('/')
 
