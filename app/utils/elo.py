@@ -22,6 +22,4 @@ def calculate(Ra, Rb, success):
     Na = Ra + Ka * (Sa - Ea)
     Nb = Rb + Kb * (Sb - Eb)
 
-    print(Na - Ra, Nb - Rb)
-
     return round(Na), round(Nb)
