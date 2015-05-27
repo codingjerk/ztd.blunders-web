@@ -52,7 +52,7 @@
 	var sendResult = function() {
 		$.ajax({
 			type: 'POST',
-			url: "http://localhost/validateBlunder", // TODO: Remove localhost from this
+			url: "/validateBlunder",
 			contentType: 'application/json',
 			data: JSON.stringify({
 				id: blunder.id,
@@ -290,7 +290,7 @@
 	function getRandomBlunder() {
 		$.ajax({
 			type: 'GET',
-			url: "http://localhost/getRandomBlunder" // TODO: Remove localhost from this
+			url: "/getRandomBlunder"
 		}).done(onBlunderRequest);
 	}
 
@@ -314,7 +314,7 @@
 	function updateRating() {
 		$.ajax({
 			type: 'GET',
-			url: "http://localhost/getRating" // TODO: Remove localhost from this
+			url: "/getRating"
 		}).done(function(data) {
 			$('#rating').html('(' + data.rating + ')');
 		});
