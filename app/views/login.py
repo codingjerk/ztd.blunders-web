@@ -19,5 +19,7 @@ def login_post():
 
 @app.route('/logout')
 def logout():
-    del session['username']
+    if 'username' in session:
+        del session['username']
+    
     return redirect('#')
