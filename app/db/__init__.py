@@ -2,6 +2,7 @@ from bson.objectid import ObjectId
 
 from app.db import mongo, postgre
 
+# TODO: Calculate real elo
 def changeRating(username, blunder_id, success):
     data = mongo.db['filtered_blunders'].find({'_id': ObjectId(blunder_id)})
     if data.count() != 1: return

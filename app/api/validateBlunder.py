@@ -26,14 +26,12 @@ def validateBlunder():
     userLine = request.json['line']
 
     if 'username' in session:
-        # TODO: check if we have that task assigned
-
-        postgre.closeBlunderTask(session['username'], blunder_id)
+        if not postgre.closeBlunderTask(session['username'], blunder_id): return flask.jsonify({'status': 'error', 'message': ''}) # TODO: return warning to client
 
         success = compareLines(blunder_id, userLine)
 
         newElo, delta = db.changeRating(session['username'], blunder_id, success)
 
-        return flask.jsonify({'elo': newElo, 'delta': delta})
+        return flask.jsonify({'elo': newElo, 'delta': delta, 'status': 'ok'})
 
-    return flask.jsonify({})
+    return flask.jsonify({'status': 'ok'})

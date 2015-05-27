@@ -79,6 +79,8 @@ def closeBlunderTask(username, blunder_id):
             , (user_id, blunder_id)
         )
 
+        return connection.cursor.rowcount == 1
+
 def setRating(username, elo):
     user_id = getUserId(username)
 

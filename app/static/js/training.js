@@ -46,6 +46,11 @@
 	}
 
 	var onResultAprooved = function(data) {
+		if (data.status !== 'ok') {
+			updateRating();
+			return;
+		}
+
 		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
 	}
 
@@ -264,6 +269,11 @@
 	}
 
 	function onBlunderRequest(data) {
+		if (data.status !== 'ok') {
+			// TODO: Show warning!
+			return;
+		}
+			
 		setStatus('playing');
 
 		blunder = data;
@@ -316,6 +326,11 @@
 			type: 'GET',
 			url: "/getRating"
 		}).done(function(data) {
+			if (data.status !== 'ok') {
+				// TODO: Show warning!
+				return;
+			}
+
 			$('#rating').html('(' + data.rating + ')');
 		});
 	}
