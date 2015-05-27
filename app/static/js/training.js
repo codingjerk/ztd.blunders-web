@@ -367,8 +367,4 @@
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
 	});
-
-	$('footer>ul>li>a,nav>ul>li>a,nav>ul>li>ul>li>a').on('click', function() {
-        return confirm('Are you sure?');
-	});
 })();
