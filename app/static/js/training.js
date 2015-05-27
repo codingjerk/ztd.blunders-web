@@ -46,6 +46,11 @@
 	}
 
 	var onResultAprooved = function(data) {
+		if (data.status !== 'ok') {
+			updateRating();
+			return;
+		}
+
 		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
 	}
 
@@ -264,6 +269,11 @@
 	}
 
 	function onBlunderRequest(data) {
+		if (data.status !== 'ok') {
+			// TODO: Show warning!
+			return;
+		}
+			
 		setStatus('playing');
 
 		blunder = data;
@@ -316,6 +326,11 @@
 			type: 'GET',
 			url: "/getRating"
 		}).done(function(data) {
+			if (data.status !== 'ok') {
+				// TODO: Show warning!
+				return;
+			}
+
 			$('#rating').html('(' + data.rating + ')');
 		});
 	}
@@ -366,9 +381,5 @@
 
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
-	});
-
-	$('footer>ul>li>a,nav>ul>li>a,nav>ul>li>ul>li>a').on('click', function() {
-        return confirm('Are you sure?');
 	});
 })();

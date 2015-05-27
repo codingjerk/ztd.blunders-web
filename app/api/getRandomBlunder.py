@@ -39,4 +39,7 @@ def getRandomBlunder():
     if blunder is None:
         blunder = newBlunder()
 
-    return flask.jsonify(jsonifyBlunder(blunder))
+    data = jsonifyBlunder(blunder)
+    data['status'] = 'ok'
+
+    return flask.jsonify(data)
