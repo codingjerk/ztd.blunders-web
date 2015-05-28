@@ -52,11 +52,12 @@
 		}
 
 		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
+		
+		getBlunderInfo(blunder.id);
+		if (finished) showComments();
 	}
 
 	var sendResult = function() {
-		if (finished) showComments();
-
 		$.ajax({
 			type: 'POST',
 			url: "/validateBlunder",
@@ -326,6 +327,12 @@
 		}
 	}
 
+	function commentOnReply(comment_id) {
+		return function() {
+			console.log('Replying on ', comment_id);
+		}
+	}
+
 	function commentBuilder(data, comments) {
 		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		const body = '<div class="comment-body">{2}</div>';
@@ -350,7 +357,7 @@
 
 		const comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
 
-		const replyButton = '<a href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>';
+		const replyButton = '<a id="comment-reply-button-{0}" href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
 
 		const subcommentsData = buildCommentReplies(comments, data.id);
 
@@ -364,24 +371,25 @@
 			$('#favorite-icon').removeClass('fa-star').addClass('fa-star-o').removeClass('active-star-icon');
 		}
 
-		$('#favorites').html(data.favorites)
-		$('#likes').html(data.likes)
-		$('#dislikes').html(data.dislikes)
+		$('#favorites').html(data.favorites);
+		$('#likes').html(data.likes);
+		$('#dislikes').html(data.dislikes);
 
-		const successRate = data.successTries * 100 / data.totalTries
+		const successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
 
-		$('#blunder-rating').html(data.elo)
-		$('#success-played').html(data.successTries)
-		$('#total-played').html(data.totalTries)
-		$('#success-rate').html(successRate.toFixed(2))
+		$('#blunder-rating').html(data.elo);
+		$('#success-played').html(data.successTries);
+		$('#total-played').html(data.totalTries);
+		$('#success-rate').html(successRate.toFixed(2));
 
-		const htmlData = buildCommentReplies(data.comments, 0)
+		const htmlData = buildCommentReplies(data.comments, 0);
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
 
 		data.comments.forEach(function(comment) {
 			$('#comment-like-button-' + comment.id).on('click', commentOnLike(comment.id));
 			$('#comment-dislike-button-' + comment.id).on('click', commentOnDislike(comment.id));
+			$('#comment-reply-button-' + comment.id).on('click', commentOnReply(comment.id));
 		});
 	}
 

@@ -26,8 +26,7 @@ def getBlunderInfo():
 
     elo = blunder['elo']
 
-    totalTries = random.randint(0, 1000) # TODO: get from postgre
-    successTries = int(totalTries / 3)
+    successTries, totalTries = postgre.getTries(blunder_id)
 
     comments = [{
         'id': 1,
@@ -47,11 +46,10 @@ def getBlunderInfo():
         'text': 'NOOOOOOO! THIS POSITION IS VERY BAD!!!',
     }] # TODO: get comments
 
-    myFavorite = random.randint(0, 100) > 90
-
-    favorites = random.randint(0, 100)
-    likes = random.randint(0, 100)
-    dislikes = random.randint(0, 100)
+    comments += postgre.getBlunderComments(blunder_id)
+    myFavorite = postgre.myFavorite(session.username(), blunder_id)
+    favorites = postgre.getBlunderPopularity(blunder_id)
+    likes, dislikes = postgre.getBlunderVotes(blunder_id)
     
     return jsonify({
         'status': 'ok',

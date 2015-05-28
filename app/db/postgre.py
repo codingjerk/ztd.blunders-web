@@ -83,6 +83,8 @@ def assignBlunderTask(username, blunder_id):
         )
 
 def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
+    print('SAVING HISTORY')
+
     if username is None: 
         raise Exception('postre.setRating for anonim')
 
@@ -157,3 +159,36 @@ def signupUser(username, salt, hash, email):
         if not success: return {'status': 'error', 'message': "Unable to register user"}
 
     return {'status': 'ok'}
+
+def getTries(blunder_id):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_history where blunder_id = %s;'
+            , (blunder_id,)
+        )
+
+        total = connection.cursor.rowcount
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_history where blunder_id = %s AND result = 1;'
+            , (blunder_id,)
+        )
+
+        success = connection.cursor.rowcount
+
+    return success, total
+
+def getBlunderComments(blunder_id):
+    return []
+
+def myFavorite(username, blunder_id):
+    if username is None: return False
+
+    return True
+
+def getBlunderPopularity(blunder_id):
+    return 0
+
+def getBlunderVotes(blunder_id):
+    return 12, 15
