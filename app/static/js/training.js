@@ -314,6 +314,18 @@
 		return result;
 	}
 
+	function commentOnLike(comment_id) {
+		return function() {
+			console.log('Liking comment ', comment_id);
+		}
+	}
+
+	function commentOnDislike(comment_id) {
+		return function() {
+			console.log('Disliking comment ', comment_id);
+		}
+	}
+
 	function commentBuilder(data, comments) {
 		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		const body = '<div class="comment-body">{2}</div>';
@@ -366,6 +378,11 @@
 		const htmlData = buildCommentReplies(data.comments, 0)
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
+
+		data.comments.forEach(function(comment) {
+			$('#comment-like-button-' + comment.id).on('click', commentOnLike(comment.id));
+			$('#comment-dislike-button-' + comment.id).on('click', commentOnDislike(comment.id));
+		});
 	}
 
 	function getRandomBlunder() {
