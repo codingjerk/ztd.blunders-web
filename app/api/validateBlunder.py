@@ -31,6 +31,10 @@ def validateBlunder():
         })
 
     success = compareLines(blunder_id, userLine)
+
+    blunder = mongo.getBlunderById(blunder_id)
+    postgre.saveBlunderHistory(session.username(), blunder_id, blunder['elo'], success, userLine)
+
     newElo, delta = db.changeRating(session.username(), blunder_id, success)
 
     return flask.jsonify({

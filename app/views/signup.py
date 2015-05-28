@@ -1,7 +1,8 @@
-from flask import render_template, request, redirect, session, jsonify
-from app import app
+from flask import render_template, request, redirect, jsonify
 
+from app import app
 from app.db import postgre
+from app.utils import hash, session
 
 @app.route('/signup', methods=['GET'])
 def signup_get():
@@ -11,10 +12,10 @@ def signup_get():
 def signup_post():
     username, password, email = request.json['username'], request.json['password'], request.json['email']
 
-    status = postgre.signupUser(username, password, email)
+    salt, hashPass = hash.new(username, password)
+    status = postgre.signupUser(username, salt, hashPass, email)
 
     if status['status'] == 'ok':
-        if postgre.autentithicateUser(username, password):
-            session['username'] = username
+        session.authorize(username, password)
 
     return jsonify(status)

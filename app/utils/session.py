@@ -1,5 +1,6 @@
 from flask import session
 
+from app.db import postgre
 from app.utils import hash
 
 def isAnonymous():

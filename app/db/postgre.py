@@ -82,6 +82,22 @@ def assignBlunderTask(username, blunder_id):
             , (user_id, blunder_id)
         )
 
+def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
+    if username is None: 
+        raise Exception('postre.setRating for anonim')
+
+    user_id = getUserId(username)
+    user_elo = getRating(username)
+    result = 1 if success else 0
+
+    if success: userLine = ''
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line) VALUES (%s, %s, %s, %s, %s, %s);'
+            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
+        )
+
 def closeBlunderTask(username, blunder_id):
     if username is None: return
 
@@ -123,15 +139,15 @@ def getAssignedBlunder(username):
 
         return blunder_id[0]
 
-def signupUser(username, password, email):
+def signupUser(username, salt, hash, email):
     # TODO: Validation
     if len(username) < 3: return {'status': 'error', 'field': 'username', 'message': "Username is too short"}
 
     with PostgreConnection('w') as connection:
         try:
             connection.cursor.execute(
-                'INSERT INTO users (username, password, role, email, registration, last_login) VALUES (%s, %s, %s, %s, NOW(), NOW());'
-                , (username, password, USER_ROLE, email)
+                'INSERT INTO users (username, salt, password, role, email, registration, last_login) VALUES (%s, %s, %s, %s, %s, NOW(), NOW());'
+                , (username, salt, hash, USER_ROLE, email)
             )
         except psycopg2.IntegrityError as e:
             return {'status': 'error', 'field': 'username', 'message': 'Already registered'}
