@@ -1,45 +1,63 @@
 {% extends "layout.html" %}
 
 {% block section %}
-	<div id="help">
-		<p>
-			The player has just made a fatal mistake.
-			Play the best moves to obtain advantage.
-			There's only one winning variation wins at least 2 pawns.
-		</p>
-	</div>
+	<span id='main-block'>
+		<div id="help">
+			<p>
+				The player has just made a fatal mistake.
+				Play the best moves to obtain advantage.
+				There's only one winning variation wins at least 2 pawns.
+			</p>
+		</div>
 
-	<div id="blunderControls">
-		<a href="#" id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Give up</a>
-		<a href="#" id="goToGame" class="blunderControl"><i class="fa fa-trophy"></i> Go to game</a>
-	</div>
+		<div id="blunderControls">
+			<table>
+				<tr>
+					<td id='blunderControls'>
+						<a href="#" id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Give up</a>
+					</td>
+					<td id='ratingControls'>
+						<a href="#" id="dislikeButton"><i class="fa fa-thumbs-down"></i> <span id="dislikes">0</span></a>
+						<a href="#" id="likeButton"><i class="fa fa-thumbs-up"></i> <span id="likes">0</span></a>
+						<a href="#" id="favoriteButton"><i id="favorite-icon" class="fa fa-star-o"></i> <span id="favorites">0</span></a>
+					</td>
+				</tr>
+			</table>
+		</div>
 
-	<div id="board" style="width: 400px"></div>
+		<div id="board" style="width: 400px"></div>
 
-	<div id="boardControls">
-		<table>
-			<tr>
-				<td id="status">
-					White to move
-				</td>
-				<td id="controlButtons">
-					<a href="#" id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
-					<a href="#" id="previousMove" class="control"><i class="fa fa-backward"></i></a>
-					<a href="#" id="nextMove" class="control"><i class="fa fa-forward"></i></a>
-					<a href="#" id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
-					<span class="spacer"></span>
-					<a href="#" id="flip" class="control"><i class="fa fa-retweet"></i></a>
-					<a href="#" id="getFen" class="control"><i class="fa fa-file-text"></i></a>
-				</td>
-			</tr>
-		</table>
-	</div>
+		<div id="boardControls">
+			<table>
+				<tr>
+					<td id="status">
+						White to move
+					</td>
+					<td id="controlButtons">
+						<a href="#" id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
+						<a href="#" id="previousMove" class="control"><i class="fa fa-backward"></i></a>
+						<a href="#" id="nextMove" class="control"><i class="fa fa-forward"></i></a>
+						<a href="#" id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
+						<span class="spacer"></span>
+						<a href="#" id="flip" class="control"><i class="fa fa-retweet"></i></a>
+						<a href="#" id="getFen" class="control"><i class="fa fa-file-text"></i></a>
+					</td>
+				</tr>
+			</table>
+		</div>
 
-	<div id="moves">
-	</div>
+		<div id="moves">
+		</div>
 
-	<div id="rightMoves">
-	</div>
+		<div id="rightMoves">
+		</div>
+	</span>
+	<span id='info-block'>
+		<div id="blunder-rating-container"><span class="bold">Rating:</span> <span id='blunder-rating'>0</span></div>
+		<div id="blunder-success-rate-container"><span class="bold">Success rate:</span> <span id='success-played'>0</span>/<span id='total-played'>0</span> (<span id='success-rate'>0</span>%)</div>
+		<a id='comments-spoiler' href="#" class='bold'><span id='comments-label'>Comments (<span id='comments-counter'>0</span>)</span> <i id='comments-icon' class="fa fa-angle-down"></i></a><br/>
+		<ul id="comments"></ul>
+	</span>
 {% endblock %}
 
 {% block script %}

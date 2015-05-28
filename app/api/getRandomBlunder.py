@@ -10,7 +10,7 @@ def newBlunder():
     postgre.assignBlunderTask(session.username(), str(blunder['_id']))
     return blunder
 
-@app.route('/getRandomBlunder')
+@app.route('/getRandomBlunder', methods = ['POST'])
 def getRandomBlunder():
     blunder = db.getAssignedBlunder(session.username())
 

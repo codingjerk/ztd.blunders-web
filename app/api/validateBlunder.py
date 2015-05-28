@@ -1,8 +1,7 @@
 import random
 import json
 
-import flask
-from flask import request
+from flask import request, jsonify
 
 from app import app, db
 from app.db import mongo, postgre
@@ -19,13 +18,19 @@ def compareLines(blunder_id, userLine):
 
 @app.route('/validateBlunder', methods = ['POST'])
 def validateBlunder():
-    blunder_id = request.json['id']
-    userLine = request.json['line']
+    try:
+        blunder_id = request.json['id']
+        userLine = request.json['line']
+    except:
+        return jsonify({
+            'status': 'error',
+            'message': 'Blunder id and user line required'
+        })
 
-    if session.isAnonymous(): return flask.jsonify({'status': 'ok'})
+    if session.isAnonymous(): return jsonify({'status': 'ok'})
 
     if not postgre.closeBlunderTask(session.username(), blunder_id): 
-        return flask.jsonify({
+        return jsonify({
             'status': 'error', 
             'message': ''  # TODO: return warning to client
         })
@@ -37,7 +42,7 @@ def validateBlunder():
 
     newElo, delta = db.changeRating(session.username(), blunder_id, success)
 
-    return flask.jsonify({
+    return jsonify({
         'status': 'ok',
         'elo': newElo, 
         'delta': delta

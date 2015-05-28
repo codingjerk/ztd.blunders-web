@@ -55,6 +55,8 @@
 	}
 
 	var sendResult = function() {
+		if (finished) showComments();
+
 		$.ajax({
 			type: 'POST',
 			url: "/validateBlunder",
@@ -273,10 +275,13 @@
 			// TODO: Show warning!
 			return;
 		}
-			
-		setStatus('playing');
 
 		blunder = data;
+
+		hideComments();
+		getBlunderInfo(blunder.id);
+			
+		setStatus('playing');
 
 		multiPv = [];
 		multiPv.push([blunder.blunderMove].concat(blunder.forcedLine));
@@ -297,11 +302,88 @@
 		makeMove(board, data.blunderMove, true);
 	}
 
+	function buildCommentReplies(comments, parent_id) {
+		var result = '';
+
+		comments.forEach(function(c) {
+			if (c.parent_id === parent_id) {
+				result += commentBuilder(c, comments);
+			}
+		});
+
+		return result;
+	}
+
+	function commentBuilder(data, comments) {
+		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
+		const body = '<div class="comment-body">{2}</div>';
+		const controls = '<div class="comment-controls">{3} {4}</div>';
+		const subcomments = '<ul class="comment-responses">{5}</ul>';
+
+		const likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
+		const dislikeButton = '<a href="#" class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
+		
+		const votesCount = data.likes - data.dislikes;
+
+		var votesClass = "";
+		if (votesCount > 0) {
+			votesClass = 'green';
+		} else if (votesCount < 0) {
+			votesClass = 'red';
+		}
+
+		const voteData = '<span class="{0}">{1}</span>'.format(votesClass, votesCount);
+
+		const commentRating = '<span class="comment-rating">{0} {1} {2}</span>'.format(dislikeButton, voteData, likeButton);
+
+		const comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
+
+		const replyButton = '<a href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>';
+
+		const subcommentsData = buildCommentReplies(comments, data.id);
+
+		return comment.format(data.username, data.date, data.text, replyButton, commentRating, subcommentsData);
+	}
+
+	function onInfoRequest(data) {
+		if (data.myFavorite) {
+			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
+		} else {
+			$('#favorite-icon').removeClass('fa-star').addClass('fa-star-o').removeClass('active-star-icon');
+		}
+
+		$('#favorites').html(data.favorites)
+		$('#likes').html(data.likes)
+		$('#dislikes').html(data.dislikes)
+
+		const successRate = data.successTries * 100 / data.totalTries
+
+		$('#blunder-rating').html(data.elo)
+		$('#success-played').html(data.successTries)
+		$('#total-played').html(data.totalTries)
+		$('#success-rate').html(successRate.toFixed(2))
+
+		const htmlData = buildCommentReplies(data.comments, 0)
+		$('#comments').html(htmlData);
+		$('#comments-counter').html(data.comments.length);
+	}
+
 	function getRandomBlunder() {
 		$.ajax({
-			type: 'GET',
+			type: 'POST',
 			url: "/getRandomBlunder"
 		}).done(onBlunderRequest);
+	}
+
+	function getBlunderInfo(blunder_id) {
+		$.ajax({
+			type: 'POST',
+			url: "/getBlunderInfo",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id
+			})
+		}).done(onInfoRequest);		
 	}
 
 	function pieceTheme(piece) {
@@ -381,5 +463,26 @@
 
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
+	});
+
+	function showComments() {
+		$('#comments').removeClass('hidden').addClass('visible');
+		$('#comments-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+	}
+
+	function hideComments() {
+		$('#comments').removeClass('visible').addClass('hidden');
+		$('#comments-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+	}
+
+	function switchComments() {
+		if ($('#comments').hasClass('hidden'))
+			showComments();
+		else
+			hideComments();
+	}
+
+	$('#comments-spoiler').on('click', function() {
+		switchComments();
 	});
 })();
