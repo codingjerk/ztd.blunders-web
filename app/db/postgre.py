@@ -1,5 +1,7 @@
 import psycopg2
 
+USER_ROLE = 3
+
 class PostgreConnection:
     def __init__(self, type):
         self.type = type
@@ -120,3 +122,22 @@ def getAssignedBlunder(username):
         if blunder_id is None: return None
 
         return blunder_id[0]
+
+def signupUser(username, password, email):
+    # TODO: Validation
+    if len(username) < 3: return {'status': 'error', 'field': 'username', 'message': "Username is too short"}
+
+    with PostgreConnection('w') as connection:
+        try:
+            connection.cursor.execute(
+                'INSERT INTO users (username, password, role, email, registration, last_login) VALUES (%s, %s, %s, %s, NOW(), NOW());'
+                , (username, password, USER_ROLE, email)
+            )
+        except psycopg2.IntegrityError as e:
+            return {'status': 'error', 'field': 'username', 'message': 'Already registered'}
+
+        success = (connection.cursor.rowcount == 1)
+
+        if not success: return {'status': 'error', 'message': "Unable to register user"}
+
+    return {'status': 'ok'}
