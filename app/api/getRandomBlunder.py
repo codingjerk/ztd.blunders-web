@@ -1,45 +1,21 @@
-import random
-
-import flask
-from flask import session
+from flask import jsonify
 
 from app import app, db
-from app.db import mongo
-from app.db import postgre
-
-def jsonifyBlunder(data):
-    return {
-        'id': str(data['_id']),
-        'pgn_id': str(data['pgn_id']),
-        'move_index': data['move_index'],
-
-        'forcedLine': data['forcedLine'],
-        'pv': data['pv'],
-
-        'fenBefore': data['fenBefore'],
-        'blunderMove': data['blunderMove'],
-
-        'elo': data['elo'],
-    }
+from app.db import mongo, postgre
+from app import utils
+from app.utils import session
 
 def newBlunder():
-    randomIndex = random.randrange(0, mongo.db['filtered_blunders'].count())
-
-    data = mongo.db['filtered_blunders'].find().skip(randomIndex).limit(1)[0]
-
-    if 'username' in session:
-        postgre.assignBlunderTask(session['username'], str(data['_id']))
-
-    return data
+    blunder = mongo.randomBlunder()
+    postgre.assignBlunderTask(session.username(), str(blunder['_id']))
+    return blunder
 
 @app.route('/getRandomBlunder')
 def getRandomBlunder():
-    blunder = db.getAssignedBlunder(session['username'] if 'username' in session else None)
+    blunder = db.getAssignedBlunder(session.username())
 
     if blunder is None:
         blunder = newBlunder()
 
-    data = jsonifyBlunder(blunder)
-    data['status'] = 'ok'
-
-    return flask.jsonify(data)
+    data = utils.jsonifyBlunder(blunder)
+    return jsonify(data)

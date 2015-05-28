@@ -21,11 +21,13 @@ class PostgreConnection:
         self.cursor.close()
         self.connection.close()
 
-def autentithicateUser(username, password):
+def autentithicateUser(username, hash):
+    if username is None: return False
+
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
             'SELECT * from users WHERE username = %s AND password = %s;'
-            , (username, password)
+            , (username, hash)
         )
 
         users = connection.cursor.fetchall()
@@ -41,27 +43,35 @@ def autentithicateUser(username, password):
 
     return success
 
-def getRating(username):
+def getUserField(username, field):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT elo from users WHERE username = %s;'
-            , (username,)
-        )
-
-        elo = connection.cursor.fetchone()
-
-        return elo[0]
-
-def getUserId(username):
-    with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            'SELECT id from users WHERE username = %s;'
+            'SELECT ' + field + ' from users WHERE username = %s;'
             , (username,)
         )
 
         return connection.cursor.fetchone()[0]
 
+def getRating(username):
+    if username is None: return 0
+
+    return getUserField(username, 'elo')
+
+def getSalt(username):
+    if username is None:
+        raise Exception('Getting salt for None user!')
+
+    return getUserField(username, 'salt')
+
+def getUserId(username):
+    if username is None: 
+        raise Exception('postre.getUserId for anonim')
+
+    return getUserField(username, 'id')
+
 def assignBlunderTask(username, blunder_id):
+    if username is None: return
+
     user_id = getUserId(username)
 
     with PostgreConnection('w') as connection:
@@ -71,6 +81,8 @@ def assignBlunderTask(username, blunder_id):
         )
 
 def closeBlunderTask(username, blunder_id):
+    if username is None: return
+
     user_id = getUserId(username)
 
     with PostgreConnection('w') as connection:
@@ -82,6 +94,9 @@ def closeBlunderTask(username, blunder_id):
         return connection.cursor.rowcount == 1
 
 def setRating(username, elo):
+    if username is None: 
+        raise Exception('postre.setRating for anonim')
+
     user_id = getUserId(username)
 
     with PostgreConnection('w') as connection:
@@ -91,6 +106,8 @@ def setRating(username, elo):
         )
 
 def getAssignedBlunder(username):
+    if username is None: return None
+
     user_id = getUserId(username)
 
     with PostgreConnection('r') as connection:

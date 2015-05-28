@@ -1,11 +1,12 @@
 import flask
-from flask import session
 
 from app import app
 from app.db import postgre
+from app.utils import session
 
 @app.route('/getRating')
 def getRating():
-    rating = postgre.getRating(session['username']) if 'username' in session else 0
-
-    return flask.jsonify({'rating': rating, 'status': 'ok'})
+    return flask.jsonify({
+        'status': 'ok',
+        'rating': postgre.getRating(session.username())
+    })

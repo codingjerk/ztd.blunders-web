@@ -1,12 +1,11 @@
-from bson.objectid import ObjectId 
-
 from app.db import mongo, postgre
 
 # TODO: Calculate real elo
 def changeRating(username, blunder_id, success):
-    data = mongo.db['filtered_blunders'].find({'_id': ObjectId(blunder_id)})
-    if data.count() != 1: return
-    blunder = data[0]
+    if username is None: return
+
+    blunder = mongo.getBlunderById(blunder_id)
+    if blunder is None: return
 
     blunder_elo = blunder['elo']
     user_elo = postgre.getRating(username)
@@ -17,7 +16,7 @@ def changeRating(username, blunder_id, success):
     newBlunderElo = blunder_elo - delta
 
     postgre.setRating(username, newUserElo)
-    mongo.db['filtered_blunders'].update({'_id': ObjectId(blunder_id)}, {'$set': {'elo': newBlunderElo}})
+    mongo.setRating(blunder_id, newBlunderElo)
 
     return newUserElo, delta
 
@@ -28,8 +27,4 @@ def getAssignedBlunder(username):
 
     if blunder_id is None: return None
 
-    data = mongo.db['filtered_blunders'].find({'_id': ObjectId(blunder_id)})
-
-    if data.count() != 1: return None
-
-    return data[0]
+    return mongo.getBlunderById(blunder_id)
