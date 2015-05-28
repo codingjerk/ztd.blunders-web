@@ -12,7 +12,7 @@ def main():
     db = mongo['chessdb']
 
 def randomBlunder():
-    randomIndex = random.randrange(1, 2)#db['filtered_blunders'].count())
+    randomIndex = random.randrange(0, db['filtered_blunders'].count())
 
     return db['filtered_blunders'].find().skip(randomIndex).limit(1)[0]
 

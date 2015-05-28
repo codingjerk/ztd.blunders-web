@@ -83,8 +83,6 @@ def assignBlunderTask(username, blunder_id):
         )
 
 def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
-    print('SAVING HISTORY')
-
     if username is None: 
         raise Exception('postre.setRating for anonim')
 
@@ -185,10 +183,45 @@ def getBlunderComments(blunder_id):
 def myFavorite(username, blunder_id):
     if username is None: return False
 
-    return True
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_favorites where blunder_id = %s and user_id = %s;'
+            , (blunder_id, user_id)
+        )
+
+        if connection.cursor.rowcount == 1:
+            return True
+        elif connection.cursor.rowcount == 0:
+            return False
+
+    raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
 
 def getBlunderPopularity(blunder_id):
-    return 0
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_favorites where blunder_id = %s;'
+            , (blunder_id,)
+        )
+
+        return connection.cursor.rowcount
 
 def getBlunderVotes(blunder_id):
-    return 12, 15
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_votes where blunder_id = %s and vote = 1;'
+            , (blunder_id,)
+        )
+
+        likes = connection.cursor.rowcount
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_votes where blunder_id = %s AND vote = -1;'
+            , (blunder_id,)
+        )
+
+        dislikes = connection.cursor.rowcount
+
+    return likes, dislikes
