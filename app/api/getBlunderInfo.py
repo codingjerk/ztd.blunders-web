@@ -19,25 +19,7 @@ def getBlunderInfoById(blunder_id):
 
     successTries, totalTries = postgre.getTries(blunder_id)
 
-    comments = [{
-        'id': 1,
-        'likes': 10,
-        'dislikes': 1,
-        'date': 'yesterday',
-        'parent_id': 0,
-        'username': 'JackalSh',
-        'text': 'This position is the best i saw ever!',
-    },{
-        'id': 2,
-        'likes': 1,
-        'dislikes': 6,
-        'date': 'yesterday',
-        'parent_id': 1,
-        'username': 'Failuref',
-        'text': 'NOOOOOOO! THIS POSITION IS VERY BAD!!!',
-    }] # TODO: get comments
-
-    comments += postgre.getBlunderComments(blunder_id)
+    comments = postgre.getBlunderComments(blunder_id)
     myFavorite = postgre.myFavorite(session.username(), blunder_id)
     favorites = postgre.getBlunderPopularity(blunder_id)
     likes, dislikes = postgre.getBlunderVotes(blunder_id)

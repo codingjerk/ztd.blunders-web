@@ -71,6 +71,18 @@ def getUserId(username):
 
     return getUserField(username, 'id')
 
+def getUsernameById(user_id):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT username from users WHERE id = %s;'
+            , (user_id,)
+        )
+
+        result = connection.cursor.fetchone()
+        if result is None: raise Exception('User with id %d is not exist' % user_id)
+
+        return result[0]
+
 def assignBlunderTask(username, blunder_id):
     if username is None: return
 
@@ -178,7 +190,35 @@ def getTries(blunder_id):
     return success, total
 
 def getBlunderComments(blunder_id):
-    return []
+    result = []
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT id, date, parent_id, user_id, comment from blunder_comments WHERE blunder_id = %s'
+            , (blunder_id,)
+        )
+
+        comments = connection.cursor.fetchall()
+
+        for comment in comments:
+            comment_id, date, parent_id, user_id, text = comment
+            username = getUsernameById(user_id) 
+            likes, dislikes = getBlunderCommentVotes(comment_id)
+
+            pythonComment = {
+                'id': comment_id,
+                'date': date,
+                'parent_id': parent_id,
+                'username': username,
+                'text': text,
+
+                'likes': likes,
+                'dislikes': dislikes,
+            }
+
+            result.append(pythonComment)
+
+    return result
 
 def myFavorite(username, blunder_id):
     if username is None: return False
@@ -220,6 +260,27 @@ def getBlunderVotes(blunder_id):
         connection.cursor.execute(
             'SELECT * from blunder_votes where blunder_id = %s AND vote = -1;'
             , (blunder_id,)
+        )
+
+        dislikes = connection.cursor.rowcount
+
+    return likes, dislikes
+
+def getBlunderCommentVotes(comment_id):
+    if comment_id == 0: raise Exception('Getting votes for root comment')
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_comments_votes where comment_id = %s and vote = 1;'
+            , (comment_id,)
+        )
+
+        likes = connection.cursor.rowcount
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT * from blunder_comments_votes where comment_id = %s and vote = -1;'
+            , (comment_id,)
         )
 
         dislikes = connection.cursor.rowcount
@@ -281,5 +342,31 @@ def favoriteBlunder(username, blunder_id):
 
         if connection.cursor.rowcount != 1:
             raise Exception('Error inserting favorite for user %s with blunder id %s' % (username, blunder_id))
+
+    return True
+
+def commentBlunder(username, blunder_id, parent_id, user_input):
+    if username is None: return False
+
+    user_id = getUserId(username)
+
+    if parent_id != 0:
+        with PostgreConnection('r') as connection:
+            connection.cursor.execute(
+                'SELECT * from blunder_comments where id = %s AND blunder_id = %s;'
+                , (parent_id, blunder_id)
+            )
+
+            if connection.cursor.rowcount != 1:
+                raise Exception('Adding reply to not existing comment')
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'INSERT INTO blunder_comments(user_id, blunder_id, parent_id, comment) VALUES (%s, %s, %s, %s);'
+            , (user_id, blunder_id, parent_id, user_input)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Can\'t insert comment')
 
     return True

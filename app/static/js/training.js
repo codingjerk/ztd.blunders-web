@@ -330,13 +330,36 @@
 	function commentOnReply(comment_id) {
 		return function() {
 			console.log('Replying on ', comment_id);
+
+			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-thumbs-up"></i> Submit</a>'
+				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-thumbs-up"></i> Cancel</a>'
+
+			editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
+
+			controls = '#comment-controls-' + comment_id;
+			userinput = '#comment-user-input-' + comment_id;
+
+			$(controls).css('visibility', 'hidden');
+			$(userinput).html(editField);
+
+			function closeReplyField() {
+				$(controls).css('visibility', 'visible');
+				$(userinput).html('');
+			}
+
+			$(userinput + '>.cancel-comment-button').on('click', closeReplyField);
+
+			$(userinput + '>.submit-comment-button').on('click', function() {
+				sendComment(blunder.id, comment_id, $(userinput + '>div>textarea').val());
+				closeReplyField();
+			});
 		}
 	}
 
 	function commentBuilder(data, comments) {
 		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		const body = '<div class="comment-body">{2}</div>';
-		const controls = '<div class="comment-controls">{3} {4}</div>';
+		const controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
 		const subcomments = '<ul class="comment-responses">{5}</ul>';
 
 		const likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
@@ -387,9 +410,14 @@
 		$('#total-played').html(data.totalTries);
 		$('#success-rate').html(successRate.toFixed(2));
 
-		const htmlData = buildCommentReplies(data.comments, 0);
+		const rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
+		const rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
+
+		const htmlData = rootControls + buildCommentReplies(data.comments, 0);
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
+
+		$('#comment-reply-button-0').on('click', commentOnReply(0));
 
 		data.comments.forEach(function(comment) {
 			$('#comment-like-button-' + comment.id).on('click', commentOnLike(comment.id));
@@ -435,6 +463,19 @@
 			contentType: 'application/json',
 			data: JSON.stringify({
 				blunder_id: blunder_id
+			})
+		}).done(onInfoRequest);
+	}
+
+	function sendComment(blunder_id, comment_id, text) {
+		$.ajax({
+			type: 'POST',
+			url: "/commentBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				comment_id: comment_id,
+				user_input: text
 			})
 		}).done(onInfoRequest);
 	}
