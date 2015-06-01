@@ -225,3 +225,61 @@ def getBlunderVotes(blunder_id):
         dislikes = connection.cursor.rowcount
 
     return likes, dislikes
+
+def voteBlunder(username, blunder_id, vote):
+    if username is None: return False
+
+    user_id = getUserId(username)
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'UPDATE blunder_votes SET vote = %s WHERE blunder_id = %s AND user_id = %s;'
+            , (vote, blunder_id, user_id)
+        )
+
+        count = connection.cursor.rowcount 
+
+        if count > 1:
+            raise Exception('Duplicate votes for user %s with blunder id %s' % (username, blunder_id))
+        elif count == 1:
+            return True
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'INSERT INTO blunder_votes(user_id, blunder_id, vote) VALUES (%s, %s, %s);'
+            , (user_id, blunder_id, vote)
+        )
+
+        if connection.cursor.rowcount != 1: 
+            raise Exception('Can not add vote for user %s with blunder id %s' % (username, blunder_id))
+
+    return True
+
+def favoriteBlunder(username, blunder_id):
+    if username is None: return False
+
+    user_id = getUserId(username)
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'DELETE FROM blunder_favorites WHERE blunder_id = %s AND user_id = %s;'
+            , (blunder_id, user_id)
+        )
+
+        count = connection.cursor.rowcount
+
+        if count > 1:
+            raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
+        elif count == 1:
+            return True
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'INSERT INTO blunder_favorites(user_id, blunder_id) VALUES (%s,%s);'
+            , (user_id, blunder_id)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Error inserting favorite for user %s with blunder id %s' % (username, blunder_id))
+
+    return True

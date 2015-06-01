@@ -365,6 +365,11 @@
 	}
 
 	function onInfoRequest(data) {
+		if (data.status === 'error') {
+			// @TODO: Show Notifiy.Js
+			return
+		}
+
 		if (data.myFavorite) {
 			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
 		} else {
@@ -409,6 +414,29 @@
 				blunder_id: blunder_id
 			})
 		}).done(onInfoRequest);		
+	}
+
+	function voteBlunder(blunder_id, vote) {
+		$.ajax({
+			type: 'POST',
+			url: "/voteBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				vote: vote
+			})
+		}).done(onInfoRequest);
+	}
+
+	function favoriteBlunder(blunder_id) {
+		$.ajax({
+			type: 'POST',
+			url: "/favoriteBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id
+			})
+		}).done(onInfoRequest);
 	}
 
 	function pieceTheme(piece) {
@@ -510,4 +538,17 @@
 	$('#comments-spoiler').on('click', function() {
 		switchComments();
 	});
+
+	$('#likeButton').on('click', function() {
+		voteBlunder(blunder.id, 1);
+	});
+
+	$('#dislikeButton').on('click', function() {
+		voteBlunder(blunder.id, -1);
+	});
+
+	$('#favoriteButton').on('click', function() {
+		favoriteBlunder(blunder.id);
+	});
+
 })();
