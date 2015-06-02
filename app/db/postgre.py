@@ -294,7 +294,7 @@ def voteBlunder(username, blunder_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_votes SET vote = %s WHERE blunder_id = %s AND user_id = %s;'
+            'UPDATE blunder_votes SET vote = %s, assign_date = NOW() WHERE blunder_id = %s AND user_id = %s;'
             , (vote, blunder_id, user_id)
         )
 
@@ -380,7 +380,7 @@ def voteCommentBlunder(username, blunder_id, comment_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_comments_votes SET vote = %s WHERE blunder_id = %s AND comment_id = %s AND user_id = %s;'
+            'UPDATE blunder_comments_votes SET vote = %s, assign_date = NOW() WHERE blunder_id = %s AND comment_id = %s AND user_id = %s;'
             , (vote, blunder_id, comment_id, user_id)
         )
 
