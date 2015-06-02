@@ -9,8 +9,6 @@ from app.api.getBlunderInfo import getBlunderInfoById
 
 @app.route('/voteCommentBlunder', methods = ['POST'])
 def voteCommentBlunder():
-    print("Hi")
-
     if session.isAnonymous(): return jsonify({
         'status': 'error',
         'message': 'Voting allowed only for authorized user'
@@ -32,7 +30,7 @@ def voteCommentBlunder():
             'message': 'Vote must be +1 or -1'
         })
 
-    if not postgre.voteCommentBlunder(session.username(), blunder_id, comment_id, vote): 
+    if not postgre.voteCommentBlunder(session.username(), comment_id, vote): 
         return jsonify({
             'status': 'error', 
             'message': ''  # TODO: return warning to client

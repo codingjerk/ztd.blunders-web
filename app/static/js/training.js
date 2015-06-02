@@ -422,7 +422,6 @@
 
 		data.comments.forEach(function(comment) {
 			$('#comment-like-button-' + comment.id).on('click', function() {
-				console.log("log");
 				voteCommentBlunder(blunder.id, comment.id, 1);
 			});
 			$('#comment-dislike-button-' + comment.id).on('click', function() {
