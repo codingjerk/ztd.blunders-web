@@ -370,3 +370,34 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
             raise Exception('Can\'t insert comment')
 
     return True
+
+def voteCommentBlunder(username, blunder_id, comment_id, vote):
+    if username is None: return False
+
+    user_id = getUserId(username)
+
+    #TODO: error check if comment_id belongs to blunder with blunder_id
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'UPDATE blunder_comments_votes SET vote = %s WHERE blunder_id = %s AND comment_id = %s AND user_id = %s;'
+            , (vote, blunder_id, comment_id, user_id)
+        )
+
+        count = connection.cursor.rowcount 
+
+        if count > 1:
+            raise Exception('Duplicate comment vote for user %s with blunder id %s' % (username, blunder_id))
+        elif count == 1:
+            return True
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            'INSERT INTO blunder_comments_votes(user_id, blunder_id, comment_id, vote) VALUES (%s, %s, %s, %s);'
+            , (user_id, blunder_id, comment_id, vote)
+        )
+
+        if connection.cursor.rowcount != 1: 
+            raise Exception('Can not add comment vote for user %s with blunder id %s' % (username, blunder_id))
+
+    return True

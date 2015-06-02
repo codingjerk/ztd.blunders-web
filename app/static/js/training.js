@@ -315,16 +315,17 @@
 		return result;
 	}
 
-	function commentOnLike(comment_id) {
-		return function() {
-			console.log('Liking comment ', comment_id);
-		}
-	}
-
-	function commentOnDislike(comment_id) {
-		return function() {
-			console.log('Disliking comment ', comment_id);
-		}
+	function voteCommentBlunder(blunder_id, comment_id, vote) {
+		$.ajax({
+			type: 'POST',
+			url: "/voteCommentBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				comment_id: comment_id,
+				vote: vote
+			})
+		}).done(onInfoRequest);
 	}
 
 	function commentOnReply(comment_id) {
@@ -420,8 +421,13 @@
 		$('#comment-reply-button-0').on('click', commentOnReply(0));
 
 		data.comments.forEach(function(comment) {
-			$('#comment-like-button-' + comment.id).on('click', commentOnLike(comment.id));
-			$('#comment-dislike-button-' + comment.id).on('click', commentOnDislike(comment.id));
+			$('#comment-like-button-' + comment.id).on('click', function() {
+				console.log("log");
+				voteCommentBlunder(blunder.id, comment.id, 1);
+			});
+			$('#comment-dislike-button-' + comment.id).on('click', function() {
+				voteCommentBlunder(blunder.id, comment.id, -1);
+			});
 			$('#comment-reply-button-' + comment.id).on('click', commentOnReply(comment.id));
 		});
 	}
