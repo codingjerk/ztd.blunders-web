@@ -315,10 +315,10 @@
 		return result;
 	}
 
-	function voteCommentBlunder(blunder_id, comment_id, vote) {
+	function voteBlunderComment(blunder_id, comment_id, vote) {
 		$.ajax({
 			type: 'POST',
-			url: "/voteCommentBlunder",
+			url: "/voteBlunderComment",
 			contentType: 'application/json',
 			data: JSON.stringify({
 				blunder_id: blunder_id,
@@ -422,11 +422,13 @@
 
 		data.comments.forEach(function(comment) {
 			$('#comment-like-button-' + comment.id).on('click', function() {
-				voteCommentBlunder(blunder.id, comment.id, 1);
+				voteBlunderComment(blunder.id, comment.id, 1);
 			});
+			
 			$('#comment-dislike-button-' + comment.id).on('click', function() {
-				voteCommentBlunder(blunder.id, comment.id, -1);
+				voteBlunderComment(blunder.id, comment.id, -1);
 			});
+
 			$('#comment-reply-button-' + comment.id).on('click', commentOnReply(comment.id));
 		});
 	}

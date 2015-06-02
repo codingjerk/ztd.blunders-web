@@ -371,7 +371,7 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
 
     return True
 
-def voteCommentBlunder(username, comment_id, vote):
+def voteBlunderComment(username, comment_id, vote):
     if username is None: return False
 
     user_id = getUserId(username)
@@ -391,7 +391,7 @@ def voteCommentBlunder(username, comment_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_comments_votes(user_id, comment_id, vote) VALUES (%s, %s, %s, %s);'
+            'INSERT INTO blunder_comments_votes(user_id, comment_id, vote) VALUES (%s, %s, %s);'
             , (user_id, comment_id, vote)
         )
 

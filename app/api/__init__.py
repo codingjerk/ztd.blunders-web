@@ -1,2 +1,2 @@
 from app.api import getRating, getRandomBlunder, validateBlunder, getBlunderInfo
-from app.api import voteBlunder, commentBlunder, voteCommentBlunder
+from app.api import voteBlunder, commentBlunder, voteBlunderComment
