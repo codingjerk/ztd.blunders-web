@@ -357,6 +357,17 @@
 		}
 	}
 
+	// TODO: Move to utils module
+	function escapeHtml(text) {
+		return text
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '$quot;')
+			.replace(/'/g, '&#039;')
+			.replace(/\n/g, '<br/>')
+	}
+
 	function commentBuilder(data, comments) {
 		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		const body = '<div class="comment-body">{2}</div>';
@@ -385,7 +396,7 @@
 
 		const subcommentsData = buildCommentReplies(comments, data.id);
 
-		return comment.format(data.username, data.date, data.text, replyButton, commentRating, subcommentsData);
+		return comment.format(data.username, data.date, escapeHtml(data.text), replyButton, commentRating, subcommentsData);
 	}
 
 	function onInfoRequest(data) {
