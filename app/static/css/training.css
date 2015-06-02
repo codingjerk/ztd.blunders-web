@@ -294,3 +294,11 @@ a.move:active {
 .red {
     color: rgb(217, 83, 79);
 }
+
+.submit-comment-button {
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+.submit-comment-cancel {
+}

@@ -6,7 +6,7 @@ from app.utils import hash, session
 
 @app.route('/signup', methods=['GET'])
 def signup_get():
-    return render_template('signup.html', title = 'Ztd.Blunders')
+    return render_template('signup.html', title = 'Ztd.Blunders', session = session)
 
 @app.route('/signup', methods=['POST'])
 def signup_post():

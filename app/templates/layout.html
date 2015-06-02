@@ -23,9 +23,9 @@
 				</li>
 			</ul>
 
-			{% if 'username' in session %}
+			{% if session.isAuthorized() %}
 				<ul id='user-bar'>
-					<li><a href="#"><i class="fa fa-user"></i> {{session['username']}}</a> <span id='rating'></span>
+					<li><a href="#"><i class="fa fa-user"></i> {{session.username()}}</a> <span id='rating'></span>
 						<ul>
 							<li><a href="/"><i class="fa fa-file-text"></i> Profile</a></li>
 							<li><a href="/"><i class="fa fa-line-chart"></i> Statistics</a></li>
@@ -54,6 +54,9 @@
 			</ul>
 		</footer>
 
+		
+		<script src="static/third-party/chessboardjs/js/jquery-1.10.1.min.js"></script>
+		<script src="static/third-party/notifyjs/notify.min.js"></script>
 		{% block script %}{% endblock %}
 	</body>
 </html>
