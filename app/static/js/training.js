@@ -16,6 +16,35 @@
 
 	var finished = false;
 
+	$.notify.addStyle('error', {
+	  html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
+	  classes: {
+	    base: {
+    		"color": "#ffffff",
+    		"border-color": "rgb(212, 63, 58)",
+    		"background-color": "rgb(217, 83, 79)",
+    		"padding": "7px 15px",
+    		"margin-bottom": "15px",
+    		"margin-right": "55px",
+    		"border-radius": "4px",
+    		"border-style": "solid",
+    		"border-width": "1px",
+	    }
+	  }
+	});
+
+	function notifyError(text) {
+		if (text === undefined) return;
+
+		$.notify(
+			text, 
+			{
+				style: 'error',
+				position: 'bottom right',
+			}
+		);
+	}
+
 	String.prototype.format = function() {
 		var str = this;
 		for (var i = 0; i < arguments.length; i++) {
@@ -48,6 +77,7 @@
 	var onResultAprooved = function(data) {
 		if (data.status !== 'ok') {
 			updateRating();
+			notifyError(data.message);
 			return;
 		}
 
@@ -273,7 +303,7 @@
 
 	function onBlunderRequest(data) {
 		if (data.status !== 'ok') {
-			// TODO: Show warning!
+			notifyError(data.message);
 			return;
 		}
 
@@ -401,7 +431,7 @@
 
 	function onInfoRequest(data) {
 		if (data.status === 'error') {
-			// @TODO: Show Notifiy.Js
+			notifyError(data.message);
 			return
 		}
 

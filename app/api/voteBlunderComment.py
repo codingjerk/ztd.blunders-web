@@ -39,7 +39,7 @@ def voteBlunderComment():
     if not postgre.voteBlunderComment(session.username(), comment_id, vote): 
         return jsonify({
             'status': 'error', 
-            'message': ''  # TODO: return warning to client
+            'message': "Can't vote comment"
         })
 
     return getBlunderInfoById(blunder_id)

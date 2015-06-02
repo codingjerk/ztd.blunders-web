@@ -2,4 +2,4 @@
 
 from app import app
 
-app.run(port = 80, debug = True)
+app.run(host = '192.168.175.128', port = 80, debug = True)

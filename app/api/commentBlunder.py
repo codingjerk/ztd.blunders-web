@@ -34,7 +34,7 @@ def commentBlunder():
     if not postgre.commentBlunder(session.username(), blunder_id, comment_id, user_input): 
         return jsonify({
             'status': 'error', 
-            'message': ''  # TODO: return warning to client
+            'message': "Can't comment blunder"
         })
 
     return getBlunderInfoById(blunder_id)
