@@ -399,3 +399,17 @@ def voteBlunderComment(username, comment_id, vote):
             raise Exception('Can not add comment vote for user %s' % (username))
 
     return True
+
+def blunderCommentAuthor(comment_id):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT user_id from blunder_comments where id = %s;'
+            , (comment_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Trying to get not exist comment')
+
+        (user_id,) = connection.cursor.fetchone()
+
+        return getUsernameById(user_id)

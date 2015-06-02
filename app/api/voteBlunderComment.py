@@ -30,6 +30,12 @@ def voteBlunderComment():
             'message': 'Vote must be +1 or -1'
         })
 
+    if postgre.blunderCommentAuthor(comment_id) == session.username(): 
+        return jsonify({
+            'status': 'error', 
+            'message': "Can't vote for own comments"
+        })
+
     if not postgre.voteBlunderComment(session.username(), comment_id, vote): 
         return jsonify({
             'status': 'error', 
