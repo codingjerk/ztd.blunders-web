@@ -32,7 +32,7 @@ def validateBlunder():
     if not postgre.closeBlunderTask(session.username(), blunder_id): 
         return jsonify({
             'status': 'error', 
-            'message': "Can't validate task"
+            'message': "Validation failed"
         })
 
     success = compareLines(blunder_id, userLine)

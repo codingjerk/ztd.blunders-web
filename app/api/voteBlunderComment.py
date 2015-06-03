@@ -24,12 +24,6 @@ def voteBlunderComment():
             'message': 'Blunder id, comment id and vote required'
         })
 
-    if vote not in [-1, 1]: 
-        return jsonify({
-            'status': 'error',
-            'message': 'Vote must be +1 or -1'
-        })
-
     if postgre.blunderCommentAuthor(comment_id) == session.username(): 
         return jsonify({
             'status': 'error', 

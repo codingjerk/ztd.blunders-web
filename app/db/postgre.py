@@ -94,6 +94,9 @@ def assignBlunderTask(username, blunder_id):
             , (user_id, blunder_id)
         )
 
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder)
+
 def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
     if username is None: 
         raise Exception('postre.setRating for anonim')
@@ -109,6 +112,9 @@ def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
             'INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line) VALUES (%s, %s, %s, %s, %s, %s);'
             , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
         )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder)
 
 def closeBlunderTask(username, blunder_id):
     if username is None: return

@@ -23,12 +23,6 @@ def voteBlunder():
             'message': 'Blunder id and vote required'
         })
 
-    if vote not in [-1, 1]: 
-        return jsonify({
-            'status': 'error',
-            'message': 'Vote must be +1 or -1'
-        })
-
     if not postgre.voteBlunder(session.username(), blunder_id, vote): 
         return jsonify({
             'status': 'error', 
