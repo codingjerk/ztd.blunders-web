@@ -1,7 +1,7 @@
 from flask import request, jsonify
 
-from app import app, db
-from app.db import mongo, postgre
+from app import app
+from app.db import postgre
 from app.utils import session
 
 from app.api.getBlunderInfo import getBlunderInfoById
