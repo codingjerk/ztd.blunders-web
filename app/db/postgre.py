@@ -28,7 +28,9 @@ def autentithicateUser(username, hash):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from users WHERE username = %s AND password = %s;'
+            """SELECT *
+               FROM users 
+               WHERE username = %s AND password = %s;"""
             , (username, hash)
         )
 
@@ -39,7 +41,9 @@ def autentithicateUser(username, hash):
     if success:
         with PostgreConnection('w') as connection:
             connection.cursor.execute(
-                'UPDATE users SET last_login = NOW() WHERE username = %s;'
+                """UPDATE users 
+                   SET last_login = NOW()
+                   WHERE username = %s;"""
                 , (username,)
             )
 
@@ -74,7 +78,9 @@ def getUserId(username):
 def getUsernameById(user_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT username from users WHERE id = %s;'
+            """SELECT username
+               FROM users 
+               WHERE id = %s;"""
             , (user_id,)
         )
 
@@ -109,7 +115,8 @@ def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line) VALUES (%s, %s, %s, %s, %s, %s);'
+            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line)
+               VALUES (%s, %s, %s, %s, %s, %s);"""
             , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
         )
 
@@ -123,7 +130,8 @@ def closeBlunderTask(username, blunder_id):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'DELETE FROM blunder_tasks WHERE user_id = %s AND blunder_id = %s;'
+            """DELETE FROM blunder_tasks
+               WHERE user_id = %s AND blunder_id = %s;"""
             , (user_id, blunder_id)
         )
 
@@ -137,7 +145,9 @@ def setRating(username, elo):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE users SET elo = %s WHERE id = %s;'
+            """UPDATE users
+               SET elo = %s
+               WHERE id = %s;"""
             , (elo, user_id)
         )
 
@@ -152,7 +162,9 @@ def getAssignedBlunder(username):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT blunder_id from blunder_tasks WHERE user_id = %s;'
+            """SELECT blunder_id
+               FROM blunder_tasks
+               WHERE user_id = %s;"""
             , (user_id,)
         )
 
@@ -168,7 +180,8 @@ def signupUser(username, salt, hash, email):
     with PostgreConnection('w') as connection:
         try:
             connection.cursor.execute(
-                'INSERT INTO users (username, salt, password, role, email, registration, last_login) VALUES (%s, %s, %s, %s, %s, NOW(), NOW());'
+                """INSERT INTO users (username, salt, password, role, email, registration, last_login)
+                   VALUES (%s, %s, %s, %s, %s, NOW(), NOW());"""
                 , (username, salt, hash, USER_ROLE, email)
             )
         except psycopg2.IntegrityError as e:
@@ -183,7 +196,9 @@ def signupUser(username, salt, hash, email):
 def getTries(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_history where blunder_id = %s;'
+            """SELECT * 
+               FROM blunder_history
+               WHERE blunder_id = %s;"""
             , (blunder_id,)
         )
 
@@ -204,7 +219,9 @@ def getBlunderComments(blunder_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT id, date, parent_id, user_id, comment from blunder_comments WHERE blunder_id = %s'
+            """SELECT id, date, parent_id, user_id, comment
+               FROM blunder_comments
+               WHERE blunder_id = %s"""
             , (blunder_id,)
         )
 
@@ -237,7 +254,9 @@ def myFavorite(username, blunder_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_favorites where blunder_id = %s and user_id = %s;'
+            """SELECT * from blunder_favorites
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (blunder_id, user_id)
         )
 
@@ -251,7 +270,9 @@ def myFavorite(username, blunder_id):
 def getBlunderPopularity(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_favorites where blunder_id = %s;'
+            """SELECT *
+               FROM blunder_favorites
+               WHERE blunder_id = %s;"""
             , (blunder_id,)
         )
 
@@ -260,7 +281,9 @@ def getBlunderPopularity(blunder_id):
 def getBlunderVotes(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_votes where blunder_id = %s and vote = 1;'
+            """SELECT *
+               FROM blunder_votes
+               WHERE blunder_id = %s and vote = 1;"""
             , (blunder_id,)
         )
 
@@ -268,7 +291,9 @@ def getBlunderVotes(blunder_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_votes where blunder_id = %s AND vote = -1;'
+            """SELECT *
+               FROM blunder_votes
+               WHERE blunder_id = %s AND vote = -1;"""
             , (blunder_id,)
         )
 
@@ -281,7 +306,10 @@ def getBlunderCommentVotes(comment_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_comments_votes where comment_id = %s and vote = 1;'
+            """SELECT *
+               FROM blunder_comments_votes
+               WHERE comment_id = %s
+                 AND vote = 1;"""
             , (comment_id,)
         )
 
@@ -289,7 +317,10 @@ def getBlunderCommentVotes(comment_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_comments_votes where comment_id = %s and vote = -1;'
+            """SELECT *
+               FROM blunder_comments_votes
+               WHERE comment_id = %s
+                 AND vote = -1;"""
             , (comment_id,)
         )
 
@@ -304,7 +335,10 @@ def voteBlunder(username, blunder_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_votes SET vote = %s, assign_date = NOW() WHERE blunder_id = %s AND user_id = %s;'
+            """UPDATE blunder_votes
+               SET vote = %s, assign_date = NOW()
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (vote, blunder_id, user_id)
         )
 
@@ -317,7 +351,8 @@ def voteBlunder(username, blunder_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_votes(user_id, blunder_id, vote) VALUES (%s, %s, %s);'
+            """INSERT INTO blunder_votes(user_id, blunder_id, vote)
+               VALUES (%s, %s, %s);"""
             , (user_id, blunder_id, vote)
         )
 
@@ -333,7 +368,9 @@ def favoriteBlunder(username, blunder_id):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'DELETE FROM blunder_favorites WHERE blunder_id = %s AND user_id = %s;'
+            """DELETE FROM blunder_favorites
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (blunder_id, user_id)
         )
 
@@ -346,7 +383,8 @@ def favoriteBlunder(username, blunder_id):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_favorites(user_id, blunder_id) VALUES (%s,%s);'
+            """INSERT INTO blunder_favorites(user_id, blunder_id)
+               VALUES (%s,%s);"""
             , (user_id, blunder_id)
         )
 
@@ -362,7 +400,8 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_comments(user_id, blunder_id, parent_id, comment) VALUES (%s, %s, %s, %s);'
+            """INSERT INTO blunder_comments(user_id, blunder_id, parent_id, comment)
+               VALUES (%s, %s, %s, %s);"""
             , (user_id, blunder_id, parent_id, user_input)
         )
 
@@ -378,7 +417,10 @@ def voteBlunderComment(username, comment_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_comments_votes SET vote = %s, assign_date = NOW() WHERE comment_id = %s AND user_id = %s;'
+            """UPDATE blunder_comments_votes
+               SET vote = %s, assign_date = NOW()
+               WHERE comment_id = %s
+                 AND user_id = %s;"""
             , (vote, comment_id, user_id)
         )
 
@@ -391,7 +433,8 @@ def voteBlunderComment(username, comment_id, vote):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_comments_votes(user_id, comment_id, vote) VALUES (%s, %s, %s);'
+            """INSERT INTO blunder_comments_votes(user_id, comment_id, vote)
+               VALUES (%s, %s, %s);"""
             , (user_id, comment_id, vote)
         )
 
@@ -403,7 +446,9 @@ def voteBlunderComment(username, comment_id, vote):
 def blunderCommentAuthor(comment_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT user_id from blunder_comments where id = %s;'
+            """SELECT user_id
+               FROM blunder_comments
+               WHERE id = %s;"""
             , (comment_id,)
         )
 
