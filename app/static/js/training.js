@@ -321,9 +321,6 @@
 		matches = data.fenBefore.match(/\d+/g);
 		firstMoveIndex = +matches[matches.length - 1];
 
-		console.log(multiPv[0])
-		console.log('Elo:', blunder.elo)
-
 		visitedMoveCounter = 0;
 
 		board.position(data.fenBefore, false);
@@ -360,8 +357,6 @@
 
 	function commentOnReply(comment_id) {
 		return function() {
-			console.log('Replying on ', comment_id);
-
 			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-thumbs-up"></i> Submit</a>'
 				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-thumbs-up"></i> Cancel</a>'
 
