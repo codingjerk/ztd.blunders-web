@@ -37,7 +37,7 @@ CREATE TABLE blunder_comments (
     user_id integer NOT NULL,
     blunder_id character varying(255) NOT NULL,
     date timestamp without time zone DEFAULT now() NOT NULL,
-    parent_id integer DEFAULT 0 NOT NULL,
+    parent_id integer,
     comment text NOT NULL
 );
 
@@ -343,14 +343,6 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 --
 
 COPY blunder_comments (id, user_id, blunder_id, date, parent_id, comment) FROM stdin;
-1	120	556b3b9be1382331efae3f6b	2015-06-02 14:10:01.156	0	fgfg
-2	120	556b336ee138232acf525080	2015-06-02 14:52:39.45111	0	sdfdsfdsf
-3	120	556b43b0e13823404953bbcf	2015-06-02 15:01:21.187979	0	hjkjhkjhk
-4	120	556b43b0e13823404953bbcf	2015-06-03 16:33:11.447524	3	Hi\n
-5	120	556b42f2e13823404953bbb9	2015-06-03 16:37:33.308303	0	Hi
-6	122	556b42f2e13823404953bbb9	2015-06-03 16:40:31.124313	5	Hi you too
-7	122	556b3b1ce1382331efae3f60	2015-06-03 16:46:14.176086	0	retretret
-8	122	556b3bdae1382331efae3f71	2015-06-03 16:46:40.037297	0	dfg
 \.
 
 
@@ -358,7 +350,7 @@ COPY blunder_comments (id, user_id, blunder_id, date, parent_id, comment) FROM s
 -- Name: blunder_comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_comments_id_seq', 8, true);
+SELECT pg_catalog.setval('blunder_comments_id_seq', 22, true);
 
 
 --
@@ -366,8 +358,6 @@ SELECT pg_catalog.setval('blunder_comments_id_seq', 8, true);
 --
 
 COPY blunder_comments_votes (id, user_id, comment_id, assign_date, vote) FROM stdin;
-12	121	1	2015-06-03 15:25:31.203489	1
-14	122	5	2015-06-03 16:40:20.916752	1
 \.
 
 
@@ -383,18 +373,6 @@ SELECT pg_catalog.setval('blunder_comments_votes_id_seq', 14, true);
 --
 
 COPY blunder_favorites (id, user_id, blunder_id, assign_date) FROM stdin;
-22	120	556b4292e13823404953bbaf	2015-06-01 20:57:44.605283
-23	120	556b43f5e13823404953bbd6	2015-06-01 20:57:54.842294
-25	120	556b43fce13823404953bbd7	2015-06-01 21:49:19.905517
-26	120	556b3aa7e1382331efae3f53	2015-06-01 21:49:31.639267
-27	120	556b3ae4e1382331efae3f59	2015-06-01 21:50:13.73623
-28	120	556b3b9be1382331efae3f6b	2015-06-01 21:50:45.421789
-29	120	556b4274e13823404953bbad	2015-06-01 21:50:48.663275
-30	120	556b432be13823404953bbc0	2015-06-01 21:50:52.583251
-31	120	556b3acbe1382331efae3f57	2015-06-01 21:50:56.237807
-33	120	556b3ab8e1382331efae3f55	2015-06-03 16:33:48.194497
-34	122	556b42f2e13823404953bbb9	2015-06-03 16:40:41.606013
-35	122	556b3bdae1382331efae3f71	2015-06-03 16:46:41.238796
 \.
 
 
@@ -402,7 +380,7 @@ COPY blunder_favorites (id, user_id, blunder_id, assign_date) FROM stdin;
 -- Name: blunder_favorites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_favorites_id_seq', 35, true);
+SELECT pg_catalog.setval('blunder_favorites_id_seq', 38, true);
 
 
 --
@@ -410,17 +388,6 @@ SELECT pg_catalog.setval('blunder_favorites_id_seq', 35, true);
 --
 
 COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, date, user_line) FROM stdin;
-124	122	556b42f2e13823404953bbb9	0	1387	1472	2015-06-03 16:40:45.2554	{Qg6+}
-126	122	556b3be3e1382331efae3f72	0	1375	1700	2015-06-03 16:40:49.833206	{Rc2}
-128	122	556b3b91e1382331efae3f6a	0	1371	1300	2015-06-03 16:40:52.957282	{Kg5}
-130	122	556b3b1ce1382331efae3f60	0	1349	1300	2015-06-03 16:46:25.286887	{Qe2}
-125	122	556b3b16e1382331efae3f5f	0	1375	2100	2015-06-03 16:40:47.288974	{b4}
-127	122	556b3b34e1382331efae3f62	0	1371	2700	2015-06-03 16:40:51.85562	{Ne4}
-129	122	556b3a2de1382331efae3f46	0	1352	1722	2015-06-03 16:46:09.060735	{Kd8,f6}
-131	122	556b3bdae1382331efae3f71	0	1331	1300	2015-06-03 16:46:35.2008	{Qe3+,Rf2}
-121	122	556b3ae4e1382331efae3f59	0	1429	1530	2015-06-03 16:40:04.939738	{Qg4,Bf3}
-122	122	556b43fce13823404953bbd7	0	1418	1553	2015-06-03 16:40:10.682445	{Ke1,Nc2+}
-123	122	556b3380e138232acf525083	0	1408	1300	2015-06-03 16:40:15.589286	{Kb6,Nc4+}
 \.
 
 
@@ -428,7 +395,7 @@ COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, da
 -- Name: blunder_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_history_id_seq', 131, true);
+SELECT pg_catalog.setval('blunder_history_id_seq', 135, true);
 
 
 --
@@ -436,7 +403,7 @@ SELECT pg_catalog.setval('blunder_history_id_seq', 131, true);
 --
 
 COPY blunder_tasks (id, user_id, blunder_id, assign_date) FROM stdin;
-154	120	556b433fe13823404953bbc3	2015-06-03 16:46:59.429778
+158	120	556b4381e13823404953bbc9	2015-06-04 08:51:38.859388
 \.
 
 
@@ -444,7 +411,7 @@ COPY blunder_tasks (id, user_id, blunder_id, assign_date) FROM stdin;
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_tasks_id_seq', 154, true);
+SELECT pg_catalog.setval('blunder_tasks_id_seq', 158, true);
 
 
 --
@@ -455,6 +422,9 @@ COPY blunder_votes (id, blunder_id, assign_date, vote, user_id) FROM stdin;
 13	556b43b0e13823404953bbcf	2015-06-03 16:33:32.357754	-1	120
 14	556b42f2e13823404953bbb9	2015-06-03 16:40:43.12862	1	122
 15	556b3b1ce1382331efae3f60	2015-06-03 16:46:16.41893	1	122
+16	556b4265e13823404953bbab	2015-06-04 08:50:28.866158	1	120
+17	556b3acbe1382331efae3f57	2015-06-04 08:50:38.353441	-1	120
+18	556b4381e13823404953bbc9	2015-06-04 08:51:50.451349	-1	120
 \.
 
 
@@ -462,7 +432,7 @@ COPY blunder_votes (id, blunder_id, assign_date, vote, user_id) FROM stdin;
 -- Name: blunder_votes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_votes_id_seq', 15, true);
+SELECT pg_catalog.setval('blunder_votes_id_seq', 18, true);
 
 
 --
@@ -472,7 +442,7 @@ SELECT pg_catalog.setval('blunder_votes_id_seq', 15, true);
 COPY users (id, username, password, role, registration, last_login, elo, email, salt) FROM stdin;
 121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-01 19:37:10.166601	1671	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
 122	demo	$2a$12$cqwAprmH0bZYi/J2pWnVSeiGZcvA4u9KKbuK40EN30I//zNPZA6.a	3	2015-06-03 16:38:04.173926	2015-06-03 16:38:04.569265	1314		$2a$12$cqwAprmH0bZYi/J2pWnVSe
-120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-03 16:46:58.842631	1239	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
+120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-04 09:26:17.445983	1224	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
 \.
 
 
@@ -577,6 +547,14 @@ ALTER TABLE ONLY users
 
 ALTER TABLE ONLY users
     ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: blunder_comments_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY blunder_comments
+    ADD CONSTRAINT blunder_comments_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES blunder_comments(id);
 
 
 --
