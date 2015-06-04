@@ -95,7 +95,7 @@ def assignBlunderTask(username, blunder_id):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Failed to assign new blunder)
+            raise Exception('Failed to assign new blunder')
 
 def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
     if username is None: 
@@ -114,7 +114,7 @@ def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Failed to assign new blunder)
+            raise Exception('Failed to assign new blunder')
 
 def closeBlunderTask(username, blunder_id):
     if username is None: return
@@ -140,6 +140,10 @@ def setRating(username, elo):
             'UPDATE users SET elo = %s WHERE id = %s;'
             , (elo, user_id)
         )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder')
+
 
 def getAssignedBlunder(username):
     if username is None: return None
