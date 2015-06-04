@@ -94,6 +94,9 @@ def assignBlunderTask(username, blunder_id):
             , (user_id, blunder_id)
         )
 
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder')
+
 def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
     if username is None: 
         raise Exception('postre.setRating for anonim')
@@ -109,6 +112,9 @@ def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
             'INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line) VALUES (%s, %s, %s, %s, %s, %s);'
             , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
         )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder')
 
 def closeBlunderTask(username, blunder_id):
     if username is None: return
@@ -134,6 +140,10 @@ def setRating(username, elo):
             'UPDATE users SET elo = %s WHERE id = %s;'
             , (elo, user_id)
         )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to assign new blunder')
+
 
 def getAssignedBlunder(username):
     if username is None: return None
@@ -208,7 +218,7 @@ def getBlunderComments(blunder_id):
             pythonComment = {
                 'id': comment_id,
                 'date': date,
-                'parent_id': parent_id,
+                'parent_id': parent_id if parent_id is not None else 0,
                 'username': username,
                 'text': text,
 
@@ -349,16 +359,6 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
     if username is None: return False
 
     user_id = getUserId(username)
-
-    if parent_id != 0:
-        with PostgreConnection('r') as connection:
-            connection.cursor.execute(
-                'SELECT * from blunder_comments where id = %s AND blunder_id = %s;'
-                , (parent_id, blunder_id)
-            )
-
-            if connection.cursor.rowcount != 1:
-                raise Exception('Adding reply to not existing comment')
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
