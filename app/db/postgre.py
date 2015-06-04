@@ -218,7 +218,7 @@ def getBlunderComments(blunder_id):
             pythonComment = {
                 'id': comment_id,
                 'date': date,
-                'parent_id': parent_id,
+                'parent_id': parent_id if parent_id is not None else 0,
                 'username': username,
                 'text': text,
 
@@ -359,16 +359,6 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
     if username is None: return False
 
     user_id = getUserId(username)
-
-    if parent_id != 0:
-        with PostgreConnection('r') as connection:
-            connection.cursor.execute(
-                'SELECT * from blunder_comments where id = %s AND blunder_id = %s;'
-                , (parent_id, blunder_id)
-            )
-
-            if connection.cursor.rowcount != 1:
-                raise Exception('Adding reply to not existing comment')
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(

@@ -25,6 +25,11 @@ def commentBlunder():
             'message': 'Blunder id, input and comment_id required'
         })
 
+    # Frontend uses 0 to say comment is the root comment,
+    # but backend uses None for that
+    if comment_id == 0:
+        comment_id = None
+
     if len(user_input) > MAX_MESSAGE_SIZE:
         return jsonify({
             'status': 'error',
