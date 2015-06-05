@@ -63,9 +63,11 @@ def getRating(user_id):
 
     return getUserField(user_id, 'elo')
 
-def getSalt(user_id):
-    if user_id is None:
+def getSalt(username):
+    if username is None:
         raise Exception('Getting salt for None user!')
+
+    user_id = getUserId(username)
 
     return getUserField(user_id, 'salt')
 
@@ -73,7 +75,13 @@ def getUserId(username):
     if username is None: 
         raise Exception('postre.getUserId for anonim')
 
-    return getUserField(username, 'id')
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT id from users WHERE username = %s;'
+            , (username,)
+        )
+
+        return connection.cursor.fetchone()[0]
 
 def getUsernameById(user_id):
     with PostgreConnection('r') as connection:
