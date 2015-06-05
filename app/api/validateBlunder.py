@@ -29,6 +29,8 @@ def validateBlunder():
 
     if session.isAnonymous(): return jsonify({'status': 'ok'})
 
+    date_start = postgre.getTaskStartDate(session.userID(), blunder_id)
+
     if not postgre.closeBlunderTask(session.userID(), blunder_id): 
         return jsonify({
             'status': 'error', 
@@ -38,7 +40,7 @@ def validateBlunder():
     success = compareLines(blunder_id, userLine)
 
     blunder = mongo.getBlunderById(blunder_id)
-    postgre.saveBlunderHistory(session.userID(), blunder_id, blunder['elo'], success, userLine)
+    postgre.saveBlunderHistory(session.userID(), blunder_id, blunder['elo'], success, userLine, date_start)
 
     newElo, delta = db.changeRating(session.userID(), blunder_id, success)
 

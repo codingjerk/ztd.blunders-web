@@ -101,9 +101,11 @@ def assignBlunderTask(user_id, blunder_id):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine):
+def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start):
     if user_id is None: 
-        raise Exception('postre.setRating for anonim')
+        raise Exception('postre.saveBlunderHistory for anonim')
+    if(date_start is None):
+        raise Exception('postre.saveBlunderHistory date start is not defined')
 
     user_elo = getRating(user_id)
     result = 1 if success else 0
@@ -112,9 +114,9 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine):
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line)
-               VALUES (%s, %s, %s, %s, %s, %s);"""
-            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
+            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
+               VALUES (%s, %s, %s, %s, %s, %s, %s);"""
+            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
         )
 
         if connection.cursor.rowcount != 1:
@@ -426,3 +428,20 @@ def blunderCommentAuthor(comment_id):
         (user_id,) = connection.cursor.fetchone()
 
         return user_id
+
+def getTaskStartDate(user_id, blunder_id):
+    if user_id is None: return
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            """SELECT assign_date FROM blunder_tasks
+               WHERE user_id = %s AND blunder_id = %s;"""
+            , (user_id, blunder_id)
+        )
+
+        (assign_date,) = connection.cursor.fetchone()
+
+        if(connection.cursor.rowcount == 1):
+            return assign_date
+        
+        return None
