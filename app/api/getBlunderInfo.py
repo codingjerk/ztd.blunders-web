@@ -20,7 +20,7 @@ def getBlunderInfoById(blunder_id):
     successTries, totalTries = postgre.getTries(blunder_id)
 
     comments = postgre.getBlunderComments(blunder_id)
-    myFavorite = postgre.myFavorite(session.username(), blunder_id)
+    myFavorite = postgre.isFavorite(session.userID(), blunder_id)
     favorites = postgre.getBlunderPopularity(blunder_id)
     likes, dislikes = postgre.getBlunderVotes(blunder_id)
     

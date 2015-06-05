@@ -3,6 +3,7 @@
 --
 
 SET statement_timeout = 0;
+SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -42,7 +43,7 @@ CREATE TABLE blunder_comments (
 );
 
 
-ALTER TABLE public.blunder_comments OWNER TO postgres;
+ALTER TABLE blunder_comments OWNER TO postgres;
 
 --
 -- Name: blunder_comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -56,7 +57,7 @@ CREATE SEQUENCE blunder_comments_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_comments_id_seq OWNER TO postgres;
+ALTER TABLE blunder_comments_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_comments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -79,7 +80,7 @@ CREATE TABLE blunder_comments_votes (
 );
 
 
-ALTER TABLE public.blunder_comments_votes OWNER TO postgres;
+ALTER TABLE blunder_comments_votes OWNER TO postgres;
 
 --
 -- Name: blunder_comments_votes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -93,7 +94,7 @@ CREATE SEQUENCE blunder_comments_votes_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_comments_votes_id_seq OWNER TO postgres;
+ALTER TABLE blunder_comments_votes_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_comments_votes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -114,7 +115,7 @@ CREATE TABLE blunder_favorites (
 );
 
 
-ALTER TABLE public.blunder_favorites OWNER TO postgres;
+ALTER TABLE blunder_favorites OWNER TO postgres;
 
 --
 -- Name: blunder_favorites_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -128,7 +129,7 @@ CREATE SEQUENCE blunder_favorites_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_favorites_id_seq OWNER TO postgres;
+ALTER TABLE blunder_favorites_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_favorites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -148,13 +149,14 @@ CREATE TABLE blunder_history (
     result integer NOT NULL,
     user_elo integer NOT NULL,
     blunder_elo integer NOT NULL,
-    date timestamp without time zone DEFAULT now() NOT NULL,
     user_line character varying(255) NOT NULL,
+    date_start timestamp without time zone NOT NULL,
+    date_finish timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT blunder_history_result_check CHECK ((result = ANY (ARRAY[0, 1])))
 );
 
 
-ALTER TABLE public.blunder_history OWNER TO postgres;
+ALTER TABLE blunder_history OWNER TO postgres;
 
 --
 -- Name: blunder_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -168,7 +170,7 @@ CREATE SEQUENCE blunder_history_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_history_id_seq OWNER TO postgres;
+ALTER TABLE blunder_history_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -189,7 +191,7 @@ CREATE TABLE blunder_tasks (
 );
 
 
-ALTER TABLE public.blunder_tasks OWNER TO postgres;
+ALTER TABLE blunder_tasks OWNER TO postgres;
 
 --
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -203,7 +205,7 @@ CREATE SEQUENCE blunder_tasks_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_tasks_id_seq OWNER TO postgres;
+ALTER TABLE blunder_tasks_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -226,7 +228,7 @@ CREATE TABLE blunder_votes (
 );
 
 
-ALTER TABLE public.blunder_votes OWNER TO postgres;
+ALTER TABLE blunder_votes OWNER TO postgres;
 
 --
 -- Name: blunder_votes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -240,7 +242,7 @@ CREATE SEQUENCE blunder_votes_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.blunder_votes_id_seq OWNER TO postgres;
+ALTER TABLE blunder_votes_id_seq OWNER TO postgres;
 
 --
 -- Name: blunder_votes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -266,7 +268,7 @@ CREATE TABLE users (
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
+ALTER TABLE users OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -280,7 +282,7 @@ CREATE SEQUENCE users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO postgres;
+ALTER TABLE users_id_seq OWNER TO postgres;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -343,6 +345,7 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 --
 
 COPY blunder_comments (id, user_id, blunder_id, date, parent_id, comment) FROM stdin;
+23	120	556b4381e13823404953bbc9	2015-06-05 15:52:51.109154	\N	fghfghf
 \.
 
 
@@ -350,7 +353,7 @@ COPY blunder_comments (id, user_id, blunder_id, date, parent_id, comment) FROM s
 -- Name: blunder_comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_comments_id_seq', 22, true);
+SELECT pg_catalog.setval('blunder_comments_id_seq', 23, true);
 
 
 --
@@ -373,6 +376,7 @@ SELECT pg_catalog.setval('blunder_comments_votes_id_seq', 14, true);
 --
 
 COPY blunder_favorites (id, user_id, blunder_id, assign_date) FROM stdin;
+39	120	556b4381e13823404953bbc9	2015-06-05 15:52:47.44741
 \.
 
 
@@ -380,14 +384,21 @@ COPY blunder_favorites (id, user_id, blunder_id, assign_date) FROM stdin;
 -- Name: blunder_favorites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_favorites_id_seq', 38, true);
+SELECT pg_catalog.setval('blunder_favorites_id_seq', 39, true);
 
 
 --
 -- Data for Name: blunder_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, date, user_line) FROM stdin;
+COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, date_finish) FROM stdin;
+140	120	556b43a7e13823404953bbce	0	1237	1300	{Rxf5,e4}	2015-06-05 16:37:12.51485	2015-06-05 16:37:12.51485
+141	120	556b434ce13823404953bbc4	0	1224	2500	{Nxe6,Bf4}	2015-06-05 16:45:01.95433	2015-06-05 16:45:50.285175
+142	120	556b3a4be1382331efae3f4a	0	1224	1700	{Be3,Rxe3,Rxe3,Bxe3}	2015-06-05 16:46:05.931595	2015-06-05 16:46:12.425337
+143	120	556b42f9e13823404953bbba	0	1222	1509	{Kxg4,Rg2+}	2015-06-05 16:46:15.312264	2015-06-05 16:46:22.537519
+144	120	556b3bcce1382331efae3f70	0	1217	1500	{Kxg4,Rf5}	2015-06-05 16:51:57.0931	2015-06-05 16:52:11.833162
+145	120	556b3a57e1382331efae3f4b	0	1212	1702	{Be2,Rxf2,Qxf2,Nf4,Qf3,Nxe2}	2015-06-05 16:52:34.473762	2015-06-05 16:53:07.722489
+146	120	556b3af0e1382331efae3f5b	1	1210	1313		2015-06-05 16:53:18.021846	2015-06-05 16:53:26.226707
 \.
 
 
@@ -395,7 +406,7 @@ COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, da
 -- Name: blunder_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_history_id_seq', 135, true);
+SELECT pg_catalog.setval('blunder_history_id_seq', 146, true);
 
 
 --
@@ -403,7 +414,6 @@ SELECT pg_catalog.setval('blunder_history_id_seq', 135, true);
 --
 
 COPY blunder_tasks (id, user_id, blunder_id, assign_date) FROM stdin;
-158	120	556b4381e13823404953bbc9	2015-06-04 08:51:38.859388
 \.
 
 
@@ -411,7 +421,7 @@ COPY blunder_tasks (id, user_id, blunder_id, assign_date) FROM stdin;
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_tasks_id_seq', 158, true);
+SELECT pg_catalog.setval('blunder_tasks_id_seq', 171, true);
 
 
 --
@@ -424,7 +434,8 @@ COPY blunder_votes (id, blunder_id, assign_date, vote, user_id) FROM stdin;
 15	556b3b1ce1382331efae3f60	2015-06-03 16:46:16.41893	1	122
 16	556b4265e13823404953bbab	2015-06-04 08:50:28.866158	1	120
 17	556b3acbe1382331efae3f57	2015-06-04 08:50:38.353441	-1	120
-18	556b4381e13823404953bbc9	2015-06-04 08:51:50.451349	-1	120
+18	556b4381e13823404953bbc9	2015-06-05 15:52:46.060383	1	120
+19	556b3bcce1382331efae3f70	2015-06-05 16:52:32.200985	1	120
 \.
 
 
@@ -432,7 +443,7 @@ COPY blunder_votes (id, blunder_id, assign_date, vote, user_id) FROM stdin;
 -- Name: blunder_votes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_votes_id_seq', 18, true);
+SELECT pg_catalog.setval('blunder_votes_id_seq', 19, true);
 
 
 --
@@ -442,7 +453,7 @@ SELECT pg_catalog.setval('blunder_votes_id_seq', 18, true);
 COPY users (id, username, password, role, registration, last_login, elo, email, salt) FROM stdin;
 121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-01 19:37:10.166601	1671	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
 122	demo	$2a$12$cqwAprmH0bZYi/J2pWnVSeiGZcvA4u9KKbuK40EN30I//zNPZA6.a	3	2015-06-03 16:38:04.173926	2015-06-03 16:38:04.569265	1314		$2a$12$cqwAprmH0bZYi/J2pWnVSe
-120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-04 09:26:17.445983	1224	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
+120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-04 09:26:17.445983	1231	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
 \.
 
 

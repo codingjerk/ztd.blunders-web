@@ -28,7 +28,9 @@ def autentithicateUser(username, hash):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from users WHERE username = %s AND password = %s;'
+            """SELECT *
+               FROM users 
+               WHERE username = %s AND password = %s;"""
             , (username, hash)
         )
 
@@ -39,31 +41,33 @@ def autentithicateUser(username, hash):
     if success:
         with PostgreConnection('w') as connection:
             connection.cursor.execute(
-                'UPDATE users SET last_login = NOW() WHERE username = %s;'
+                """UPDATE users 
+                   SET last_login = NOW()
+                   WHERE username = %s;"""
                 , (username,)
             )
 
     return success
 
-def getUserField(username, field):
+def getUserField(user_id, field):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT ' + field + ' from users WHERE username = %s;'
-            , (username,)
+            'SELECT ' + field + ' from users WHERE id = %s;'
+            , (user_id,)
         )
 
         return connection.cursor.fetchone()[0]
 
-def getRating(username):
-    if username is None: return 0
+def getRating(user_id):
+    if user_id is None: return 0
 
-    return getUserField(username, 'elo')
+    return getUserField(user_id, 'elo')
 
-def getSalt(username):
-    if username is None:
+def getSalt(user_id):
+    if user_id is None:
         raise Exception('Getting salt for None user!')
 
-    return getUserField(username, 'salt')
+    return getUserField(user_id, 'salt')
 
 def getUserId(username):
     if username is None: 
@@ -74,7 +78,9 @@ def getUserId(username):
 def getUsernameById(user_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT username from users WHERE id = %s;'
+            """SELECT username
+               FROM users 
+               WHERE id = %s;"""
             , (user_id,)
         )
 
@@ -83,10 +89,8 @@ def getUsernameById(user_id):
 
         return result[0]
 
-def assignBlunderTask(username, blunder_id):
-    if username is None: return
-
-    user_id = getUserId(username)
+def assignBlunderTask(user_id, blunder_id):
+    if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -97,47 +101,48 @@ def assignBlunderTask(username, blunder_id):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
-    if username is None: 
-        raise Exception('postre.setRating for anonim')
+def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start):
+    if user_id is None: 
+        raise Exception('postre.saveBlunderHistory for anonim')
+    if(date_start is None):
+        raise Exception('postre.saveBlunderHistory date start is not defined')
 
-    user_id = getUserId(username)
-    user_elo = getRating(username)
+    user_elo = getRating(user_id)
     result = 1 if success else 0
 
     if success: userLine = ''
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line) VALUES (%s, %s, %s, %s, %s, %s);'
-            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine)
+            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
+               VALUES (%s, %s, %s, %s, %s, %s, %s);"""
+            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
         )
 
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def closeBlunderTask(username, blunder_id):
-    if username is None: return
-
-    user_id = getUserId(username)
+def closeBlunderTask(user_id, blunder_id):
+    if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'DELETE FROM blunder_tasks WHERE user_id = %s AND blunder_id = %s;'
+            """DELETE FROM blunder_tasks
+               WHERE user_id = %s AND blunder_id = %s;"""
             , (user_id, blunder_id)
         )
 
         return connection.cursor.rowcount == 1
 
-def setRating(username, elo):
-    if username is None: 
+def setRating(user_id, elo):
+    if user_id is None: 
         raise Exception('postre.setRating for anonim')
-
-    user_id = getUserId(username)
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE users SET elo = %s WHERE id = %s;'
+            """UPDATE users
+               SET elo = %s
+               WHERE id = %s;"""
             , (elo, user_id)
         )
 
@@ -145,14 +150,14 @@ def setRating(username, elo):
             raise Exception('Failed to assign new blunder')
 
 
-def getAssignedBlunder(username):
-    if username is None: return None
-
-    user_id = getUserId(username)
+def getAssignedBlunder(user_id):
+    if user_id is None: return None
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT blunder_id from blunder_tasks WHERE user_id = %s;'
+            """SELECT blunder_id
+               FROM blunder_tasks
+               WHERE user_id = %s;"""
             , (user_id,)
         )
 
@@ -168,7 +173,8 @@ def signupUser(username, salt, hash, email):
     with PostgreConnection('w') as connection:
         try:
             connection.cursor.execute(
-                'INSERT INTO users (username, salt, password, role, email, registration, last_login) VALUES (%s, %s, %s, %s, %s, NOW(), NOW());'
+                """INSERT INTO users (username, salt, password, role, email, registration, last_login)
+                   VALUES (%s, %s, %s, %s, %s, NOW(), NOW());"""
                 , (username, salt, hash, USER_ROLE, email)
             )
         except psycopg2.IntegrityError as e:
@@ -183,7 +189,9 @@ def signupUser(username, salt, hash, email):
 def getTries(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_history where blunder_id = %s;'
+            """SELECT * 
+               FROM blunder_history
+               WHERE blunder_id = %s;"""
             , (blunder_id,)
         )
 
@@ -204,7 +212,9 @@ def getBlunderComments(blunder_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT id, date, parent_id, user_id, comment from blunder_comments WHERE blunder_id = %s'
+            """SELECT id, date, parent_id, user_id, comment
+               FROM blunder_comments
+               WHERE blunder_id = %s"""
             , (blunder_id,)
         )
 
@@ -230,28 +240,27 @@ def getBlunderComments(blunder_id):
 
     return result
 
-def myFavorite(username, blunder_id):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def isFavorite(user_id, blunder_id):
+    if user_id is None: return False
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_favorites where blunder_id = %s and user_id = %s;'
+            """SELECT * from blunder_favorites
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (blunder_id, user_id)
         )
 
         if connection.cursor.rowcount == 1:
             return True
-        elif connection.cursor.rowcount == 0:
-            return False
-
-    raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
+        return False
 
 def getBlunderPopularity(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_favorites where blunder_id = %s;'
+            """SELECT *
+               FROM blunder_favorites
+               WHERE blunder_id = %s;"""
             , (blunder_id,)
         )
 
@@ -260,7 +269,9 @@ def getBlunderPopularity(blunder_id):
 def getBlunderVotes(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_votes where blunder_id = %s and vote = 1;'
+            """SELECT *
+               FROM blunder_votes
+               WHERE blunder_id = %s and vote = 1;"""
             , (blunder_id,)
         )
 
@@ -268,7 +279,9 @@ def getBlunderVotes(blunder_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_votes where blunder_id = %s AND vote = -1;'
+            """SELECT *
+               FROM blunder_votes
+               WHERE blunder_id = %s AND vote = -1;"""
             , (blunder_id,)
         )
 
@@ -277,11 +290,12 @@ def getBlunderVotes(blunder_id):
     return likes, dislikes
 
 def getBlunderCommentVotes(comment_id):
-    if comment_id == 0: raise Exception('Getting votes for root comment')
-
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_comments_votes where comment_id = %s and vote = 1;'
+            """SELECT *
+               FROM blunder_comments_votes
+               WHERE comment_id = %s
+                 AND vote = 1;"""
             , (comment_id,)
         )
 
@@ -289,7 +303,10 @@ def getBlunderCommentVotes(comment_id):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT * from blunder_comments_votes where comment_id = %s and vote = -1;'
+            """SELECT *
+               FROM blunder_comments_votes
+               WHERE comment_id = %s
+                 AND vote = -1;"""
             , (comment_id,)
         )
 
@@ -297,119 +314,134 @@ def getBlunderCommentVotes(comment_id):
 
     return likes, dislikes
 
-def voteBlunder(username, blunder_id, vote):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def voteBlunder(user_id, blunder_id, vote):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_votes SET vote = %s, assign_date = NOW() WHERE blunder_id = %s AND user_id = %s;'
+            """UPDATE blunder_votes
+               SET vote = %s, assign_date = NOW()
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (vote, blunder_id, user_id)
         )
 
         count = connection.cursor.rowcount 
 
-        if count > 1:
-            raise Exception('Duplicate votes for user %s with blunder id %s' % (username, blunder_id))
-        elif count == 1:
+        if count == 1:
             return True
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_votes(user_id, blunder_id, vote) VALUES (%s, %s, %s);'
+            """INSERT INTO blunder_votes(user_id, blunder_id, vote)
+               VALUES (%s, %s, %s);"""
             , (user_id, blunder_id, vote)
         )
 
         if connection.cursor.rowcount != 1: 
-            raise Exception('Can not add vote for user %s with blunder id %s' % (username, blunder_id))
+            raise Exception('Can not add vote for user id %s with blunder id %s' % (user_id, blunder_id))
 
     return True
 
-def favoriteBlunder(username, blunder_id):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def favoriteBlunder(user_id, blunder_id):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'DELETE FROM blunder_favorites WHERE blunder_id = %s AND user_id = %s;'
+            """DELETE FROM blunder_favorites
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
             , (blunder_id, user_id)
         )
 
         count = connection.cursor.rowcount
 
-        if count > 1:
-            raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
-        elif count == 1:
+        if count == 1:
             return True
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_favorites(user_id, blunder_id) VALUES (%s,%s);'
+            """INSERT INTO blunder_favorites(user_id, blunder_id)
+               VALUES (%s,%s);"""
             , (user_id, blunder_id)
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Error inserting favorite for user %s with blunder id %s' % (username, blunder_id))
+            raise Exception('Error inserting favorite for user id %s with blunder id %s' % (user_id, blunder_id))
 
     return True
 
-def commentBlunder(username, blunder_id, parent_id, user_input):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def commentBlunder(user_id, blunder_id, parent_id, user_input):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_comments(user_id, blunder_id, parent_id, comment) VALUES (%s, %s, %s, %s);'
+            """INSERT INTO blunder_comments(user_id, blunder_id, parent_id, comment)
+               VALUES (%s, %s, %s, %s);"""
             , (user_id, blunder_id, parent_id, user_input)
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Can\'t insert comment')
+            raise Exception('Failed to comment')
 
     return True
 
-def voteBlunderComment(username, comment_id, vote):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def voteBlunderComment(user_id, comment_id, vote):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'UPDATE blunder_comments_votes SET vote = %s, assign_date = NOW() WHERE comment_id = %s AND user_id = %s;'
+            """UPDATE blunder_comments_votes
+               SET vote = %s, assign_date = NOW()
+               WHERE comment_id = %s
+                 AND user_id = %s;"""
             , (vote, comment_id, user_id)
         )
 
-        count = connection.cursor.rowcount 
-
-        if count > 1:
-            raise Exception('Duplicate comment vote for user %s' % (username))
-        elif count == 1:
+        if connection.cursor.rowcount  == 1:
             return True
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_comments_votes(user_id, comment_id, vote) VALUES (%s, %s, %s);'
+            """INSERT INTO blunder_comments_votes(user_id, comment_id, vote)
+               VALUES (%s, %s, %s);"""
             , (user_id, comment_id, vote)
         )
 
         if connection.cursor.rowcount != 1: 
-            raise Exception('Can not add comment vote for user %s' % (username))
+            raise Exception('Can not add comment vote for user id %s' % (user_id))
 
     return True
 
 def blunderCommentAuthor(comment_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT user_id from blunder_comments where id = %s;'
+            """SELECT user_id
+               FROM blunder_comments
+               WHERE id = %s;"""
             , (comment_id,)
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Trying to get not exist comment')
+            raise Exception('Trying to get not exist comment with id %s' % (comment_id))
 
         (user_id,) = connection.cursor.fetchone()
 
-        return getUsernameById(user_id)
+        return user_id
+
+def getTaskStartDate(user_id, blunder_id):
+    if user_id is None: return
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            """SELECT assign_date FROM blunder_tasks
+               WHERE user_id = %s AND blunder_id = %s;"""
+            , (user_id, blunder_id)
+        )
+
+        (assign_date,) = connection.cursor.fetchone()
+
+        if(connection.cursor.rowcount == 1):
+            return assign_date
+        
+        return None

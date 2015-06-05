@@ -23,7 +23,7 @@ def voteBlunder():
             'message': 'Blunder id and vote required'
         })
 
-    if not postgre.voteBlunder(session.username(), blunder_id, vote): 
+    if not postgre.voteBlunder(session.userID(), blunder_id, vote): 
         return jsonify({
             'status': 'error', 
             'message': "Can't vote blunder"
@@ -46,7 +46,7 @@ def favoriteBlunder():
             'message': 'Blunder id required'
         })
 
-    if not postgre.favoriteBlunder(session.username(), blunder_id): 
+    if not postgre.favoriteBlunder(session.userID(), blunder_id): 
         return jsonify({
             'status': 'error', 
             'message': "Can't favorite blunder"
