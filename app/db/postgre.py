@@ -302,8 +302,6 @@ def getBlunderVotes(blunder_id):
     return likes, dislikes
 
 def getBlunderCommentVotes(comment_id):
-    if comment_id == 0: raise Exception('Getting votes for root comment')
-
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT *
@@ -344,9 +342,7 @@ def voteBlunder(username, blunder_id, vote):
 
         count = connection.cursor.rowcount 
 
-        if count > 1:
-            raise Exception('Duplicate votes for user %s with blunder id %s' % (username, blunder_id))
-        elif count == 1:
+        if count == 1:
             return True
 
     with PostgreConnection('w') as connection:
@@ -376,9 +372,7 @@ def favoriteBlunder(username, blunder_id):
 
         count = connection.cursor.rowcount
 
-        if count > 1:
-            raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
-        elif count == 1:
+        if count == 1:
             return True
 
     with PostgreConnection('w') as connection:
