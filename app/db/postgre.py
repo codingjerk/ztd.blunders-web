@@ -447,9 +447,9 @@ def getTaskStartDate(user_id, blunder_id):
             , (user_id, blunder_id)
         )
 
+        if(connection.cursor.rowcount != 1):
+            return None
+
         (assign_date,) = connection.cursor.fetchone()
 
-        if(connection.cursor.rowcount == 1):
-            return assign_date
-        
-        return None
+        return assign_date

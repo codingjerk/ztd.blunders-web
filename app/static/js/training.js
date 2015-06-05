@@ -87,7 +87,7 @@
 		if (finished) showComments();
 	}
 
-	var sendResult = function() {
+	var sendResult = function(callback) {
 		$.ajax({
 			type: 'POST',
 			url: "/validateBlunder",
@@ -96,7 +96,10 @@
 				id: blunder.id,
 				line: getPv('user')
 			})
-		}).done(onResultAprooved);
+		}).done(function(data) {
+			onResultAprooved(data);
+			callback && callback(data);
+		});
 	}
 
 	var setStatus = function(status) {
@@ -557,9 +560,9 @@
 	updateRating();
 
 	$('#nextBlunder').on('click', function() {
-		if (!finished) sendResult();
-
-		getRandomBlunder();	
+		if (!finished) {
+			sendResult(getRandomBlunder);
+		}
 	});
 
 	$('#goToGame').on('click', function() {
