@@ -49,25 +49,25 @@ def autentithicateUser(username, hash):
 
     return success
 
-def getUserField(username, field):
+def getUserField(user_id, field):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            'SELECT ' + field + ' from users WHERE username = %s;'
-            , (username,)
+            'SELECT ' + field + ' from users WHERE id = %s;'
+            , (user_id,)
         )
 
         return connection.cursor.fetchone()[0]
 
-def getRating(username):
-    if username is None: return 0
+def getRating(user_id):
+    if user_id is None: return 0
 
-    return getUserField(username, 'elo')
+    return getUserField(user_id, 'elo')
 
-def getSalt(username):
-    if username is None:
+def getSalt(user_id):
+    if user_id is None:
         raise Exception('Getting salt for None user!')
 
-    return getUserField(username, 'salt')
+    return getUserField(user_id, 'salt')
 
 def getUserId(username):
     if username is None: 
@@ -89,10 +89,8 @@ def getUsernameById(user_id):
 
         return result[0]
 
-def assignBlunderTask(username, blunder_id):
-    if username is None: return
-
-    user_id = getUserId(username)
+def assignBlunderTask(user_id, blunder_id):
+    if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -103,12 +101,11 @@ def assignBlunderTask(username, blunder_id):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
-    if username is None: 
+def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine):
+    if user_id is None: 
         raise Exception('postre.setRating for anonim')
 
-    user_id = getUserId(username)
-    user_elo = getRating(username)
+    user_elo = getRating(user_id)
     result = 1 if success else 0
 
     if success: userLine = ''
@@ -123,10 +120,8 @@ def saveBlunderHistory(username, blunder_id, blunder_elo, success, userLine):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def closeBlunderTask(username, blunder_id):
-    if username is None: return
-
-    user_id = getUserId(username)
+def closeBlunderTask(user_id, blunder_id):
+    if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -137,11 +132,9 @@ def closeBlunderTask(username, blunder_id):
 
         return connection.cursor.rowcount == 1
 
-def setRating(username, elo):
-    if username is None: 
+def setRating(user_id, elo):
+    if user_id is None: 
         raise Exception('postre.setRating for anonim')
-
-    user_id = getUserId(username)
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -155,10 +148,8 @@ def setRating(username, elo):
             raise Exception('Failed to assign new blunder')
 
 
-def getAssignedBlunder(username):
-    if username is None: return None
-
-    user_id = getUserId(username)
+def getAssignedBlunder(user_id):
+    if user_id is None: return None
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
@@ -247,10 +238,8 @@ def getBlunderComments(blunder_id):
 
     return result
 
-def myFavorite(username, blunder_id):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def isFavorite(user_id, blunder_id):
+    if user_id is None: return False
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
@@ -262,10 +251,7 @@ def myFavorite(username, blunder_id):
 
         if connection.cursor.rowcount == 1:
             return True
-        elif connection.cursor.rowcount == 0:
-            return False
-
-    raise Exception('Duplicate favorites for user %s with blunder id %s' % (username, blunder_id))
+        return False
 
 def getBlunderPopularity(blunder_id):
     with PostgreConnection('r') as connection:
@@ -326,10 +312,8 @@ def getBlunderCommentVotes(comment_id):
 
     return likes, dislikes
 
-def voteBlunder(username, blunder_id, vote):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def voteBlunder(user_id, blunder_id, vote):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -353,14 +337,12 @@ def voteBlunder(username, blunder_id, vote):
         )
 
         if connection.cursor.rowcount != 1: 
-            raise Exception('Can not add vote for user %s with blunder id %s' % (username, blunder_id))
+            raise Exception('Can not add vote for user id %s with blunder id %s' % (user_id, blunder_id))
 
     return True
 
-def favoriteBlunder(username, blunder_id):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def favoriteBlunder(user_id, blunder_id):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -383,14 +365,12 @@ def favoriteBlunder(username, blunder_id):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Error inserting favorite for user %s with blunder id %s' % (username, blunder_id))
+            raise Exception('Error inserting favorite for user id %s with blunder id %s' % (user_id, blunder_id))
 
     return True
 
-def commentBlunder(username, blunder_id, parent_id, user_input):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def commentBlunder(user_id, blunder_id, parent_id, user_input):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -400,14 +380,12 @@ def commentBlunder(username, blunder_id, parent_id, user_input):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Can\'t insert comment')
+            raise Exception('Failed to comment')
 
     return True
 
-def voteBlunderComment(username, comment_id, vote):
-    if username is None: return False
-
-    user_id = getUserId(username)
+def voteBlunderComment(user_id, comment_id, vote):
+    if user_id is None: return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -418,11 +396,7 @@ def voteBlunderComment(username, comment_id, vote):
             , (vote, comment_id, user_id)
         )
 
-        count = connection.cursor.rowcount 
-
-        if count > 1:
-            raise Exception('Duplicate comment vote for user %s' % (username))
-        elif count == 1:
+        if connection.cursor.rowcount  == 1:
             return True
 
     with PostgreConnection('w') as connection:
@@ -433,7 +407,7 @@ def voteBlunderComment(username, comment_id, vote):
         )
 
         if connection.cursor.rowcount != 1: 
-            raise Exception('Can not add comment vote for user %s' % (username))
+            raise Exception('Can not add comment vote for user id %s' % (user_id))
 
     return True
 
@@ -447,8 +421,8 @@ def blunderCommentAuthor(comment_id):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Trying to get not exist comment')
+            raise Exception('Trying to get not exist comment with id %s' % (comment_id))
 
         (user_id,) = connection.cursor.fetchone()
 
-        return getUsernameById(user_id)
+        return user_id
