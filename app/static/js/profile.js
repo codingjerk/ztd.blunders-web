@@ -12,13 +12,16 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             chart[i] = [new Date(point[0]), point[1]];
         }
 
-        console.log(chart);
-
         $.jqplot(e.id, [chart], {
-            series: [{showMarker: false}],
+            series: [{
+                showMarker: false,
+                rendererOptions: {
+                    smooth: true
+                }
+            }],
             axes: {
                 xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer 
+                    renderer: $.jqplot.DateAxisRenderer
                 }
             }
         });
