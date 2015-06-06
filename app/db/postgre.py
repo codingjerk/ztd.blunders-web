@@ -453,3 +453,61 @@ def getTaskStartDate(user_id, blunder_id):
         (assign_date,) = connection.cursor.fetchone()
 
         return assign_date
+
+def getUserProfile(username):
+    
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.id,
+                   u.username,
+                   u.elo,
+                   COUNT(b.id),
+                   COUNT(b.id) FILTER (WHERE b.result = 1),
+                   COUNT(b.id) FILTER (WHERE b.result = 0)
+            FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
+            GROUP BY u.id, u.username, u.elo HAVING u.username = %s;"""
+            , (username,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Trying to get not exist user with name %s' % username
+            }
+
+        (user_id, username, user_elo, total, solved, failed) = connection.cursor.fetchone()
+
+        karma = 0
+        #chart = [[[1, 1], [2, 2], [3, 3]]]
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT to_char(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
+                   COUNT(b.id), 
+                   AVG(b.user_elo) 
+            FROM blunder_history AS b
+            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
+            , (user_id,))
+
+        data = connection.cursor.fetchall()
+        elo_chart = []
+        count_chart = []
+        for i, point in enumerate(data):
+            (date, count, elo,) = point
+            elo_chart.append([date, int(elo)]) 
+            count_chart.append([date, int(count)]) 
+
+        ratingCharts = [elo_chart]
+
+    return {
+        'status': 'ok',
+        'data': [
+            {'id': 'rating-chart',          'value': ratingCharts},
+            {'id': 'failed-blunders-value', 'value': failed},
+            {'id': 'total-blunders-value',  'value': total},
+            {'id': 'solved-blunders-value', 'value': solved},
+            {'id': 'user-rating-value',     'value': user_elo},
+            {'id': 'user-karma-value',      'value': karma},
+            {'id': 'username-value',        'value': username}
+        ]
+    }

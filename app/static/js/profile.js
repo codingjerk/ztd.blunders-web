@@ -5,20 +5,26 @@ for (var i=0; i<50*Math.PI; i+=0.1){
 
 (function() {
     function drawRatingChart(e) {
-        $.jqplot(e.id, e.value, {  
+        var chart = e.value[0];
+        for (var i = 0; i < chart.length; ++i) {
+            var point = chart[i];
+
+            chart[i] = [new Date(point[0]), point[1]];
+        }
+
+        console.log(chart);
+
+        $.jqplot(e.id, [chart], {
             series: [{showMarker: false}],
             axes: {
                 xaxis: {
-                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer
-                },
-                yaxis: {
-                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+                    renderer: $.jqplot.DateAxisRenderer 
                 }
             }
         });
     }
 
-    blocks = [{
+    var blocks = [{
         caption: 'Blunders',
         rows: [
             {
@@ -49,28 +55,22 @@ for (var i=0; i<50*Math.PI; i+=0.1){
     var html = grid.generate(blocks);
     $('#details').html(html);
 
-    ajaxDummy = [
-        {
-            id: 'rating-chart',
-            value: [cosPoints]
-        },
-        {
-            id: 'failed-blunders-value',
-            value: 124
-        },
-        {
-            id: 'total-blunders-value',
-            value: 321
-        },
-        {
-            id: 'solved-blunders-value',
-            value: 321-124
+    function onRequest(response) {
+        if (response.status !== 'ok') {
+            // TODO: notify
+            return;
         }
-    ];
 
-    function onRequest(data) {
-        grid.update(data, {'rating-chart': drawRatingChart});
+        grid.update(response.data, {'rating-chart': drawRatingChart});
     }
 
-    onRequest(ajaxDummy);
+    $.ajax({
+        type: 'POST',
+        url: "/getUserProfile",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            username: $.url('?user'),
+        })
+    }).done(onRequest);
+
 })();

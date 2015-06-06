@@ -6,15 +6,15 @@
             <td id="summary">
                 <div id="avatar"><img src="http://www.cbc.ca/smartestperson/content/image/avatar-placeholder.png"/></div>
 
-                <div id="username">Failuref</div>
+                <div id="username-value"></div>
                 <div id="user-join-date">
-                    <i class="fa fa-clock-o"></i> Joined on <span id="user-join-value">Feb 24, 2015</span>
+                    <i class="fa fa-clock-o"></i> Joined on <span id="user-join-value"></span>
                 </div>
 
                 <table id="user-rating-table">
                     <tr id="user-values">
-                        <td id="user-rating-value">1900</td>
-                        <td id="user-karma-value">+300</td>
+                        <td id="user-rating-value"></td>
+                        <td id="user-karma-value"></td>
                     </tr>
 
                     <tr id="user-labels">
@@ -45,6 +45,8 @@
     <script src="static/third-party/jqplot/jquery.jqplot.min.js"></script>
     <script src="static/third-party/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
     <script src="static/third-party/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="static/third-party/js-url/url.min.js"></script>
     <script src="static/js/grid.js"></script>
     <script src="static/js/profile.js"></script>
 {% endblock %}
