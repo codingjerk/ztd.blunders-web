@@ -5,12 +5,17 @@ for (var i=0; i<50*Math.PI; i+=0.1){
 
 (function() {
 
-    function drawRatingChart(e) {
-        chart = e.value[0].value
-
-        for (var i = 0; i < chart.length; ++i) {
-            chart[i][0] = new Date(chart[i][0])
+    function fixDate(data)
+    {
+        for (var i = 0; i < data.length; ++i) {
+            data[i][0] = new Date(data[i][0])
         }
+
+        return data
+    }
+
+    function drawRatingChart(e) {
+        chart = fixDate(e.value[0].value)
 
         $.jqplot(e.id, [chart], {
             series: [{
@@ -25,6 +30,47 @@ for (var i=0; i<50*Math.PI; i+=0.1){
                 }
             }
         });
+    }
+
+    function drawBlunderChart(e) {
+          data = [
+                    fixDate(e.value[1].value),
+                    fixDate(e.value[2].value)
+                 ]
+          plot3 = $.jqplot(e.id, data, {
+            // Tell the plot to stack the bars.
+            stackSeries: true,
+            captureRightClick: true,
+            seriesDefaults:{
+              renderer:$.jqplot.BarRenderer,
+              rendererOptions: {
+                  // Put a 30 pixel margin between bars.
+                  barMargin: 1,
+                  // Highlight bars when mouse button pressed.
+                  // Disables default highlighting on mouse over.
+                  highlightMouseDown: true   
+              },
+              pointLabels: {show: true}
+            },
+            axes: {
+              xaxis: {
+                  renderer: $.jqplot.DateAxisRenderer,
+                  autoscale:true 
+              },
+              yaxis: {
+                // Don't pad out the bottom of the data range.  By default,
+                // axes scaled as if data extended 10% above and below the
+                // actual range to prevent data points right on grid boundaries.
+                // Don't want to do that here.
+                padMin: 0
+              }
+            },
+            legend: {
+              show: true,
+              location: 'e',
+              placement: 'outside'
+            }      
+          });
     }
 
     function updateProfile()
@@ -47,6 +93,24 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             grid.update(response.data,  {'rating-statistics': drawRatingChart});
         }
 
+        function onUpdateRatingChartRequest(response) {
+            if (response.status !== 'ok') {
+                // TODO: notify
+                return;
+            }
+
+            grid.update(response.data,  {'rating-statistics': drawRatingChart});
+        } 
+
+        function onUpdateBlunderChartRequest(response) {
+            if (response.status !== 'ok') {
+                // TODO: notify
+                return;
+            }
+
+            grid.update(response.data,  {'blunder-count-statistics': drawBlunderChart});
+        } 
+
         $.ajax({
             type: 'POST',
             url: "/getUserProfile",
@@ -64,6 +128,15 @@ for (var i=0; i<50*Math.PI; i+=0.1){
                 username: $.url('?user'),
             })
         }).done(onUpdateRatingChartRequest);
+
+        $.ajax({
+            type: 'POST',
+            url: "/statistics/getBlundersByDate",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username: $.url('?user'),
+            })
+        }).done(onUpdateBlunderChartRequest);
     }
 
     var blocks = [{
@@ -90,6 +163,10 @@ for (var i=0; i<50*Math.PI; i+=0.1){
                 label: 'Solved',
                 id: 'solved-blunders-value',
                 additional: 'all time'
+            },
+            {
+                type: 'chart', 
+                id: 'blunder-count-statistics'
             },
         ]
     }];

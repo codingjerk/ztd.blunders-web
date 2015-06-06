@@ -540,7 +540,7 @@ def getBlundersByDate(username):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:MI') AS date, 
+                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date, 
                        COUNT(b.id) as total,
                        COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                        COUNT(b.id) FILTER (WHERE b.result = 0) as failed
@@ -550,25 +550,27 @@ def getBlundersByDate(username):
 
         data = connection.cursor.fetchall()
 
-        xData = []
         yData1 = []
         yData2 = []
         yData3 = []        
         for i, point in enumerate(data):
             (date, total, solved, failed,) = point
-            xData.append(date)
-            yData1.append(total)
-            yData2.append(solved)
-            yData3.append(failed)
+            yData1.append([date, total])
+            yData2.append([date, solved])
+            yData3.append([date, failed])
 
         yData = [yData1, yData2, yData3]
 
     return {
         'status': 'ok',
+        'username': username,
         'data': [
-            {'id': 'username-value',                'value': username},
-            {'id': 'date',                          'value': xData},
-            {'id': 'blunder_counts',                'value': yData},
-            {'id': 'blunders-by-date-chart',        'value': statisticsCharts},
+                { 'id': 'blunder-count-statistics', 'value': 
+                    [
+                        {'id': 'total_blunders',    'value': yData1},
+                        {'id': 'succeed_blunders',  'value': yData2},
+                        {'id': 'failed_blunders',   'value': yData3},
+                    ]
+                },
         ]
     }
