@@ -553,7 +553,10 @@
 	$('#nextBlunder').on('click', function() {
 		if (!finished) {
 			sendResult(getRandomBlunder);
+			return;
 		}
+
+		getRandomBlunder();
 	});
 
 	$('#goToGame').on('click', function() {
