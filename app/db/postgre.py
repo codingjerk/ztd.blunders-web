@@ -461,9 +461,9 @@ def getUserProfile(username):
             SELECT u.id,
                    u.username,
                    u.elo,
-                   COUNT(b.id),
-                   COUNT(b.id) FILTER (WHERE b.result = 1),
-                   COUNT(b.id) FILTER (WHERE b.result = 0)
+                   COUNT(b.id) as total,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
             GROUP BY u.id, u.username, u.elo HAVING u.username = %s;"""
             , (username,)
@@ -491,31 +491,11 @@ def getUserProfile(username):
 
         karma = commentLikeSum * 2 + 10
 
-    with PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT to_char(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
-                   COUNT(b.id), 
-                   AVG(b.user_elo) 
-            FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
-            , (user_id,))
-
-        data = connection.cursor.fetchall()
-        elo_chart = []
-        count_chart = []
-        for i, point in enumerate(data):
-            (date, count, elo,) = point
-            elo_chart.append([date, int(elo)]) 
-            count_chart.append([date, int(count)]) 
-
-        ratingCharts = [elo_chart]
-
     userJoinDate = getUserField(user_id, "to_char(registration, 'Month DD, YYYY')")
 
     return {
         'status': 'ok',
         'data': [
-            {'id': 'rating-chart',          'value': ratingCharts},
             {'id': 'failed-blunders-value', 'value': failed},
             {'id': 'total-blunders-value',  'value': total},
             {'id': 'solved-blunders-value', 'value': solved},
@@ -523,5 +503,72 @@ def getUserProfile(username):
             {'id': 'user-karma-value',      'value': karma},
             {'id': 'username-value',        'value': username},
             {'id': 'user-join-value',       'value': userJoinDate}
+        ]
+    }
+
+def getRatingByDate(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+            connection.cursor.execute("""
+                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
+                       AVG(b.user_elo) 
+                FROM blunder_history AS b
+                GROUP BY date, b.user_id HAVING b.user_id = %s;"""
+                , (user_id,))
+
+            data = connection.cursor.fetchall()
+            result = []
+            for i, point in enumerate(data):
+                (date, elo,) = point
+                result.append([date, int(elo)])
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data' : [ 
+                { 'id': 'rating-statistics', 'value': 
+                    [
+                        {'id': 'rating-change-in-time',    'value': result},
+                    ]
+                },
+        ]
+    }
+
+def getBlundersByDate(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:MI') AS date, 
+                       COUNT(b.id) as total,
+                       COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                       COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+                FROM blunder_history AS b
+                GROUP BY date, b.user_id HAVING b.user_id = %s"""
+                , (user_id,))
+
+        data = connection.cursor.fetchall()
+
+        xData = []
+        yData1 = []
+        yData2 = []
+        yData3 = []        
+        for i, point in enumerate(data):
+            (date, total, solved, failed,) = point
+            xData.append(date)
+            yData1.append(total)
+            yData2.append(solved)
+            yData3.append(failed)
+
+        yData = [yData1, yData2, yData3]
+
+    return {
+        'status': 'ok',
+        'data': [
+            {'id': 'username-value',                'value': username},
+            {'id': 'date',                          'value': xData},
+            {'id': 'blunder_counts',                'value': yData},
+            {'id': 'blunders-by-date-chart',        'value': statisticsCharts},
         ]
     }
