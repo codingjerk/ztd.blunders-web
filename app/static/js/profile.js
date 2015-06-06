@@ -4,8 +4,8 @@ for (var i=0; i<50*Math.PI; i+=0.1){
 } 
 
 (function() {
-    function drawChart(id, data) {
-        $.jqplot(id, data, {  
+    function drawRatingChart(e) {
+        $.jqplot(e.id, e.value, {  
             series: [{showMarker: false}],
             axes: {
                 xaxis: {
@@ -69,15 +69,7 @@ for (var i=0; i<50*Math.PI; i+=0.1){
     ];
 
     function onRequest(data) {
-        for (var i = 0; i < data.length; i++) {
-            var element = data[i];
-
-            if (element.id === 'rating-chart') {
-                drawChart('rating-chart', element.value);
-            } else {
-                $('#' + element.id).html(element.value);
-            }
-        }
+        grid.update(data, {'rating-chart': drawRatingChart});
     }
 
     onRequest(ajaxDummy);

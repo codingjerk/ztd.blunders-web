@@ -92,4 +92,17 @@ var grid = {};
 
         return result;
     }
+
+    module.update = function(data, rules) {
+        for (var i = 0; i < data.length; i++) {
+            var element = data[i];
+
+            var ruleFunction = rules[element.id];
+            if (ruleFunction !== undefined) {
+                ruleFunction(element);
+            } else {
+                $('#' + element.id).html(element.value);
+            }
+        }
+    }
 })(grid);
