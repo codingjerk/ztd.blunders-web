@@ -35,19 +35,19 @@ for (var i=0; i<50*Math.PI; i+=0.1){
                 type: 'cell',
                 label: 'Failed',
                 id: 'failed-blunders-value',
-                additional: 'Last week'
+                additional: 'all time'
             },
             {
                 type: 'cell',
                 label: 'Total',
                 id: 'total-blunders-value',
-                additional: 'Last week'
+                additional: 'all time'
             },
             {
                 type: 'cell',
                 label: 'Solved',
                 id: 'solved-blunders-value',
-                additional: 'Last week'
+                additional: 'all time'
             }
         ]
     }];

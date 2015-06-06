@@ -477,8 +477,19 @@ def getUserProfile(username):
 
         (user_id, username, user_elo, total, solved, failed) = connection.cursor.fetchone()
 
-        karma = 0
-        #chart = [[[1, 1], [2, 2], [3, 3]]]
+       
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT SUM(bcv.vote)
+            FROM blunder_comments as bc INNER JOIN blunder_comments_votes as bcv 
+                ON bc.id = bcv.comment_id WHERE bc.user_id = %s;"""
+            , (user_id,))
+
+        (commentLikeSum,) = connection.cursor.fetchone()
+        if commentLikeSum is None:
+            commentLikeSum = 0
+
+        karma = commentLikeSum * 2 + 10
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -499,6 +510,8 @@ def getUserProfile(username):
 
         ratingCharts = [elo_chart]
 
+    userJoinDate = getUserField(user_id, "to_char(registration, 'Month DD, YYYY')")
+
     return {
         'status': 'ok',
         'data': [
@@ -508,6 +521,7 @@ def getUserProfile(username):
             {'id': 'solved-blunders-value', 'value': solved},
             {'id': 'user-rating-value',     'value': user_elo},
             {'id': 'user-karma-value',      'value': karma},
-            {'id': 'username-value',        'value': username}
+            {'id': 'username-value',        'value': username},
+            {'id': 'user-join-value',       'value': userJoinDate}
         ]
     }
