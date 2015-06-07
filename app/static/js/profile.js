@@ -71,7 +71,7 @@
     } 
 
     function drawRatingChart(id, data) {
-        var chart = data.mapNear(0, utils.fixDate);
+        var chart = data.mapIndex(0, utils.fixDate);
         
         $.jqplot(id, [data], {
             series: [{
@@ -105,8 +105,8 @@
     } 
 
     function drawBlunderChart(id, data) {
-        var failed = data.failed.mapNear(0, utils.fixDate);
-        var solved = data.solved.mapNear(0, utils.fixDate);
+        var failed = data.failed.mapIndex(0, utils.fixDate);
+        var solved = data.solved.mapIndex(0, utils.fixDate);
 
         $.jqplot(id, [failed, solved], {
             stackSeries: true,

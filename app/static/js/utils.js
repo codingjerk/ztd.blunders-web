@@ -19,13 +19,41 @@ var utils = {};
         return result;
     }
 
-    Array.prototype.mapNear = function(index, f) {
+    Array.prototype.mapIndex = function(index, f) {
         return this.map(function(e) {
             var result = e;
             result[index] = f(result[index]);
 
             return e;
         });
+    }
+
+    Array.prototype.extract = function(index) {
+        return this.map(function (e) {
+            return e[index];
+        });
+    }
+
+    Array.prototype.filter = function(p) {
+        var result = [];
+
+        for (var i = 0; i < this.length; ++i) {
+            if (p(this[i])) result.push(this[i]);
+        }
+
+        return result;
+    }
+
+    Array.prototype.shiftWhile = function(p) {
+        var result = [];
+
+        while (this.length > 0) {
+            if (!p(this[0])) break;
+
+            result.push(this.shift());
+        }
+
+        return result;
     }
 
     module.fixDate = function(rawDate) {
