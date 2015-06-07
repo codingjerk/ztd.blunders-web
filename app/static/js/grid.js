@@ -101,7 +101,7 @@ var grid = {};
             if (ruleFunction !== undefined) {
                 ruleFunction(element);
             } else {
-                $('#' + element.id).html(element.value);
+                $('#' + element.id).html(element);
             }
         }
     }
