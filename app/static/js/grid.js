@@ -26,7 +26,7 @@ var grid = {};
             return generateNamedRow(rowData);
         }
 
-        console.log('Unknown row type');
+        console.log('grid.generateRow: Unknown row type');
     }
 
     var parseNamedRows = function(rowsData) {
@@ -84,13 +84,7 @@ var grid = {};
     }
 
     module.generate = function(blocks) {
-        var result = '';
-
-        blocks.forEach(function(block) {
-            result += generateBlock(block);
-        });
-
-        return result;
+        return blocks.map(generateBlock).join('');
     }
 
     module.update = function(data, rules) {
