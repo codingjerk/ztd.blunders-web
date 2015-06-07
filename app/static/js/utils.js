@@ -60,6 +60,15 @@ var utils = {};
         return result;
     }
 
+    Array.prototype.shiftGroup = function(size) {
+        var result = [];
+        for (var i = 0; i < size; ++i) {
+            result.push(this.shift());
+        }
+
+        return result;
+    }
+
     module.fixDate = function(rawDate) {
         return new Date(rawDate);
     }
