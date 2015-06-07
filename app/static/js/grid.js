@@ -1,73 +1,66 @@
 var grid = {};
 
 (function (module) {
-    var generateCaption = function(caption) {
-        return '<tr class="caption-row"><td class="caption-block" colspan="3">{0}</td></tr>'
-            .format(caption);
+    var generateCaption = function(caption, cellsInRow) {
+        return '<tr class="caption-row"><td class="caption-block" colspan="{0}">{1}</td></tr>'
+            .format(cellsInRow, caption);
     }
 
-    var generateNamedRow = function(rowData) {
-        return '<tr class="info-row"><td class="info-block-wrapper" colspan="3"><div id="{0}"></div></td></tr>'
-            .format(rowData.id);
+    var generateNamedRow = function(rowData, cellsInRow) {
+        return '<tr class="wide-row"><td class="wide-block-wrapper" colspan="{0}"><div id="{1}"></div></td></tr>'
+            .format(cellsInRow, rowData.id);
     }
 
-    var generateCell = function(cell) {
-        return ('<td class="grid-block">' +
-            '<div class="grid-label">{0}</div>' +
-            '<div class="grid-value" id="{1}"></div>' +
-            '<div class="grid-additional">{2}</div>' +
-            '</td>').format(cell.label, cell.id, cell.additional);
+    var generateCell = function(cell, cellsInRow) {
+        var cellSize = 100 / cellsInRow;
+        return ('<td class="cell-block" style="width: {0}%;">' +
+            '<div class="cell-label">{1}</div>' +
+            '<div class="cell-value" id="{2}"></div>' +
+            '<div class="cell-additional">{3}</div>' +
+            '</td>').format(cellSize, cell.label, cell.id, cell.additional);
     }
 
-    var generateRow = function(rowData) {
-        if (rowData.type === 'cell') {
-            return generateCell(rowData);
-        } else if (rowData.type === 'chart') {
-            return generateNamedRow(rowData);
-        }
-
-        console.log('grid.generateRow: Unknown row type');
-    }
-
-    var parseNamedRows = function(rowsData) {
+    var parseNamedRows = function(rowsData, cellsInRow) {
         return rowsData.shiftWhile(function(row){
             return (row.type === 'chart');
-        }).map(generateRow).join('');
+        }).map(generateNamedRow, cellsInRow).join('');
     }
 
-    var parseCells = function(rowsData) {
+    var parseCells = function(rowsData, cellsInRow) {
         var cells = rowsData.shiftWhile(function(row) {
             return (row.type === 'cell');
-        }).map(generateRow);
+        }).map(generateCell, cellsInRow);
 
         var result = '';
         while (cells.length > 0) {
-            var group = cells.shiftGroup(3).map(function(e) {return e || '';});
-            result += '<tr class="grid-row">' + group.join('') + '</tr>';
+            var group = cells.shiftGroup(cellsInRow).map(function(e) {return e || '';});
+            result += '<tr class="short-row">' + group.join('') + '</tr>';
         }
 
         return result;
     }
 
-    var generateRows = function(rowsData) {
+    var generateRows = function(rowsData, cellsInRow) {
         var result = '';
         while (rowsData.length > 0) {
-            result += parseNamedRows(rowsData);
-            result += parseCells(rowsData);
+            result += parseNamedRows(rowsData, cellsInRow);
+            result += parseCells(rowsData, cellsInRow);
         }
 
         return result;
     }
 
-    var generateBlock = function(block) {
-        var caption = generateCaption(block.caption);
-        var body = generateRows(block.rows);
+    var generateBlock = function(block, cellsInRow) {
+        var caption = generateCaption(block.caption, cellsInRow);
+        var body = generateRows(block.rows, cellsInRow);
 
         return '<table class="details-block">{0}{1}</table>'.format(caption, body);
     }
 
-    module.generate = function(blocks) {
-        return blocks.map(generateBlock).join('');
+    module.generate = function(blocks, cellsInRow) {
+        var cellsInRow = cellsInRow || 3;
+
+        return blocks.map(generateBlock, [cellsInRow]).join('');
     }
 
     module.update = function(data, rules) {

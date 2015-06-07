@@ -31,7 +31,7 @@
         ]
     }];
 
-    var html = grid.generate(blocks);
+    var html = grid.generate(blocks, 3);
     $('#details').html(html);
 })();
 
