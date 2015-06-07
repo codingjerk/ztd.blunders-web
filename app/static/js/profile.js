@@ -1,21 +1,14 @@
-var cosPoints = []; 
-for (var i=0; i<50*Math.PI; i+=0.1){ 
-    cosPoints.push([i, Math.cos(i)]); 
-} 
-
 (function() {
-
-    function fixDate(data)
-    {
+    function fixDate(data) {
         for (var i = 0; i < data.length; ++i) {
-            data[i][0] = new Date(data[i][0])
+            data[i][0] = new Date(data[i][0]);
         }
 
-        return data
+        return data;
     }
 
     function drawRatingChart(e) {
-        chart = fixDate(e.value[0].value)
+        var chart = fixDate(e.value[0].value);
 
         $.jqplot(e.id, [chart], {
             series: [{
@@ -33,48 +26,42 @@ for (var i=0; i<50*Math.PI; i+=0.1){
     }
 
     function drawBlunderChart(e) {
-          data = [
-                    fixDate(e.value[1].value),
-                    fixDate(e.value[2].value)
-                 ]
-          plot3 = $.jqplot(e.id, data, {
-            // Tell the plot to stack the bars.
+        var data = [
+            fixDate(e.value[1].value),
+            fixDate(e.value[2].value)
+        ];
+
+        $.jqplot(e.id, data, {
             stackSeries: true,
             captureRightClick: true,
-            seriesDefaults:{
-              renderer:$.jqplot.BarRenderer,
-              rendererOptions: {
-                  // Put a 30 pixel margin between bars.
-                  barMargin: 1,
-                  // Highlight bars when mouse button pressed.
-                  // Disables default highlighting on mouse over.
-                  highlightMouseDown: true   
-              },
-              pointLabels: {show: true}
+            seriesDefaults: {
+                renderer: $.jqplot.BarRenderer,
+                rendererOptions: {
+                    barMargin: 1,
+                    highlightMouseDown: true   
+                },
+                pointLabels: {
+                    show: true
+                }
             },
             axes: {
-              xaxis: {
-                  renderer: $.jqplot.DateAxisRenderer,
-                  autoscale:true 
-              },
-              yaxis: {
-                // Don't pad out the bottom of the data range.  By default,
-                // axes scaled as if data extended 10% above and below the
-                // actual range to prevent data points right on grid boundaries.
-                // Don't want to do that here.
-                padMin: 0
-              }
+                xaxis: {
+                    renderer: $.jqplot.DateAxisRenderer,
+                    autoscale: true 
+                },
+                yaxis: {
+                    padMin: 0
+                }
             },
             legend: {
-              show: true,
-              location: 'e',
-              placement: 'outside'
-            }      
-          });
+                show: true,
+                location: 'e',
+                placement: 'outside'
+            }
+        });
     }
 
-    function updateProfile()
-    {
+    function updateProfile() {
         function onUpdateProfileRequest(response) {
             if (response.status !== 'ok') {
                 // TODO: notify
@@ -116,7 +103,7 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             url: "/getUserProfile",
             contentType: 'application/json',
             data: JSON.stringify({
-                username: $.url('?user'),
+                username: $.url('?user')
             })
         }).done(onUpdateProfileRequest);
 
@@ -125,7 +112,7 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             url: "/statistics/getRatingByDate",
             contentType: 'application/json',
             data: JSON.stringify({
-                username: $.url('?user'),
+                username: $.url('?user')
             })
         }).done(onUpdateRatingChartRequest);
 
@@ -134,7 +121,7 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             url: "/statistics/getBlundersByDate",
             contentType: 'application/json',
             data: JSON.stringify({
-                username: $.url('?user'),
+                username: $.url('?user')
             })
         }).done(onUpdateBlunderChartRequest);
     }
@@ -167,7 +154,7 @@ for (var i=0; i<50*Math.PI; i+=0.1){
             {
                 type: 'chart', 
                 id: 'blunder-count-statistics'
-            },
+            }
         ]
     }];
 
@@ -175,5 +162,4 @@ for (var i=0; i<50*Math.PI; i+=0.1){
     $('#details').html(html);
 
     updateProfile();
-
 })();

@@ -455,7 +455,6 @@ def getTaskStartDate(user_id, blunder_id):
         return assign_date
 
 def getUserProfile(username):
-    
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.id,
@@ -510,28 +509,33 @@ def getRatingByDate(username):
     user_id = getUserId(username)
 
     with PostgreConnection('r') as connection:
-            connection.cursor.execute("""
-                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
-                       AVG(b.user_elo) 
-                FROM blunder_history AS b
-                GROUP BY date, b.user_id HAVING b.user_id = %s;"""
-                , (user_id,))
+        connection.cursor.execute("""
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
+                   AVG(b.user_elo) 
+            FROM blunder_history AS b
+            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
+            , (user_id,)
+        )
 
-            data = connection.cursor.fetchall()
-            result = []
-            for i, point in enumerate(data):
-                (date, elo,) = point
-                result.append([date, int(elo)])
+        data = connection.cursor.fetchall()
+        result = []
+        for i, point in enumerate(data):
+            (date, elo,) = point
+            result.append([date, int(elo)])
 
     return {
         'status': 'ok',
         'username': username,
         'data' : [ 
-                { 'id': 'rating-statistics', 'value': 
-                    [
-                        {'id': 'rating-change-in-time',    'value': result},
-                    ]
-                },
+            { 
+                'id': 'rating-statistics', 
+                'value': [
+                    {
+                        'id': 'rating-change-in-time',
+                        'value': result
+                    }
+                ]
+            },
         ]
     }
 
@@ -540,13 +544,14 @@ def getBlundersByDate(username):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-                SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date, 
-                       COUNT(b.id) as total,
-                       COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
-                       COUNT(b.id) FILTER (WHERE b.result = 0) as failed
-                FROM blunder_history AS b
-                GROUP BY date, b.user_id HAVING b.user_id = %s"""
-                , (user_id,))
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date, 
+                   COUNT(b.id) as total,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+            FROM blunder_history AS b
+            GROUP BY date, b.user_id HAVING b.user_id = %s"""
+            , (user_id,)
+        )
 
         data = connection.cursor.fetchall()
 
@@ -565,12 +570,13 @@ def getBlundersByDate(username):
         'status': 'ok',
         'username': username,
         'data': [
-                { 'id': 'blunder-count-statistics', 'value': 
-                    [
-                        {'id': 'total_blunders',    'value': yData1},
-                        {'id': 'succeed_blunders',  'value': yData2},
-                        {'id': 'failed_blunders',   'value': yData3},
-                    ]
-                },
+            { 
+                'id': 'blunder-count-statistics', 
+                'value': [
+                    {'id': 'total_blunders',   'value': yData1},
+                    {'id': 'succeed_blunders', 'value': yData2},
+                    {'id': 'failed_blunders',  'value': yData3},
+                ]
+            },
         ]
     }
