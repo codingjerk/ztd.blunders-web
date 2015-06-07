@@ -1,131 +1,4 @@
-(function() {
-    function fixDate(data) {
-        for (var i = 0; i < data.length; ++i) {
-            data[i][0] = new Date(data[i][0]);
-        }
-
-        return data;
-    }
-
-    function drawRatingChart(e) {
-        var chart = fixDate(e.value[0].value);
-
-        $.jqplot(e.id, [chart], {
-            series: [{
-                showMarker: false,
-                rendererOptions: {
-                    smooth: true
-                }
-            }],
-            axes: {
-                xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer
-                }
-            }
-        });
-    }
-
-    function drawBlunderChart(e) {
-        var data = [
-            fixDate(e.value[1].value),
-            fixDate(e.value[2].value)
-        ];
-
-        $.jqplot(e.id, data, {
-            stackSeries: true,
-            captureRightClick: true,
-            seriesDefaults: {
-                renderer: $.jqplot.BarRenderer,
-                rendererOptions: {
-                    barMargin: 1,
-                    highlightMouseDown: true   
-                },
-                pointLabels: {
-                    show: true
-                }
-            },
-            axes: {
-                xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer,
-                    autoscale: true 
-                },
-                yaxis: {
-                    padMin: 0
-                }
-            },
-            legend: {
-                show: true,
-                location: 'e',
-                placement: 'outside'
-            }
-        });
-    }
-
-    function updateProfile() {
-        function onUpdateProfileRequest(response) {
-            if (response.status !== 'ok') {
-                // TODO: notify
-                return;
-            }
-
-            grid.update(response.data, {});
-        }
-
-        function onUpdateRatingChartRequest(response) {
-            if (response.status !== 'ok') {
-                // TODO: notify
-                return;
-            }
-
-            grid.update(response.data,  {'rating-statistics': drawRatingChart});
-        }
-
-        function onUpdateRatingChartRequest(response) {
-            if (response.status !== 'ok') {
-                // TODO: notify
-                return;
-            }
-
-            grid.update(response.data,  {'rating-statistics': drawRatingChart});
-        } 
-
-        function onUpdateBlunderChartRequest(response) {
-            if (response.status !== 'ok') {
-                // TODO: notify
-                return;
-            }
-
-            grid.update(response.data,  {'blunder-count-statistics': drawBlunderChart});
-        } 
-
-        $.ajax({
-            type: 'POST',
-            url: "/getUserProfile",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                username: $.url('?user')
-            })
-        }).done(onUpdateProfileRequest);
-
-        $.ajax({
-            type: 'POST',
-            url: "/statistics/getRatingByDate",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                username: $.url('?user')
-            })
-        }).done(onUpdateRatingChartRequest);
-
-        $.ajax({
-            type: 'POST',
-            url: "/statistics/getBlundersByDate",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                username: $.url('?user')
-            })
-        }).done(onUpdateBlunderChartRequest);
-    }
-
+(function generateStructure() {
     var blocks = [{
         caption: 'Blunders',
         rows: [
@@ -160,6 +33,108 @@
 
     var html = grid.generate(blocks);
     $('#details').html(html);
+})();
 
-    updateProfile();
+(function updateProfile() {
+    function onUpdateProfileRequest(response) {
+        if (response.status !== 'ok') {
+            // TODO: notify
+            return;
+        }
+
+        grid.update(response.data);
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: "/getUserProfile",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            username: $.url('?user')
+        })
+    }).done(onUpdateProfileRequest);
+})();
+
+(function updateRatingChart() {
+    $.ajax({
+        type: 'POST',
+        url: "/statistics/getRatingByDate",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            username: $.url('?user')
+        })
+    }).done(onUpdateRatingChartRequest);
+
+    function onUpdateRatingChartRequest(response) {
+        if (response.status !== 'ok') return; // TODO: notify
+        grid.update(response.data,  {'rating-statistics': drawRatingChart});
+    } 
+
+    function drawRatingChart(id, data) {
+        var chart = data.mapNear(0, utils.fixDate);
+        
+        $.jqplot(id, [data], {
+            series: [{
+                showMarker: false,
+                rendererOptions: {
+                    smooth: true
+                }
+            }],
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.DateAxisRenderer
+                }
+            }
+        });
+    }
+})();
+
+(function updateBlunderChart() {
+    $.ajax({
+        type: 'POST',
+        url: "/statistics/getBlundersByDate",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            username: $.url('?user')
+        })
+    }).done(onUpdateBlunderChartRequest);
+
+    function onUpdateBlunderChartRequest(response) {
+        if (response.status !== 'ok') return; // TODO: notify
+        grid.update(response.data, {'blunder-count-statistics': drawBlunderChart});
+    } 
+
+    function drawBlunderChart(id, data) {
+        var failed = data.failed.mapNear(0, utils.fixDate);
+        var solved = data.solved.mapNear(0, utils.fixDate);
+
+        $.jqplot(id, [failed, solved], {
+            stackSeries: true,
+            captureRightClick: true,
+            seriesDefaults: {
+                renderer: $.jqplot.BarRenderer,
+                rendererOptions: {
+                    barMargin: 1,
+                    highlightMouseDown: true   
+                },
+                pointLabels: {
+                    show: true
+                }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.DateAxisRenderer,
+                    autoscale: true 
+                },
+                yaxis: {
+                    padMin: 0
+                }
+            },
+            legend: {
+                show: true,
+                location: 'e',
+                placement: 'inside'
+            }
+        });
+    }
 })();
