@@ -30,36 +30,20 @@ var grid = {};
     }
 
     var parseNamedRows = function(rowsData) {
-        var result = '';
-
-        while (rowsData.length > 0) {
-            if (rowsData[0].type !== 'chart') break;
-
-            var rowData = rowsData.shift();
-            result += generateRow(rowData);
-        }
-
-        return result;
+        return rowsData.shiftWhile(function(row){
+            return (row.type === 'chart');
+        }).map(generateRow).join('');
     }
 
     var parseCells = function(rowsData) {
-        var cells = [];
-
-        while (rowsData.length > 0) {
-            if (rowsData[0].type !== 'cell') break;
-
-            var rowData = rowsData.shift();
-            cells.push(generateRow(rowData));
-        }
+        var cells = rowsData.shiftWhile(function(row) {
+            return (row.type === 'cell');
+        }).map(generateRow);
 
         var result = '';
-
         while (cells.length > 0) {
-            var c1 = cells.shift() || '';
-            var c2 = cells.shift() || '';
-            var c3 = cells.shift() || '';
-
-            result += '<tr class="grid-row">{0}{1}{2}</tr>'.format(c1, c2, c3);
+            var group = cells.shiftGroup(3).map(function(e) {return e || '';});
+            result += '<tr class="grid-row">' + group.join('') + '</tr>';
         }
 
         return result;
@@ -67,7 +51,6 @@ var grid = {};
 
     var generateRows = function(rowsData) {
         var result = '';
-
         while (rowsData.length > 0) {
             result += parseNamedRows(rowsData);
             result += parseCells(rowsData);
@@ -90,15 +73,14 @@ var grid = {};
     module.update = function(data, rules) {
         var rules = rules || {};
 
-        for (var i = 0; i < data.length; i++) {
-            var element = data[i];
-
+        data.map(function(element) {
             var ruleFunction = rules[element.id];
+
             if (ruleFunction !== undefined) {
                 ruleFunction(element.id, element.value);
             } else {
                 $('#' + element.id).html(element.value);
             }
-        }
+        });
     }
 })(grid);
