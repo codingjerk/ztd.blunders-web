@@ -10,21 +10,23 @@ var utils = {};
         return str;
     }
 
-    Array.prototype.map = function(f) {
-        result = [];
+    Array.prototype.map = function(f, args) {
+        var args = args || [];
+
+        var result = [];
         for (var i = 0; i < this.length; ++i) {
-            result.push(f(this[i]));
+            result.push(f.apply(null, [this[i]].concat(args)));
         }
 
         return result;
     }
 
-    Array.prototype.mapIndex = function(index, f) {
+    Array.prototype.mapIndex = function(index, f, args) {
         return this.map(function(e) {
             var result = e;
-            result[index] = f(result[index]);
+            result[index] = f(result[index], args);
 
-            return e;
+            return result;
         });
     }
 
@@ -34,21 +36,23 @@ var utils = {};
         });
     }
 
-    Array.prototype.filter = function(p) {
-        var result = [];
+    Array.prototype.filter = function(p, args) {
+        var args = args || [];
 
+        var result = [];
         for (var i = 0; i < this.length; ++i) {
-            if (p(this[i])) result.push(this[i]);
+            if (p.apply(null, [this[i]].concat(args))) result.push(this[i]);
         }
 
         return result;
     }
 
-    Array.prototype.shiftWhile = function(p) {
-        var result = [];
+    Array.prototype.shiftWhile = function(p, args) {
+        var args = args || [];
 
+        var result = [];
         while (this.length > 0) {
-            if (!p(this[0])) break;
+            if (!p.apply(null, [this[0]].concat(args))) break;
 
             result.push(this.shift());
         }
