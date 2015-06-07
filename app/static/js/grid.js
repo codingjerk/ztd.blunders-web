@@ -94,14 +94,16 @@ var grid = {};
     }
 
     module.update = function(data, rules) {
+        var rules = rules || {};
+
         for (var i = 0; i < data.length; i++) {
             var element = data[i];
 
             var ruleFunction = rules[element.id];
             if (ruleFunction !== undefined) {
-                ruleFunction(element);
+                ruleFunction(element.id, element.value);
             } else {
-                $('#' + element.id).html(element);
+                $('#' + element.id).html(element.value);
             }
         }
     }
