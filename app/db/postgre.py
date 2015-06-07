@@ -518,10 +518,7 @@ def getRatingByDate(username):
         )
 
         data = connection.cursor.fetchall()
-        result = []
-        for i, point in enumerate(data):
-            (date, elo,) = point
-            result.append([date, int(elo)])
+        rating = [[date, int(elo)] for (date, elo) in data]
 
     return {
         'status': 'ok',
@@ -529,12 +526,7 @@ def getRatingByDate(username):
         'data' : [ 
             { 
                 'id': 'rating-statistics', 
-                'value': [
-                    {
-                        'id': 'rating-change-in-time',
-                        'value': result
-                    }
-                ]
+                'value': rating
             },
         ]
     }
@@ -555,28 +547,21 @@ def getBlundersByDate(username):
 
         data = connection.cursor.fetchall()
 
-        yData1 = []
-        yData2 = []
-        yData3 = []        
-        for i, point in enumerate(data):
-            (date, total, solved, failed,) = point
-            yData1.append([date, total])
-            yData2.append([date, solved])
-            yData3.append([date, failed])
-
-        yData = [yData1, yData2, yData3]
+        total = [[date, total] for (date, total, _1, _2) in data]
+        solved = [[date, solved] for (date, _1, solved, _2) in data]
+        failed = [[date, failed] for (date, _1, _2, failed) in data]
 
     return {
         'status': 'ok',
         'username': username,
         'data': [
-            { 
-                'id': 'blunder-count-statistics', 
-                'value': [
-                    {'id': 'total_blunders',   'value': yData1},
-                    {'id': 'succeed_blunders', 'value': yData2},
-                    {'id': 'failed_blunders',  'value': yData3},
-                ]
-            },
+            {
+                'id': 'blunder-count-statistics',
+                'value': {
+                    'total'  : total,
+                    'solved' : solved,
+                    'failed' : failed
+                }
+            }
         ]
     }
