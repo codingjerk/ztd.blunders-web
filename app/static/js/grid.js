@@ -66,14 +66,12 @@ var grid = {};
     module.update = function(data, rules) {
         var rules = rules || {};
 
-        data.map(function(element) {
-            var ruleFunction = rules[element.id];
-
-            if (ruleFunction !== undefined) {
-                ruleFunction(element.id, element.value);
+        for (var id in data) {
+            if (rules[id] !== undefined) {
+                rules[id](id, data[id]);
             } else {
-                $('#' + element.id).html(element.value);
+                $('#' + id).html(data[id]);
             }
-        });
+        };
     }
 })(grid);

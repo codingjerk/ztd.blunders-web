@@ -494,15 +494,15 @@ def getUserProfile(username):
 
     return {
         'status': 'ok',
-        'data': [
-            {'id': 'failed-blunders-value', 'value': failed},
-            {'id': 'total-blunders-value',  'value': total},
-            {'id': 'solved-blunders-value', 'value': solved},
-            {'id': 'user-rating-value',     'value': user_elo},
-            {'id': 'user-karma-value',      'value': karma},
-            {'id': 'username-value',        'value': username},
-            {'id': 'user-join-value',       'value': userJoinDate}
-        ]
+        'data': {
+            'failed-blunders-value': failed,
+            'total-blunders-value':  total,
+            'solved-blunders-value': solved,
+            'user-rating-value':     user_elo,
+            'user-karma-value':      karma,
+            'username-value':        username,
+            'user-join-value':       userJoinDate
+        }
     }
 
 def getRatingByDate(username):
@@ -523,12 +523,9 @@ def getRatingByDate(username):
     return {
         'status': 'ok',
         'username': username,
-        'data' : [ 
-            { 
-                'id': 'rating-statistics', 
-                'value': rating
-            },
-        ]
+        'data' : { 
+            'rating-statistics': rating
+        }
     }
 
 def getBlundersByDate(username):
@@ -554,14 +551,11 @@ def getBlundersByDate(username):
     return {
         'status': 'ok',
         'username': username,
-        'data': [
-            {
-                'id': 'blunder-count-statistics',
-                'value': {
-                    'total'  : total,
-                    'solved' : solved,
-                    'failed' : failed
-                }
+        'data': {
+            'blunder-count-statistics': {
+                'total' : total,
+                'solved': solved,
+                'failed': failed
             }
-        ]
+        }
     }
