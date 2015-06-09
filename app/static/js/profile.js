@@ -197,6 +197,8 @@
     }
 
     function onUpdateBlunderHistory(response) {
+        if (response.status !== 'ok') return; // TODO: notify
+        
         var blunders = response.data.blunders;
 
         var rows = blunders.map(function(b) {

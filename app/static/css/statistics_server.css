@@ -1,0 +1,8 @@
+
+#users-online-list {
+    text-align : center;
+}
+
+#users-online-list > a {
+    font-size: 80%;
+}

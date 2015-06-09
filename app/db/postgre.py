@@ -585,7 +585,7 @@ def getBlundersHistory(username, offset, limit):
             FROM blunder_history AS h
             WHERE h.user_id = %s
             LIMIT %s OFFSET %s"""
-            , (user_id, limit, offset)
+            , (user_id, limit, offset, )
         )
 
         data = connection.cursor.fetchall()
@@ -600,3 +600,47 @@ def getBlundersHistory(username, offset, limit):
             "blunders": blunders
         }
     }
+
+def lastActiveUsers(interval):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.username,
+                   MAX(h.date_finish) AS date_last
+            FROM blunder_history AS h
+            INNER JOIN users AS u 
+                ON h.user_id = u.id
+            WHERE h.date_finish > NOW() - INTERVAL %s
+            GROUP BY u.username;"""
+            , (interval,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        users = [username for (username, _1) in data]
+
+        return users;
+
+def getUsersStatistics():
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+                SELECT COUNT(id)
+                FROM users AS u"""
+            )
+        (users_registered_value, ) = connection.cursor.fetchone()
+
+    users_day = lastActiveUsers('1 HOUR')
+    users_week = lastActiveUsers('1 WEEK')
+
+    
+    return {
+        'status': 'ok',
+        'data': {
+            "users-registered-value": users_registered_value,
+            "users-online-value": len(users_day),
+            "users-online-list" : users_day,
+            "users-active-value": len(users_week)
+        }
+    }
+
+def getUsersByRating():
+    pass
