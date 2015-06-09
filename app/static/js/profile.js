@@ -1,35 +1,46 @@
 (function generateStructure() {
-    var blocks = [{
-        caption: 'Blunders',
-        rows: [
-            {
-                type: 'chart', 
-                id: 'rating-statistics'
-            },
-            {
-                type: 'cell',
-                label: 'Failed',
-                id: 'failed-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'cell',
-                label: 'Total',
-                id: 'total-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'cell',
-                label: 'Solved',
-                id: 'solved-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'chart', 
-                id: 'blunder-count-statistics'
-            }
-        ]
-    }];
+    var blocks = [
+        {
+            caption: 'Blunders',
+            rows: [
+                {
+                    type: 'wide', 
+                    id: 'rating-statistics'
+                },
+                {
+                    type: 'cell',
+                    label: 'Failed',
+                    id: 'failed-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'cell',
+                    label: 'Total',
+                    id: 'total-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'cell',
+                    label: 'Solved',
+                    id: 'solved-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'wide', 
+                    id: 'blunder-count-statistics'
+                }
+            ]
+        },
+        {
+            caption: 'History',
+            rows: [
+                {
+                    type: 'wide', 
+                    id: 'blunder-history'
+                }
+            ]
+        }
+    ];
 
     var html = grid.generate(blocks, 3);
     $('#details').html(html);
@@ -74,6 +85,7 @@
         var chart = data.mapIndex(0, utils.fixDate);
         
         $.jqplot(id, [data], {
+            title: "User rating dynamics",
             series: [{
                 showMarker: false,
                 rendererOptions: {
@@ -82,9 +94,16 @@
             }],
             axes: {
                 xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer
+                    renderer: $.jqplot.DateAxisRenderer,
+                    tickInterval: 'day'
                 }
-            }
+            },
+            cursor:{ 
+                show: true,
+                zoom:true, 
+                showTooltip:false,
+                clickReset:true
+            } 
         });
     }
 })();
@@ -109,8 +128,10 @@
         var solved = data.solved.mapIndex(0, utils.fixDate);
 
         $.jqplot(id, [failed, solved], {
+            title: "Blunder success / failed dynamics",
             stackSeries: true,
             captureRightClick: true,
+            seriesColors: ["rgb(217, 83, 79)", "#1fa67a"],
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
                 rendererOptions: {
@@ -124,17 +145,68 @@
             axes: {
                 xaxis: {
                     renderer: $.jqplot.DateAxisRenderer,
-                    autoscale: true 
+                    tickInterval: 'day'
                 },
                 yaxis: {
                     padMin: 0
                 }
             },
-            legend: {
-                show: true,
-                location: 'e',
-                placement: 'inside'
-            }
+            legend:{ 
+                show:true,
+                    renderer: $.jqplot.EnhancedLegendRenderer,
+                    location: 'n' ,
+                    placement : "outsideGrid",
+                    marginTop : "0px",
+                    rendererOptions: {
+                        numberRows: 1
+                    },
+                    labels: [ 'Failed to solve', 'Successfully solved']
+            },
         });
+    }
+})();
+
+(function updateBlunderHistory() {
+    var blundersPerPage = 10;
+
+    var content = '<div id="blunder-history-content"></div><div id="blunder-history-paginator"></div>';
+    $("#blunder-history").html(content);
+
+    $("#blunder-history-paginator").pagination({
+        items: 1,
+        itemsOnPage: blundersPerPage,
+        cssStyle: 'light-theme',
+        onPageClick: function(pageNumber, event) {
+            getContent(pageNumber, blundersPerPage);
+        }
+    });
+
+    getContent(1, blundersPerPage);
+
+    function getContent(page, limit) {
+        $.ajax({
+            type: 'POST',
+            url: "/statistics/getBlundersHistory",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username: $.url('?user'),
+                offset: (page - 1) * limit,
+                limit: limit
+            })
+        }).done(onUpdateBlunderHistory);
+    }
+
+    function onUpdateBlunderHistory(response) {
+        var blunders = response.data.blunders;
+
+        var rows = "";
+        for (var i = 0; i < blunders.length; ++i) {
+            rows += '<tr><td>{0}</td><td>{1}</td></tr>'.format(blunders[i].blunder_id, blunders[i].result);
+        }
+
+        var content = '<table>{0}</table>'.format(rows);
+        $("#blunder-history-content").html(content);
+
+        $("#blunder-history-paginator").pagination("updateItems", response.data.total);
     }
 })();
