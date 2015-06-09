@@ -6,8 +6,8 @@ from app import app, db
 from app.db import mongo, postgre
 from app import utils
 
-@app.route('/statistics/getBlundersHistoryList', methods=['POST'])
-def getBlundersHistoryList():
+@app.route('/statistics/getBlundersHistory', methods=['POST'])
+def getBlundersHistory():
     try:
         username = request.json['username']
         page = request.json['page']
@@ -18,5 +18,5 @@ def getBlundersHistoryList():
             'message': 'Username, page and limit required'
         })
 
-    return jsonify(postgre.getBlundersHistoryList(username, page, limit))
+    return jsonify(postgre.getBlundersHistory(username, page, limit))
     

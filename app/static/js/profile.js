@@ -197,7 +197,7 @@
         {
             $.ajax({
                 type: 'POST',
-                url: "/statistics/getBlundersHistoryList",
+                url: "/statistics/getBlundersHistory",
                 contentType: 'application/json',
                 data: JSON.stringify({
                     username: $.url('?user'),
