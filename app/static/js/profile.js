@@ -74,6 +74,7 @@
         var chart = data.mapIndex(0, utils.fixDate);
         
         $.jqplot(id, [data], {
+            title: "User rating dynamics",
             series: [{
                 showMarker: false,
                 rendererOptions: {
@@ -82,9 +83,16 @@
             }],
             axes: {
                 xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer
+                    renderer: $.jqplot.DateAxisRenderer,
+                    tickInterval: 'day'
                 }
-            }
+            },
+            cursor:{ 
+                show: true,
+                zoom:true, 
+                showTooltip:false,
+                clickReset:true
+            } 
         });
     }
 })();
@@ -109,8 +117,10 @@
         var solved = data.solved.mapIndex(0, utils.fixDate);
 
         $.jqplot(id, [failed, solved], {
+            title: "Blunder success / failed dynamics",
             stackSeries: true,
             captureRightClick: true,
+            seriesColors: ["rgb(217, 83, 79)", "#1fa67a"],
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
                 rendererOptions: {
@@ -124,17 +134,23 @@
             axes: {
                 xaxis: {
                     renderer: $.jqplot.DateAxisRenderer,
-                    autoscale: true 
+                    tickInterval: 'day'
                 },
                 yaxis: {
                     padMin: 0
                 }
             },
-            legend: {
-                show: true,
-                location: 'e',
-                placement: 'inside'
-            }
+            legend:{ 
+                show:true,
+                    renderer: $.jqplot.EnhancedLegendRenderer,
+                    location: 'n' ,
+                    placement : "outsideGrid",
+                    marginTop : "0px",
+                    rendererOptions: {
+                        numberRows: 1
+                    },
+                    labels: [ 'Failed to solve', 'Successfully solved']
+            },
         });
     }
 })();
