@@ -559,3 +559,47 @@ def getBlundersByDate(username):
             }
         }
     }
+
+def getBlundersHistoryList(username, page, limit):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_history as h
+            WHERE h.user_id = %s"""
+            , (user_id, )
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting blunders for user'
+            }
+        (total, ) = connection.cursor.fetchone()
+        print(total)
+
+    offset = (page - 1) * limit
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT h.blunder_id, h.result
+            FROM blunder_history as h
+            WHERE h.user_id = %s
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset)
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [{"blunder_id":blunder_id, "result":result} for (blunder_id, result) in data]
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+                "total" : total,
+                "page" : page,
+                "blunders" : blunders
+                }
+        }

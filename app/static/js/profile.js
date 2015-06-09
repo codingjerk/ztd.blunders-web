@@ -27,6 +27,10 @@
             {
                 type: 'chart', 
                 id: 'blunder-count-statistics'
+            },
+            {
+                type: 'chart', 
+                id: 'blunder-history'
             }
         ]
     }];
@@ -153,4 +157,57 @@
             },
         });
     }
+})();
+
+(function updateBlunderHistory() {
+        const limitOnOnePage = 10
+
+        content = '<div id="blunder-history-list"></div><div id="blunder-history-paginator"></div>';
+        $("#blunder-history").html(content)
+
+        function initPaginator(totalPages, itemsOnPage) {
+                $("#blunder-history-paginator").pagination({
+                    items: totalPages,
+                    itemsOnPage: itemsOnPage,
+                    cssStyle: 'light-theme',
+                    onPageClick: function(pageNumber, event){
+                        getContent(pageNumber, limitOnOnePage)
+                    }
+                })
+        }
+
+        function onUpdateBlunderHistory(response)
+        {
+            var blunders = response.data.blunders;
+
+            var rows = "";
+            for(var i = 0; i < blunders.length; ++i) {
+                rows += '<tr><td>{0}</td><td>{1}</td></tr>'.format(blunders[i].blunder_id, blunders[i].result );
+            }
+
+
+            var content = '<table>{0}</table>'.format(rows)
+            $("#blunder-history-list").html(content);
+
+            $("#blunder-history-paginator").pagination("updateItems", response.data.total);
+            
+        }
+
+        function getContent(page, limit)
+        {
+            $.ajax({
+                type: 'POST',
+                url: "/statistics/getBlundersHistoryList",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    username: $.url('?user'),
+                    page: page,
+                    limit: limit
+                })
+            }).done(onUpdateBlunderHistory);
+        }
+
+        initPaginator(1,10);
+        getContent(1, limitOnOnePage);
+
 })();
