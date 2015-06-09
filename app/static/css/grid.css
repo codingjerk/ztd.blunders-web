@@ -17,16 +17,18 @@
     background-color: #f5f5f5;
 }
 
-.wide-block-wrapper {
-    padding: 10px 30px;
-}
-
 .cell-block {
     border: 1px solid #dedede;
 
     padding: 10px;
 
     text-align: center;
+}
+
+.wide-block-wrapper {
+    border: 1px solid #dedede;
+
+    padding: 10px 30px;
 }
 
 .cell-value {
