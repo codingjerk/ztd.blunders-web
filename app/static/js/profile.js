@@ -199,10 +199,9 @@
     function onUpdateBlunderHistory(response) {
         var blunders = response.data.blunders;
 
-        var rows = "";
-        for (var i = 0; i < blunders.length; ++i) {
-            rows += '<tr><td>{0}</td><td>{1}</td></tr>'.format(blunders[i].blunder_id, blunders[i].result);
-        }
+        var rows = utils.map(blunders, function(b) {
+            return '<tr><td>{0}</td><td>{1}</td></tr>'.format(b.blunder_id, b.result);
+        }).join('');
 
         var content = '<table>{0}</table>'.format(rows);
         $("#blunder-history-content").html(content);
