@@ -1,39 +1,46 @@
 (function generateStructure() {
-    var blocks = [{
-        caption: 'Blunders',
-        rows: [
-            {
-                type: 'chart', 
-                id: 'rating-statistics'
-            },
-            {
-                type: 'cell',
-                label: 'Failed',
-                id: 'failed-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'cell',
-                label: 'Total',
-                id: 'total-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'cell',
-                label: 'Solved',
-                id: 'solved-blunders-value',
-                additional: 'all time'
-            },
-            {
-                type: 'chart', 
-                id: 'blunder-count-statistics'
-            },
-            {
-                type: 'chart', 
-                id: 'blunder-history'
-            }
-        ]
-    }];
+    var blocks = [
+        {
+            caption: 'Blunders',
+            rows: [
+                {
+                    type: 'wide', 
+                    id: 'rating-statistics'
+                },
+                {
+                    type: 'cell',
+                    label: 'Failed',
+                    id: 'failed-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'cell',
+                    label: 'Total',
+                    id: 'total-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'cell',
+                    label: 'Solved',
+                    id: 'solved-blunders-value',
+                    additional: 'all time'
+                },
+                {
+                    type: 'wide', 
+                    id: 'blunder-count-statistics'
+                }
+            ]
+        },
+        {
+            caption: 'History',
+            rows: [
+                {
+                    type: 'wide', 
+                    id: 'blunder-history'
+                }
+            ]
+        }
+    ];
 
     var html = grid.generate(blocks, 3);
     $('#details').html(html);
@@ -160,54 +167,46 @@
 })();
 
 (function updateBlunderHistory() {
-        const limitOnOnePage = 10
+    var blundersPerPage = 10;
 
-        content = '<div id="blunder-history-list"></div><div id="blunder-history-paginator"></div>';
-        $("#blunder-history").html(content)
+    var content = '<div id="blunder-history-content"></div><div id="blunder-history-paginator"></div>';
+    $("#blunder-history").html(content);
 
-        function initPaginator(totalPages, itemsOnPage) {
-                $("#blunder-history-paginator").pagination({
-                    items: totalPages,
-                    itemsOnPage: itemsOnPage,
-                    cssStyle: 'light-theme',
-                    onPageClick: function(pageNumber, event){
-                        getContent(pageNumber, limitOnOnePage)
-                    }
-                })
+    $("#blunder-history-paginator").pagination({
+        items: 1,
+        itemsOnPage: blundersPerPage,
+        cssStyle: 'light-theme',
+        onPageClick: function(pageNumber, event) {
+            getContent(pageNumber, blundersPerPage);
+        }
+    });
+
+    getContent(1, blundersPerPage);
+
+    function getContent(page, limit) {
+        $.ajax({
+            type: 'POST',
+            url: "/statistics/getBlundersHistory",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username: $.url('?user'),
+                offset: (page - 1) * limit,
+                limit: limit
+            })
+        }).done(onUpdateBlunderHistory);
+    }
+
+    function onUpdateBlunderHistory(response) {
+        var blunders = response.data.blunders;
+
+        var rows = "";
+        for (var i = 0; i < blunders.length; ++i) {
+            rows += '<tr><td>{0}</td><td>{1}</td></tr>'.format(blunders[i].blunder_id, blunders[i].result);
         }
 
-        function onUpdateBlunderHistory(response)
-        {
-            var blunders = response.data.blunders;
+        var content = '<table>{0}</table>'.format(rows);
+        $("#blunder-history-content").html(content);
 
-            var rows = "";
-            for(var i = 0; i < blunders.length; ++i) {
-                rows += '<tr><td>{0}</td><td>{1}</td></tr>'.format(blunders[i].blunder_id, blunders[i].result );
-            }
-
-
-            var content = '<table>{0}</table>'.format(rows)
-            $("#blunder-history-list").html(content);
-
-            $("#blunder-history-paginator").pagination("updateItems", response.data.total);
-            
-        }
-
-        function getContent(page, limit)
-        {
-            $.ajax({
-                type: 'POST',
-                url: "/statistics/getBlundersHistory",
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    username: $.url('?user'),
-                    page: page,
-                    limit: limit
-                })
-            }).done(onUpdateBlunderHistory);
-        }
-
-        initPaginator(1,10);
-        getContent(1, limitOnOnePage);
-
+        $("#blunder-history-paginator").pagination("updateItems", response.data.total);
+    }
 })();

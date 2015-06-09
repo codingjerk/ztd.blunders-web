@@ -22,7 +22,7 @@ var grid = {};
 
     var parseNamedRows = function(rowsData, cellsInRow) {
         return rowsData.shiftWhile(function(row){
-            return (row.type === 'chart');
+            return (row.type === 'wide');
         }).map(generateNamedRow, cellsInRow).join('');
     }
 
