@@ -199,7 +199,7 @@
     function onUpdateBlunderHistory(response) {
         var blunders = response.data.blunders;
 
-        var rows = utils.map(blunders, function(b) {
+        var rows = blunders.map(function(b) {
             return '<tr><td>{0}</td><td>{1}</td></tr>'.format(b.blunder_id, b.result);
         }).join('');
 
