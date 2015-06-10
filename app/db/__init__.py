@@ -27,3 +27,11 @@ def getAssignedBlunder(user_id):
     if blunder_id is None: return None
 
     return mongo.getBlunderById(blunder_id)
+
+def getBlundersStatistics():
+    return {
+        'status': 'ok',
+        'data': {
+            'total-blunders-value' : mongo.countBlunders()
+        }
+    }

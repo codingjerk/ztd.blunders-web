@@ -5,7 +5,7 @@
             rows: [
                 {
                     type: 'wide', 
-                    id: 'user-rating-destribution'
+                    id: 'users-rating-destribution'
                 },
                 {
                     type: 'cell',
@@ -21,7 +21,7 @@
                 },
                 {
                     type: 'cell',
-                    label: 'Active today',
+                    label: 'Active',
                     id: 'users-active-value',
                     additional: 'users'
                 },
@@ -36,18 +36,12 @@
             rows: [
                 {
                     type: 'wide', 
-                    id: 'blunder-rating-destribution'
+                    id: 'blunders-rating-destribution'
                 },
                 {
                     type: 'cell',
                     label: 'Total',
                     id: 'total-blunders-value',
-                    additional: 'blunders'
-                },
-                {
-                    type: 'cell',
-                    label: 'Never seen',
-                    id: 'neverseen-blunders-value',
                     additional: 'blunders'
                 }
             ]
@@ -65,7 +59,6 @@
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
         }).join('');
 
-        console.log(users)
         $('#' + id).html(usersLinks);
     }
 
@@ -133,7 +126,7 @@
             return;
         }
 
-        grid.update(response.data, {"user-rating-destribution" : updateUsersRating});
+        grid.update(response.data, {"users-rating-destribution" : updateUsersRating});
     }
 
     $.ajax({
@@ -141,4 +134,75 @@
         url: "/statistics/getUsersByRating",
         contentType: 'application/json',
     }).done(onUpdateUsersRatingRequest);
+})();
+
+(function updateBlundersRatingChart() {
+
+    function updateBlundersRating(id, data){
+       data.unshift([1000, 0]) // Hack to scale x axis
+       data.push([3000,0]);
+
+       var xElo = data.map(function(el){return el[0];});
+       var yCount = data.map(function(el){return el[1];});
+
+       $.jqplot(id, [data], {
+            title: "Blunders rating destribution",
+            captureRightClick: true,
+            seriesDefaults: {
+                renderer: $.jqplot.BarRenderer,
+                rendererOptions: {
+                    barWidth: 10,
+                    barMargin: 1,
+                    highlightMouseDown: true   
+                },
+                pointLabels: {
+                    show: true
+                }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                    tickOptions: {
+                      // labelPosition: 'middle',
+                      angle: 90
+                    },
+                    ticks: xElo
+                },
+                yaxis: {
+                    padMin: 0,
+                    tickInterval: 1
+                }
+            }
+        });
+    }
+
+    function onUpdateBlundersRatingRequest(response)
+    {
+        if (response.status !== 'ok') {
+            // TODO: notify
+            return;
+        }
+
+        grid.update(response.data, {"blunders-rating-destribution" : updateBlundersRating});
+    }
+
+    $.ajax({
+        type: 'GET',
+        url: "/statistics/getBlundersByRating",
+        contentType: 'application/json',
+    }).done(onUpdateBlundersRatingRequest);
+})();
+
+
+(function updateBlunders() {
+    function onUpdateBlundersRequest(response) {
+        grid.update(response.data);
+    }
+
+    $.ajax({
+        type: 'GET',
+        url: "/statistics/getBlundersStatistics",
+        contentType: 'application/json',
+    }).done(onUpdateBlundersRequest);
 })();

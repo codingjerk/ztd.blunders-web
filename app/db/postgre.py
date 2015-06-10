@@ -660,7 +660,6 @@ def getUsersByRating(interval):
     return {
         'status': 'ok',
         'data': {
-            'user-rating-destribution': destribution
+            'users-rating-destribution': destribution
         }
     }
-    
