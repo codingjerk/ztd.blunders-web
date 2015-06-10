@@ -72,7 +72,16 @@
 			return;
 		}
 
-		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
+		if (data.delta > 0) {
+			var deltaClass = 'green';
+			data.delta = '+{0}'.format(data.delta);
+		} else if (data.delta < 0) {
+			var deltaClass = 'red';
+		} else {
+			var deltaClass = ''
+		}
+
+		$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
 		
 		getBlunderInfo(blunder.id);
 		if (finished) showComments();
