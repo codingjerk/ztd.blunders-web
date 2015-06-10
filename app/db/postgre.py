@@ -648,8 +648,7 @@ def getUsersByRating(interval):
             SELECT u.elo - MOD(u.elo, %s) AS elo_category,
                    COUNT(u.id) 
             FROM users AS u 
-            GROUP BY elo_category
-            ORDER BY elo_category ;"""
+            GROUP BY elo_category;"""
             , (interval,)
         )
 
