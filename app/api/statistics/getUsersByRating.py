@@ -6,6 +6,6 @@ from app import app, db
 from app.db import mongo, postgre
 from app import utils
 
-@app.route('/statistics/getUsersByRating', methods = ['POST'])
-def getBlundersHistory():
-    return jsonify(postgre.getUsersByRating())
+@app.route('/statistics/getUsersByRating', methods = ['GET'])
+def getUsersByRating():
+    return jsonify(postgre.getUsersByRating(50))

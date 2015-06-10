@@ -642,5 +642,25 @@ def getUsersStatistics():
         }
     }
 
-def getUsersByRating():
-    pass
+def getUsersByRating(interval):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.elo - MOD(u.elo, %s) AS elo_category,
+                   COUNT(u.id) 
+            FROM users AS u 
+            GROUP BY elo_category
+            ORDER BY elo_category ;"""
+            , (interval,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        destribution = [[elo_category, count] for (elo_category, count) in data]
+
+    return {
+        'status': 'ok',
+        'data': {
+            'user-rating-destribution': destribution
+        }
+    }
+    

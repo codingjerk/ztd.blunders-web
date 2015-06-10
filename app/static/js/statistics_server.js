@@ -60,7 +60,7 @@
 
 (function updateUsers() {
 
-    function updateUserListd(id, users) {
+    function updateUserList(id, users) {
         var usersLinks = users.map(function(user) {
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
         }).join('');
@@ -75,7 +75,7 @@
             return;
         }
 
-        grid.update(response.data, {"users-online-list" : updateUserListd});
+        grid.update(response.data, {"users-online-list" : updateUserList});
     }
 
     $.ajax({
@@ -87,4 +87,58 @@
 
 (function updateUsersRatingChart() {
 
+    function updateUsersRating(id, data){
+       data.unshift([1000, 0]) // Hack to scale x axis
+       data.push([2500,0]);
+
+       var xElo = data.map(function(el){return el[0];});
+       var yCount = data.map(function(el){return el[1];});
+
+       $.jqplot(id, [data], {
+            title: "Users rating destribution",
+            captureRightClick: true,
+            seriesDefaults: {
+                renderer: $.jqplot.BarRenderer,
+                rendererOptions: {
+                    barWidth: 20,
+                    barMargin: 1,
+                    highlightMouseDown: true   
+                },
+                pointLabels: {
+                    show: true
+                }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                    tickOptions: {
+                      // labelPosition: 'middle',
+                      angle: 90
+                    },
+                    ticks: xElo
+                },
+                yaxis: {
+                    padMin: 0,
+                    tickInterval: 1
+                }
+            }
+        });
+    }
+
+    function onUpdateUsersRatingRequest(response)
+    {
+        if (response.status !== 'ok') {
+            // TODO: notify
+            return;
+        }
+
+        grid.update(response.data, {"user-rating-destribution" : updateUsersRating});
+    }
+
+    $.ajax({
+        type: 'GET',
+        url: "/statistics/getUsersByRating",
+        contentType: 'application/json',
+    }).done(onUpdateUsersRatingRequest);
 })();

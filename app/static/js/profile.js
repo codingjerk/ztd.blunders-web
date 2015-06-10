@@ -135,6 +135,7 @@
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
                 rendererOptions: {
+                    barWidth: 10,
                     barMargin: 1,
                     highlightMouseDown: true   
                 },
@@ -198,7 +199,7 @@
 
     function onUpdateBlunderHistory(response) {
         if (response.status !== 'ok') return; // TODO: notify
-        
+
         var blunders = response.data.blunders;
 
         var rows = blunders.map(function(b) {
