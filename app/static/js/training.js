@@ -304,13 +304,13 @@
 		return pmove;
 	}
 
-	function onBlunderRequest(data) {
-		if (data.status !== 'ok') {
-			notifyError(data.message);
+	function onBlunderRequest(response) {
+		if (response.status !== 'ok') {
+			notifyError(response.message);
 			return;
 		}
 
-		blunder = data;
+		blunder = response.data;
 
 		hideComments();
 		getBlunderInfo(blunder.id);
@@ -321,16 +321,16 @@
 		multiPv.push([blunder.blunderMove].concat(blunder.forcedLine));
 		multiPv.activeIndex = 'user';
 
-		matches = data.fenBefore.match(/\d+/g);
+		matches = blunder.fenBefore.match(/\d+/g);
 		firstMoveIndex = +matches[matches.length - 1];
 
 		visitedMoveCounter = 0;
 
-		board.position(data.fenBefore, false);
-		game.load(data.fenBefore);
+		board.position(blunder.fenBefore, false);
+		game.load(blunder.fenBefore);
 		firstMoveTurn = game.turn();
 
-		makeMove(board, data.blunderMove, true);
+		makeMove(board, blunder.blunderMove, true);
 	}
 
 	function buildCommentReplies(comments, parent_id) {
@@ -427,11 +427,13 @@
 		return comment.format(data.username, data.date, escapeHtml(data.text), replyButton, commentRating, subcommentsData);
 	}
 
-	function onInfoRequest(data) {
-		if (data.status === 'error') {
-			notifyError(data.message);
+	function onInfoRequest(response) {
+		if (response.status === 'error') {
+			notifyError(response.message);
 			return
 		}
+
+		data = response.data
 
 		if (data.myFavorite) {
 			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
@@ -442,6 +444,10 @@
 		$('#favorites').html(data.favorites);
 		$('#likes').html(data.likes);
 		$('#dislikes').html(data.dislikes);
+
+		var info = data['game-info'];
+		var gameInfo = '{0}({1}) - {2}({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
+		$('#source-game-info').html(gameInfo);
 
 		const successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
 

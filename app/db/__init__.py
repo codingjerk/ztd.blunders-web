@@ -35,3 +35,7 @@ def getBlundersStatistics():
             'total-blunders-value' : mongo.countBlunders()
         }
     }
+
+def getGameByBlunderId(blunder_id):
+    blunder = mongo.getBlunderById(blunder_id)
+    print(blunder)
