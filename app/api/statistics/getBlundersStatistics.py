@@ -6,7 +6,14 @@ from app import app, db
 from app.db import mongo, postgre
 from app import utils
 
-@app.route('/statistics/getBlundersStatistics', methods=['GET'])
+@app.route('/statistics/getBlundersStatistics', methods=['POST'])
 def getBlundersStatistics():
-    return jsonify(db.getBlundersStatistics())
+    try:
+        username = request.json['username']
+        print("postgre")
+        print(username)
+        return jsonify(postgre.getBlundersStatistics(username)) # user statistics
+    except:
+        print("db")
+        return jsonify(db.getBlundersStatistics())              # server statistics
     

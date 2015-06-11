@@ -459,12 +459,9 @@ def getUserProfile(username):
         connection.cursor.execute("""
             SELECT u.id,
                    u.username,
-                   u.elo,
-                   COUNT(b.id) as total,
-                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
-                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
-            FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
-            GROUP BY u.id, u.username, u.elo HAVING u.username = %s;"""
+                   u.elo
+            FROM users AS u
+            WHERE u.username = %s;"""
             , (username,)
         )
 
@@ -474,7 +471,7 @@ def getUserProfile(username):
                 'message': 'Trying to get not exist user with name %s' % username
             }
 
-        (user_id, username, user_elo, total, solved, failed) = connection.cursor.fetchone()
+        (user_id, username, user_elo) = connection.cursor.fetchone()
 
        
     with PostgreConnection('r') as connection:
@@ -495,15 +492,45 @@ def getUserProfile(username):
     return {
         'status': 'ok',
         'data': {
-            'failed-blunders-value': failed,
-            'total-blunders-value':  total,
-            'solved-blunders-value': solved,
             'user-rating-value':     user_elo,
             'user-karma-value':      karma,
             'username-value':        username,
             'user-join-value':       userJoinDate
         }
     }
+
+def getBlundersStatistics(username):
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.id,
+                   COUNT(b.id) as total,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+            FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
+            GROUP BY u.id, u.elo HAVING u.username = %s;"""
+            , (username,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Trying to get not exist user with name %s' % username
+            }
+
+        (user_id, total, solved, failed) = connection.cursor.fetchone()
+
+    return {
+        'status': 'ok',
+        'data': {
+            'username': username,
+            'failed-blunders-value': failed,
+            'total-blunders-value':  total,
+            'solved-blunders-value': solved
+        }
+    }
+
+
 
 def getRatingByDate(username):
     user_id = getUserId(username)
@@ -581,7 +608,12 @@ def getBlundersHistory(username, offset, limit):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT h.blunder_id, h.result
+            SELECT h.blunder_id,
+                   h.result,
+                   h.blunder_elo,
+                   h.user_elo,
+                   h.date_start,
+                   h.date_finish
             FROM blunder_history AS h
             WHERE h.user_id = %s
             LIMIT %s OFFSET %s"""
@@ -590,7 +622,14 @@ def getBlundersHistory(username, offset, limit):
 
         data = connection.cursor.fetchall()
 
-        blunders = [{"blunder_id": blunder_id, "result": result} for (blunder_id, result) in data]
+        blunders = [{
+                     "blunder_id": blunder_id,
+                     "result": result,
+                     "blunder_elo": blunder_elo,
+                     "user_elo": user_elo,
+                     "date_start": date_start,
+                     "date_finish": date_finish,
+                    } for (blunder_id, result, blunder_elo, user_elo, date_start, date_finish) in data]
 
     return {
         'status': 'ok',

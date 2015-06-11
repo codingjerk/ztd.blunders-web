@@ -93,7 +93,7 @@
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
                 rendererOptions: {
-                    barWidth: 20,
+                    barWidth: 10,
                     barMargin: 1,
                     highlightMouseDown: true   
                 },
@@ -201,7 +201,7 @@
     }
 
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: "/statistics/getBlundersStatistics",
         contentType: 'application/json',
     }).done(onUpdateBlundersRequest);
