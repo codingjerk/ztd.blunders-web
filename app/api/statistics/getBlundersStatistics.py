@@ -10,10 +10,7 @@ from app import utils
 def getBlundersStatistics():
     try:
         username = request.json['username']
-        print("postgre")
-        print(username)
         return jsonify(postgre.getBlundersStatistics(username)) # user statistics
     except:
-        print("db")
         return jsonify(db.getBlundersStatistics())              # server statistics
     

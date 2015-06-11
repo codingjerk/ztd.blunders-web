@@ -52,8 +52,6 @@
             // TODO: notify
             return;
         }
-        console.log(response.data);
-
         grid.update(response.data);
     }
 
