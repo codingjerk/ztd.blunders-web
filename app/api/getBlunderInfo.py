@@ -9,10 +9,10 @@ from app.utils import session
 
 def gameShortInfo(data):
     return {
-        'White': data['White'],
-        'WhiteElo': data['WhiteElo'],
-        'Black': data['Black'],
-        'BlackElo': data['BlackElo']
+        'White': data['White'] if 'White' in data else '???',
+        'WhiteElo': data['WhiteElo'] if 'WhiteElo' in data else '---',
+        'Black': data['Black'] if 'Black' in data else '???',
+        'BlackElo': data['BlackElo'] if 'BlackElo' in data else '---'
     }
 
 def getBlunderInfoById(blunder_id):
