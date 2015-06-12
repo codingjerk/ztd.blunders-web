@@ -659,6 +659,23 @@ def lastActiveUsers(interval):
 
         return users;
 
+def getUsersTop(number):
+    with PostgreConnection('r') as connection:
+            connection.cursor.execute("""
+                SELECT u.username,
+                       u.elo
+                FROM users AS u
+                ORDER BY u.elo DESC
+                LIMIT %s"""
+                , (number,)
+            )
+
+            data = connection.cursor.fetchall()
+
+            top = [{'username':username, 'elo':elo} for (username, elo) in data]
+
+    return top;
+
 def getUsersStatistics():
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -669,7 +686,7 @@ def getUsersStatistics():
 
     users_day = lastActiveUsers('1 HOUR')
     users_week = lastActiveUsers('1 WEEK')
-
+    users_top = getUsersTop(10)
     
     return {
         'status': 'ok',
@@ -677,6 +694,7 @@ def getUsersStatistics():
             "users-registered-value": users_registered_value,
             "users-online-value": len(users_day),
             "users-online-list" : users_day,
+            "users-top-list": users_top,
             "users-active-value": len(users_week)
         }
     }

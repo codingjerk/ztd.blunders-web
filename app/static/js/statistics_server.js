@@ -24,10 +24,15 @@
                     label: 'Active',
                     id: 'users-active-value',
                     additional: 'users'
-                },
+                }
+            ]
+        },
+        {
+            caption: 'Top 10',
+            rows: [
                 {
-                    type: 'wide', 
-                    id: 'users-online-list'
+                    type: 'wide',
+                    id: 'users-top-list'
                 }
             ]
         },
@@ -45,6 +50,15 @@
                     additional: 'blunders'
                 }
             ]
+        },
+        {
+            caption: 'Online',
+            rows: [
+                {
+                    type: 'wide', 
+                    id: 'users-online-list'
+                }
+            ]
         }
     ];
 
@@ -52,14 +66,25 @@
     $('#details').html(html);
 })();
 
-(function updateUsers() {
+(function updateUsersStatistics() {
 
-    function updateUserList(id, users) {
+    function updateUsersOnlineList(id, users) {
         var usersLinks = users.map(function(user) {
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
         }).join('');
 
         $('#' + id).html(usersLinks);
+    }
+
+    function updateUsersTopList(id, users) {
+        var usersList = users.map(function(user) {
+                    var username = user['username'];
+                    var elo = user['elo'];
+                    return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username,username,elo);
+                }).join('');
+
+        var content = '<table>{0}</table>'.format(usersList);
+        $('#' + id).html(content);
     }
 
     function onUpdateUsersRequest(response) {
@@ -68,7 +93,8 @@
             return;
         }
 
-        grid.update(response.data, {"users-online-list" : updateUserList});
+        grid.update(response.data, {  "users-online-list" : updateUsersOnlineList,
+                                      "users-top-list":     updateUsersTopList    });
     }
 
     $.ajax({
