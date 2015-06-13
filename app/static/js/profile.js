@@ -1,5 +1,3 @@
-
-
 (function updateProfile() {
     function onUpdateProfileRequest(response) {
         if (response.status !== 'ok') {

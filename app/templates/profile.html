@@ -6,7 +6,7 @@
             <td id="summary">
                 <div id="avatar"><img src="static/img/default-avatar.png"/></div>
 
-                <div id="username-value"></div>
+                <div id="username-value">{{username}}</div>
                 <div id="user-join-date">
                     <i class="fa fa-clock-o"></i> Joined on <span id="user-join-value"></span>
                 </div>
@@ -24,7 +24,7 @@
                 </table>
 
                 <div id="user-links">
-                    <div id="user-statistic-link"><a href="/statistics?user={{session.username()}}"><i class="fa fa-line-chart"></i> Statistic</a></div>
+                    <div id="user-statistic-link"><a href="/statistics?user={{username}}"><i class="fa fa-line-chart"></i> Statistic</a></div>
                 </div>
                 
             </td>
