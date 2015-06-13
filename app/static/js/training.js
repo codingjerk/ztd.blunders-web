@@ -446,7 +446,7 @@
 		$('#dislikes').html(data.dislikes);
 
 		var info = data['game-info'];
-		var gameInfo = '{0}({1}) - {2}({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
+		var gameInfo = '{0} ({1}) &#8211 {2} ({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
 		$('#source-game-info').html(gameInfo);
 
 		const successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
