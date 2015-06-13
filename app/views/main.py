@@ -19,3 +19,11 @@ def donate():
 @app.route('/termsOfUse')
 def termsOfUse():
     return render_template('termsOfUse.html', title = 'Terms of Use', year = datetime.now().year, session = session)
+
+@app.route('/download')
+def download():
+    return render_template('download.html', title = 'Download', session = session)
+
+@app.route('/api')
+def api():
+    return render_template('api.html', title = 'API', session = session)

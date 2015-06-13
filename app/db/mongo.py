@@ -20,8 +20,14 @@ def getBlunderById(blunder_id):
     requestResult = db['filtered_blunders'].find({'_id': ObjectId(blunder_id)})
 
     if requestResult.count() != 1: return None
-
     return requestResult[0]
+
+def getGameById(game_id):
+    requestResult = db['games'].find({'_id': ObjectId(game_id)})
+
+    if requestResult.count() != 1: return None
+    return requestResult[0]
+
 
 def setRating(blunder_id, rating):
     db['filtered_blunders'].update({'_id': ObjectId(blunder_id)}, {'$set': {'elo': rating}})
