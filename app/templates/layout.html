@@ -17,8 +17,9 @@
 					<ul>
 						<li><a href="/training"><i class="fa fa-check"></i> Training</a></li>
 						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
-						<li><a href="#"><i class="fa fa-download"></i> Download</a></li>
-						<li><a href="#"><i class="fa fa-code"></i> API</a></li>
+						<li><a href="download"><i class="fa fa-download"></i> Download</a></li>
+						<li><a href="/statistics"><i class="fa fa-line-chart"></i> Statistics</a></li>
+						<li><a href="/api"><i class="fa fa-code"></i> API</a></li>
 					</ul>
 				</li>
 			</ul>
@@ -27,8 +28,8 @@
 				<ul id='user-bar'>
 					<li><a href="#"><i class="fa fa-user"></i> {{session.username()}}</a> <span id='rating'></span>
 						<ul>
-							<li><a href="/"><i class="fa fa-file-text"></i> Profile</a></li>
-							<li><a href="/"><i class="fa fa-line-chart"></i> Statistics</a></li>
+							<li><a href="/profile?user={{session.username()}}"><i class="fa fa-file-text"></i> Profile</a></li>
+							<li><a href="/statistics?user={{session.username()}}"><i class="fa fa-line-chart"></i> Statistics</a></li>
 							<li><a href="/logout"><i class="fa fa-sign-out"></i> Log Out</a></li>
 						</ul>
 					</li>
@@ -57,6 +58,7 @@
 		
 		<script src="static/third-party/chessboardjs/js/jquery-1.10.1.min.js"></script>
 		<script src="static/third-party/notifyjs/notify.min.js"></script>
+    	<script src="static/js/utils.js"></script>
 		{% block script %}{% endblock %}
 	</body>
 </html>
