@@ -16,13 +16,33 @@
 
 	var finished = false;
 
-	String.prototype.format = function() {
-		var str = this;
-		for (var i = 0; i < arguments.length; i++) {
-			var reg = new RegExp("\\{" + i + "\\}", "gm");
-			str = str.replace(reg, arguments[i]);
-		}
-		return str;
+	$.notify.addStyle('error', {
+	  html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
+	  classes: {
+	    base: {
+    		"color": "#ffffff",
+    		"border-color": "rgb(212, 63, 58)",
+    		"background-color": "rgb(217, 83, 79)",
+    		"padding": "7px 15px",
+    		"margin-bottom": "15px",
+    		"margin-right": "55px",
+    		"border-radius": "4px",
+    		"border-style": "solid",
+    		"border-width": "1px",
+	    }
+	  }
+	});
+
+	function notifyError(text) {
+		if (text === undefined) return;
+
+		$.notify(
+			text, 
+			{
+				style: 'error',
+				position: 'bottom right',
+			}
+		);
 	}
 
 	function getPv(index) {
@@ -48,13 +68,26 @@
 	var onResultAprooved = function(data) {
 		if (data.status !== 'ok') {
 			updateRating();
+			notifyError(data.message);
 			return;
 		}
 
-		$('#rating').html('(' + data.elo + '&nbsp' + data.delta + ')');
+		if (data.delta > 0) {
+			var deltaClass = 'green';
+			data.delta = '+{0}'.format(data.delta);
+		} else if (data.delta < 0) {
+			var deltaClass = 'red';
+		} else {
+			var deltaClass = ''
+		}
+
+		$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
+		
+		getBlunderInfo(blunder.id);
+		if (finished) showComments();
 	}
 
-	var sendResult = function() {
+	var sendResult = function(callback) {
 		$.ajax({
 			type: 'POST',
 			url: "/validateBlunder",
@@ -63,7 +96,10 @@
 				id: blunder.id,
 				line: getPv('user')
 			})
-		}).done(onResultAprooved);
+		}).done(function(data) {
+			onResultAprooved(data);
+			callback && callback(data);
+		});
 	}
 
 	var setStatus = function(status) {
@@ -268,40 +304,232 @@
 		return pmove;
 	}
 
-	function onBlunderRequest(data) {
-		if (data.status !== 'ok') {
-			// TODO: Show warning!
+	function onBlunderRequest(response) {
+		if (response.status !== 'ok') {
+			notifyError(response.message);
 			return;
 		}
+
+		blunder = response.data;
+
+		hideComments();
+		getBlunderInfo(blunder.id);
 			
 		setStatus('playing');
-
-		blunder = data;
 
 		multiPv = [];
 		multiPv.push([blunder.blunderMove].concat(blunder.forcedLine));
 		multiPv.activeIndex = 'user';
 
-		matches = data.fenBefore.match(/\d+/g);
+		matches = blunder.fenBefore.match(/\d+/g);
 		firstMoveIndex = +matches[matches.length - 1];
-
-		console.log(multiPv[0])
-		console.log('Elo:', blunder.elo)
 
 		visitedMoveCounter = 0;
 
-		board.position(data.fenBefore, false);
-		game.load(data.fenBefore);
+		board.position(blunder.fenBefore, false);
+		game.load(blunder.fenBefore);
 		firstMoveTurn = game.turn();
 
-		makeMove(board, data.blunderMove, true);
+		makeMove(board, blunder.blunderMove, true);
+	}
+
+	function buildCommentReplies(comments, parent_id) {
+		var result = '';
+
+		comments.forEach(function(c) {
+			if (c.parent_id === parent_id) {
+				result += commentBuilder(c, comments);
+			}
+		});
+
+		return result;
+	}
+
+	function voteBlunderComment(blunder_id, comment_id, vote) {
+		$.ajax({
+			type: 'POST',
+			url: "/voteBlunderComment",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				comment_id: comment_id,
+				vote: vote
+			})
+		}).done(onInfoRequest);
+	}
+
+	function commentOnReply(comment_id) {
+		return function() {
+			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-thumbs-up"></i> Submit</a>'
+				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-thumbs-up"></i> Cancel</a>'
+
+			editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
+
+			controls = '#comment-controls-' + comment_id;
+			userinput = '#comment-user-input-' + comment_id;
+
+			$(controls).css('visibility', 'hidden');
+			$(userinput).html(editField);
+
+			function closeReplyField() {
+				$(controls).css('visibility', 'visible');
+				$(userinput).html('');
+			}
+
+			$(userinput + '>.cancel-comment-button').on('click', closeReplyField);
+
+			$(userinput + '>.submit-comment-button').on('click', function() {
+				sendComment(blunder.id, comment_id, $(userinput + '>div>textarea').val());
+				closeReplyField();
+			});
+		}
+	}
+
+	// TODO: Move to utils module
+	function escapeHtml(text) {
+		return text
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '$quot;')
+			.replace(/'/g, '&#039;')
+			.replace(/\n/g, '<br/>')
+	}
+
+	function commentBuilder(data, comments) {
+		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
+		const body = '<div class="comment-body">{2}</div>';
+		const controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
+		const subcomments = '<ul class="comment-responses">{5}</ul>';
+
+		const likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
+		const dislikeButton = '<a href="#" class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
+		
+		const votesCount = data.likes - data.dislikes;
+
+		var votesClass = "";
+		if (votesCount > 0) {
+			votesClass = 'green';
+		} else if (votesCount < 0) {
+			votesClass = 'red';
+		}
+
+		const voteData = '<span class="{0}">{1}</span>'.format(votesClass, votesCount);
+
+		const commentRating = '<span class="comment-rating">{0} {1} {2}</span>'.format(dislikeButton, voteData, likeButton);
+
+		const comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
+
+		const replyButton = '<a id="comment-reply-button-{0}" href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
+
+		const subcommentsData = buildCommentReplies(comments, data.id);
+
+		return comment.format(data.username, data.date, escapeHtml(data.text), replyButton, commentRating, subcommentsData);
+	}
+
+	function onInfoRequest(response) {
+		if (response.status === 'error') {
+			notifyError(response.message);
+			return
+		}
+
+		data = response.data
+
+		if (data.myFavorite) {
+			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
+		} else {
+			$('#favorite-icon').removeClass('fa-star').addClass('fa-star-o').removeClass('active-star-icon');
+		}
+
+		$('#favorites').html(data.favorites);
+		$('#likes').html(data.likes);
+		$('#dislikes').html(data.dislikes);
+
+		var info = data['game-info'];
+		var gameInfo = '{0}({1}) - {2}({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
+		$('#source-game-info').html(gameInfo);
+
+		const successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
+
+		$('#blunder-rating').html(data.elo);
+		$('#success-played').html(data.successTries);
+		$('#total-played').html(data.totalTries);
+		$('#success-rate').html(successRate.toFixed(2));
+
+		const rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
+		const rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
+
+		const htmlData = rootControls + buildCommentReplies(data.comments, 0);
+		$('#comments').html(htmlData);
+		$('#comments-counter').html(data.comments.length);
+
+		$('#comment-reply-button-0').on('click', commentOnReply(0));
+
+		data.comments.forEach(function(comment) {
+			$('#comment-like-button-' + comment.id).on('click', function() {
+				voteBlunderComment(blunder.id, comment.id, 1);
+			});
+			
+			$('#comment-dislike-button-' + comment.id).on('click', function() {
+				voteBlunderComment(blunder.id, comment.id, -1);
+			});
+
+			$('#comment-reply-button-' + comment.id).on('click', commentOnReply(comment.id));
+		});
 	}
 
 	function getRandomBlunder() {
 		$.ajax({
-			type: 'GET',
+			type: 'POST',
 			url: "/getRandomBlunder"
 		}).done(onBlunderRequest);
+	}
+
+	function getBlunderInfo(blunder_id) {
+		$.ajax({
+			type: 'POST',
+			url: "/getBlunderInfo",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id
+			})
+		}).done(onInfoRequest);		
+	}
+
+	function voteBlunder(blunder_id, vote) {
+		$.ajax({
+			type: 'POST',
+			url: "/voteBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				vote: vote
+			})
+		}).done(onInfoRequest);
+	}
+
+	function favoriteBlunder(blunder_id) {
+		$.ajax({
+			type: 'POST',
+			url: "/favoriteBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id
+			})
+		}).done(onInfoRequest);
+	}
+
+	function sendComment(blunder_id, comment_id, text) {
+		$.ajax({
+			type: 'POST',
+			url: "/commentBlunder",
+			contentType: 'application/json',
+			data: JSON.stringify({
+				blunder_id: blunder_id,
+				comment_id: comment_id,
+				user_input: text
+			})
+		}).done(onInfoRequest);
 	}
 
 	function pieceTheme(piece) {
@@ -338,9 +566,12 @@
 	updateRating();
 
 	$('#nextBlunder').on('click', function() {
-		if (!finished) sendResult();
+		if (!finished) {
+			sendResult(getRandomBlunder);
+			return;
+		}
 
-		getRandomBlunder();	
+		getRandomBlunder();
 	});
 
 	$('#goToGame').on('click', function() {
@@ -382,4 +613,38 @@
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
 	});
+
+	function showComments() {
+		$('#comments').removeClass('hidden').addClass('visible');
+		$('#comments-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+	}
+
+	function hideComments() {
+		$('#comments').removeClass('visible').addClass('hidden');
+		$('#comments-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+	}
+
+	function switchComments() {
+		if ($('#comments').hasClass('hidden'))
+			showComments();
+		else
+			hideComments();
+	}
+
+	$('#comments-spoiler').on('click', function() {
+		switchComments();
+	});
+
+	$('#likeButton').on('click', function() {
+		voteBlunder(blunder.id, 1);
+	});
+
+	$('#dislikeButton').on('click', function() {
+		voteBlunder(blunder.id, -1);
+	});
+
+	$('#favoriteButton').on('click', function() {
+		favoriteBlunder(blunder.id);
+	});
+
 })();

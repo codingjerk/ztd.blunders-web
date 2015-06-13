@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block section %}
+    <table id="main-table">
+        <tr>
+            <td id="summary">
+                <div id="avatar"><img src="static/img/default-avatar.png"/></div>
+
+                <div id="username-value"></div>
+                <div id="user-join-date">
+                    <i class="fa fa-clock-o"></i> Joined on <span id="user-join-value"></span>
+                </div>
+
+                <table id="user-rating-table">
+                    <tr id="user-values">
+                        <td id="user-rating-value"></td>
+                        <td id="user-karma-value"></td>
+                    </tr>
+
+                    <tr id="user-labels">
+                        <td id="user-rating-label">Rating</td>
+                        <td id="user-karma-label">Karma</td>
+                    </tr>
+                </table>
+
+                <div id="user-links">
+                    <div id="user-statistic-link"><a href="/statistics?user={{session.username()}}"><i class="fa fa-line-chart"></i> Statistic</a></div>
+                </div>
+                
+            </td>
+
+            <td id="details">
+            </td>
+        </tr>
+    </table>
+{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="static/css/profile.css">
+    <link rel="stylesheet" href="static/third-party/jqplot/jquery.jqplot.min.css">
+    <link rel="stylesheet" href="static/css/grid.css">
+{% endblock %}
+
+{% block script %}
+    <script src="static/third-party/jqplot/jquery.jqplot.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.barRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
+    <script src="static/third-party/jqplot/plugins/jqplot.cursor.min.js"></script>
+    
+    <script src="static/third-party/js-url/url.min.js"></script>
+    
+    <script src="static/js/grid.js"></script>
+    <script src="static/js/profile.js"></script>
+{% endblock %}

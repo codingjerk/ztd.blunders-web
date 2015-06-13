@@ -8,5 +8,5 @@ from app.utils import session
 def getRating():
     return flask.jsonify({
         'status': 'ok',
-        'rating': postgre.getRating(session.username())
+        'rating': postgre.getRating(session.userID())
     })

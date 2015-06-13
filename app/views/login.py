@@ -6,7 +6,7 @@ from app.utils import session
 
 @app.route('/login', methods=['GET'])
 def login_get():
-    return render_template('login.html', title = 'Ztd.Blunders')
+    return render_template('login.html', title = 'Ztd.Blunders', session = session)
 
 @app.route('/login', methods=['POST'])
 def login_post():

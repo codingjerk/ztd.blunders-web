@@ -5,17 +5,18 @@ from app.db import mongo, postgre
 from app import utils
 from app.utils import session
 
-def newBlunder():
+def assignNewBlunder():
     blunder = mongo.randomBlunder()
-    postgre.assignBlunderTask(session.username(), str(blunder['_id']))
+    postgre.assignBlunderTask(session.userID(), str(blunder['_id']))
+
     return blunder
 
-@app.route('/getRandomBlunder')
+@app.route('/getRandomBlunder', methods = ['POST'])
 def getRandomBlunder():
-    blunder = db.getAssignedBlunder(session.username())
+    blunder = db.getAssignedBlunder(session.userID())
 
     if blunder is None:
-        blunder = newBlunder()
+        blunder = assignNewBlunder()
 
     data = utils.jsonifyBlunder(blunder)
     return jsonify(data)

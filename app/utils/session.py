@@ -4,7 +4,7 @@ from app.db import postgre
 from app.utils import hash
 
 def isAnonymous():
-    return 'username' not in session
+    return 'user_id' not in session
 
 def isAuthorized():
     return not isAnonymous()
@@ -13,10 +13,16 @@ def username():
     if isAnonymous(): return None
     return session['username']
 
+def userID():
+    if isAnonymous(): return None
+    return session['user_id']
+
 def authorize(username, password):
     if postgre.autentithicateUser(username, hash.get(username, password)):
         session['username'] = username
+        session['user_id'] = postgre.getUserId(username)
 
 def deauthorize():
     if isAnonymous(): return
     del session['username']
+    del session['user_id']
