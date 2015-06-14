@@ -18,9 +18,16 @@ def userID():
     return session['user_id']
 
 def authorize(username, password):
-    if postgre.autentithicateUser(username, hash.get(username, password)):
-        session['username'] = username
-        session['user_id'] = postgre.getUserId(username)
+    try:
+        if postgre.autentithicateUser(username, hash.get(username, password)):
+            session['username'] = username
+            session['user_id'] = postgre.getUserId(username)
+
+            return True
+    except:
+        pass
+
+    return False
 
 def deauthorize():
     if isAnonymous(): return

@@ -10,6 +10,8 @@ def login_get():
 
 @app.route('/login', methods=['POST'])
 def login_post():
+    # TODO: Return json authorize status
+
     session.authorize(request.form['username'], request.form['password'])
     return redirect('/')
 
