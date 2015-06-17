@@ -5,7 +5,7 @@ from flask import request, jsonify
 
 from app import app, db
 from app.db import mongo, postgre
-from app.utils import session
+from app.utils import session, TaskTypes
 
 def compareLines(blunder_id, userLine):
     data = mongo.getBlunderById(blunder_id)
@@ -29,9 +29,9 @@ def validateBlunder():
 
     if session.isAnonymous(): return jsonify({'status': 'ok'})
 
-    date_start = postgre.getTaskStartDate(session.userID(), blunder_id, 'rated')
+    date_start = postgre.getTaskStartDate(session.userID(), blunder_id, TaskTypes.RATED)
 
-    if not postgre.closeBlunderTask(session.userID(), blunder_id, 'rated'): 
+    if not postgre.closeBlunderTask(session.userID(), blunder_id, TaskTypes.RATED): 
         return jsonify({
             'status': 'error', 
             'message': "Validation failed"

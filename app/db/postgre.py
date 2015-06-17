@@ -1,6 +1,6 @@
 import psycopg2
 
-USER_ROLE = 3
+from app.utils import Roles
 
 class PostgreConnection:
     def __init__(self, type):
@@ -27,11 +27,11 @@ def autentithicateUser(username, hash):
     if username is None: return False
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT *
-               FROM users 
-               WHERE username = %s AND password = %s;"""
-            , (username, hash)
+        connection.cursor.execute("""
+            SELECT *
+            FROM users 
+            WHERE username = %s AND password = %s;
+            """, (username, hash)
         )
 
         users = connection.cursor.fetchall()
@@ -40,11 +40,11 @@ def autentithicateUser(username, hash):
 
     if success:
         with PostgreConnection('w') as connection:
-            connection.cursor.execute(
-                """UPDATE users 
-                   SET last_login = NOW()
-                   WHERE username = %s;"""
-                , (username,)
+            connection.cursor.execute("""
+                UPDATE users 
+                SET last_login = NOW()
+                WHERE username = %s;
+                """, (username,)
             )
 
     return success
@@ -85,11 +85,11 @@ def getUserId(username):
 
 def getUsernameById(user_id):
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT username
-               FROM users 
-               WHERE id = %s;"""
-            , (user_id,)
+        connection.cursor.execute("""
+            SELECT username
+            FROM users 
+            WHERE id = %s;
+            """, (user_id,)
         )
 
         result = connection.cursor.fetchone()
@@ -101,12 +101,14 @@ def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None: return
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """INSERT INTO blunder_tasks (user_id, blunder_id, type_id)
-               VALUES (%s,
-                       %s,
-                       (SELECT id FROM blunder_task_type WHERE name = %s));"""
-            , (user_id, blunder_id, type)
+        connection.cursor.execute("""
+            INSERT INTO blunder_tasks (user_id, blunder_id, type_id)
+            VALUES (
+                %s,
+                %s,
+                (SELECT id FROM blunder_task_type WHERE name = %s)
+            );
+            """, (user_id, blunder_id, type)
         )
 
         if connection.cursor.rowcount != 1:
@@ -124,10 +126,11 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date
     if success: userLine = ''
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
-               VALUES (%s, %s, %s, %s, %s, %s, %s);"""
-            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
+        connection.cursor.execute("""
+            INSERT INTO blunder_history 
+                (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
+                VALUES (%s, %s, %s, %s, %s, %s, %s);
+            """, (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
         )
 
         if connection.cursor.rowcount != 1:
@@ -137,12 +140,12 @@ def closeBlunderTask(user_id, blunder_id, type):
     if user_id is None: return
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """DELETE FROM blunder_tasks
-               WHERE user_id = %s
-                 AND blunder_id = %s
-                 AND type_id = (SELECT id FROM blunder_task_type WHERE name = %s);"""
-            , (user_id, blunder_id, type)
+        connection.cursor.execute("""
+            DELETE FROM blunder_tasks
+            WHERE user_id = %s
+                AND blunder_id = %s
+                AND type_id = (SELECT id FROM blunder_task_type WHERE name = %s);
+            """, (user_id, blunder_id, type)
         )
 
         return connection.cursor.rowcount == 1
@@ -152,29 +155,28 @@ def setRating(user_id, elo):
         raise Exception('postre.setRating for anonim')
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """UPDATE users
-               SET elo = %s
-               WHERE id = %s;"""
-            , (elo, user_id)
+        connection.cursor.execute("""
+            UPDATE users
+            SET elo = %s
+            WHERE id = %s;
+            """, (elo, user_id)
         )
 
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-
 def getAssignedBlunder(user_id, type):
     if user_id is None: return None
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT blunder_id
-               FROM blunder_tasks AS bt
-               INNER JOIN blunder_task_type AS btt
-                    ON bt.type_id = btt.id
-               WHERE bt.user_id = %s 
-                 AND btt.name = %s;"""
-            , (user_id, type)
+        connection.cursor.execute("""
+            SELECT blunder_id
+            FROM blunder_tasks AS bt
+            INNER JOIN blunder_task_type AS btt
+                ON bt.type_id = btt.id
+            WHERE bt.user_id = %s 
+                AND btt.name = %s;
+            """, (user_id, type)
         )
 
         blunder_id = connection.cursor.fetchone()
@@ -184,31 +186,42 @@ def getAssignedBlunder(user_id, type):
 
 def signupUser(username, salt, hash, email):
     # TODO: Validation
-    if len(username) < 3: return {'status': 'error', 'field': 'username', 'message': "Username is too short"}
+    if len(username) < 3: return {
+        'status': 'error', 
+        'field': 'username', 
+        'message': "Username is too short"
+    }
 
     with PostgreConnection('w') as connection:
         try:
-            connection.cursor.execute(
-                """INSERT INTO users (username, salt, password, role, email, registration, last_login)
-                   VALUES (%s, %s, %s, %s, %s, NOW(), NOW());"""
-                , (username, salt, hash, USER_ROLE, email)
+            connection.cursor.execute("""
+                INSERT INTO users (username, salt, password, role, email, registration, last_login)
+                VALUES (%s, %s, %s, %s, %s, NOW(), NOW());
+                """, (username, salt, hash, Roles.USER, email)
             )
         except psycopg2.IntegrityError as e:
-            return {'status': 'error', 'field': 'username', 'message': 'Already registered'}
+            return {
+                'status': 'error', 
+                'field': 'username', 
+                'message': 'Already registered'
+            }
 
         success = (connection.cursor.rowcount == 1)
 
-        if not success: return {'status': 'error', 'message': "Unable to register user"}
+        if not success: return {
+            'status': 'error', 
+            'message': "Unable to register user"
+        }
 
     return {'status': 'ok'}
 
 def getTries(blunder_id):
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT * 
-               FROM blunder_history
-               WHERE blunder_id = %s;"""
-            , (blunder_id,)
+        connection.cursor.execute("""
+            SELECT * 
+            FROM blunder_history
+            WHERE blunder_id = %s;
+            """, (blunder_id,)
         )
 
         total = connection.cursor.rowcount
@@ -227,11 +240,11 @@ def getBlunderComments(blunder_id):
     result = []
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT id, date, parent_id, user_id, comment
-               FROM blunder_comments
-               WHERE blunder_id = %s"""
-            , (blunder_id,)
+        connection.cursor.execute("""
+            SELECT id, date, parent_id, user_id, comment
+            FROM blunder_comments
+            WHERE blunder_id = %s
+            """, (blunder_id,)
         )
 
         comments = connection.cursor.fetchall()
