@@ -97,13 +97,16 @@ def getUsernameById(user_id):
 
         return result[0]
 
-def assignBlunderTask(user_id, blunder_id):
+def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            'INSERT INTO blunder_tasks (user_id, blunder_id) VALUES (%s, %s);'
-            , (user_id, blunder_id)
+            """INSERT INTO blunder_tasks (user_id, blunder_id, type_id)
+               VALUES (%s,
+                       %s,
+                       (SELECT id FROM blunder_task_type WHERE name = %s));"""
+            , (user_id, blunder_id, type)
         )
 
         if connection.cursor.rowcount != 1:
@@ -130,14 +133,16 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def closeBlunderTask(user_id, blunder_id):
+def closeBlunderTask(user_id, blunder_id, type):
     if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
             """DELETE FROM blunder_tasks
-               WHERE user_id = %s AND blunder_id = %s;"""
-            , (user_id, blunder_id)
+               WHERE user_id = %s
+                 AND blunder_id = %s
+                 AND type_id = (SELECT id FROM blunder_task_type WHERE name = %s);"""
+            , (user_id, blunder_id, type)
         )
 
         return connection.cursor.rowcount == 1
@@ -158,15 +163,18 @@ def setRating(user_id, elo):
             raise Exception('Failed to assign new blunder')
 
 
-def getAssignedBlunder(user_id):
+def getAssignedBlunder(user_id, type):
     if user_id is None: return None
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT blunder_id
-               FROM blunder_tasks
-               WHERE user_id = %s;"""
-            , (user_id,)
+               FROM blunder_tasks AS bt
+               INNER JOIN blunder_task_type AS btt
+                    ON bt.type_id = btt.id
+               WHERE bt.user_id = %s 
+                 AND btt.name = %s;"""
+            , (user_id, type)
         )
 
         blunder_id = connection.cursor.fetchone()
@@ -437,14 +445,19 @@ def blunderCommentAuthor(comment_id):
 
         return user_id
 
-def getTaskStartDate(user_id, blunder_id):
+def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None: return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            """SELECT assign_date FROM blunder_tasks
-               WHERE user_id = %s AND blunder_id = %s;"""
-            , (user_id, blunder_id)
+            """SELECT assign_date
+               FROM blunder_tasks AS bt
+               INNER JOIN blunder_task_type AS btt
+                   ON bt.type_id = btt.id  
+               WHERE bt.user_id = %s
+                 AND bt.blunder_id = %s
+                 AND btt.name = %s;"""
+            , (user_id, blunder_id, type)
         )
 
         if(connection.cursor.rowcount != 1):

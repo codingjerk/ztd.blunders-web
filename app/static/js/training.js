@@ -478,10 +478,10 @@
 		});
 	}
 
-	function getRandomBlunder() {
+	function getRatedBlunder() {
 		$.ajax({
 			type: 'POST',
-			url: "/getRandomBlunder"
+			url: "/getRatedBlunder"
 		}).done(onBlunderRequest);
 	}
 
@@ -547,7 +547,7 @@
 	});
 	game = new Chess();
 
-	getRandomBlunder();
+	getRatedBlunder();
 
 	function updateRating() {
 		$.ajax({
@@ -567,11 +567,11 @@
 
 	$('#nextBlunder').on('click', function() {
 		if (!finished) {
-			sendResult(getRandomBlunder);
+			sendResult(getRatedBlunder);
 			return;
 		}
 
-		getRandomBlunder();
+		getRatedBlunder();
 	});
 
 	$('#goToGame').on('click', function() {

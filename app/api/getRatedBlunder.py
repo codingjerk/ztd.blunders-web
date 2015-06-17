@@ -7,13 +7,13 @@ from app.utils import session
 
 def assignNewBlunder():
     blunder = mongo.randomBlunder()
-    postgre.assignBlunderTask(session.userID(), str(blunder['_id']))
+    postgre.assignBlunderTask(session.userID(), str(blunder['_id']), 'rated')
 
     return blunder
 
-@app.route('/getRandomBlunder', methods = ['POST'])
-def getRandomBlunder():
-    blunder = db.getAssignedBlunder(session.userID())
+@app.route('/getRatedBlunder', methods = ['POST'])
+def getRatedBlunder():
+    blunder = db.getAssignedBlunder(session.userID(), 'rated')
 
     if blunder is None:
         blunder = assignNewBlunder()

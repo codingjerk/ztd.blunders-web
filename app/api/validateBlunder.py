@@ -29,9 +29,9 @@ def validateBlunder():
 
     if session.isAnonymous(): return jsonify({'status': 'ok'})
 
-    date_start = postgre.getTaskStartDate(session.userID(), blunder_id)
+    date_start = postgre.getTaskStartDate(session.userID(), blunder_id, 'rated')
 
-    if not postgre.closeBlunderTask(session.userID(), blunder_id): 
+    if not postgre.closeBlunderTask(session.userID(), blunder_id, 'rated'): 
         return jsonify({
             'status': 'error', 
             'message': "Validation failed"
