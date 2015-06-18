@@ -16,6 +16,16 @@
 
 	var finished = false;
 
+	var counter = utils.counter(1000, function () {
+		var total = counter.total()
+		var mins = Math.floor(total / 60);
+		var secs = Math.floor(total % 60);
+
+		var spentTimeText = mins + ':' + secs.pad(2);
+
+		$('#spent-time-value').html(spentTimeText);
+	});
+
 	$.notify.addStyle('error', {
 	  html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
 	  classes: {
@@ -94,12 +104,15 @@
 			contentType: 'application/json',
 			data: JSON.stringify({
 				id: blunder.id,
-				line: getPv('user')
+				line: getPv('user'),
+				spentTime: counter.total()
 			})
 		}).done(function(data) {
 			onResultAprooved(data);
 			callback && callback(data);
 		});
+
+		counter.stop();
 	}
 
 	var setStatus = function(status) {
@@ -331,6 +344,8 @@
 		firstMoveTurn = game.turn();
 
 		makeMove(board, blunder.blunderMove, true);
+
+		counter.start();
 	}
 
 	function buildCommentReplies(comments, parent_id) {
@@ -478,10 +493,10 @@
 		});
 	}
 
-	function getRandomBlunder() {
+	function getRatedBlunder() {
 		$.ajax({
 			type: 'POST',
-			url: "/getRandomBlunder"
+			url: "/getRatedBlunder"
 		}).done(onBlunderRequest);
 	}
 
@@ -547,7 +562,7 @@
 	});
 	game = new Chess();
 
-	getRandomBlunder();
+	getRatedBlunder();
 
 	function updateRating() {
 		$.ajax({
@@ -567,11 +582,11 @@
 
 	$('#nextBlunder').on('click', function() {
 		if (!finished) {
-			sendResult(getRandomBlunder);
+			sendResult(getRatedBlunder);
 			return;
 		}
 
-		getRandomBlunder();
+		getRatedBlunder();
 	});
 
 	$('#goToGame').on('click', function() {

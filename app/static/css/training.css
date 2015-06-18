@@ -271,7 +271,7 @@ a.move:active {
     margin-left: 20px;
 }
 
-#blunder-rating-container, #blunder-success-rate-container, #game-info-container {
+#blunder-rating-container, #blunder-success-rate-container, #game-info-container, #spent-time-container {
     margin-bottom: 7px;
 }
 

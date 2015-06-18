@@ -19,10 +19,10 @@ def changeRating(user_id, blunder_id, success):
 
     return newUserElo, (newUserElo - user_elo)
 
-def getAssignedBlunder(user_id):
+def getAssignedBlunder(user_id, type):
     if user_id is None: return None
 
-    blunder_id = postgre.getAssignedBlunder(user_id)
+    blunder_id = postgre.getAssignedBlunder(user_id, type)
 
     if blunder_id is None: return None
 
