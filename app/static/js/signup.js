@@ -1,13 +1,11 @@
 (function() {
     function onResultAprooved(data) {
-        console.log(data)
-
         if (data.status !== 'ok') {
-            // TODO: Show notify
+            console.log(data); // TODO: Notify
             return;
         }
 
-        window.location.href = '/'
+        location.replace('/training');
     }
 
     $('#submit').on('click', function() {
