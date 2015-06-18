@@ -33,11 +33,13 @@ def setRating(blunder_id, rating):
     db['filtered_blunders'].update({'_id': ObjectId(blunder_id)}, {'$set': {'elo': rating}})
 
 def getBlandersByRating(interval):
-    result = db['filtered_blunders'].aggregate([ {'$project':{'elo':'$elo','mod':{'$mod':['$elo', interval]}}},
-                                                  {'$project':{'elo_category':{'$subtract':['$elo','$mod']}}},
-                                                  {'$group':{'_id':{'elo_category':'$elo_category'},'count': {'$sum': 1}}} ])
+    result = db['filtered_blunders'].aggregate([ 
+        {'$project':{'elo':'$elo','mod':{'$mod':['$elo', interval]}}},
+        {'$project':{'elo_category': {'$subtract':['$elo','$mod']}}},
+        {'$group':{'_id':{'elo_category':'$elo_category'},'count': {'$sum': 1}}}
+    ])
 
-    destribution = [ [category['_id']['elo_category'], category['count']] for category in result]
+    destribution = [[category['_id']['elo_category'], category['count']] for category in result]
     return {
         'status': 'ok',
         'data': {

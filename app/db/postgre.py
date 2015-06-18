@@ -526,7 +526,6 @@ def getUserProfile(username):
     }
 
 def getBlundersStatistics(username):
-
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.id,
@@ -555,8 +554,6 @@ def getBlundersStatistics(username):
             'solved-blunders-value': solved
         }
     }
-
-
 
 def getRatingByDate(username):
     user_id = getUserId(username)
@@ -648,14 +645,17 @@ def getBlundersHistory(username, offset, limit):
 
         data = connection.cursor.fetchall()
 
-        blunders = [{
-                     "blunder_id": blunder_id,
-                     "result": result,
-                     "blunder_elo": blunder_elo,
-                     "user_elo": user_elo,
-                     "date_start": date_start,
-                     "date_finish": date_finish,
-                    } for (blunder_id, result, blunder_elo, user_elo, date_start, date_finish) in data]
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "result": result,
+                "blunder_elo": blunder_elo,
+                "user_elo": user_elo,
+                "date_start": date_start,
+                "date_finish": date_finish,
+            } 
+            for (blunder_id, result, blunder_elo, user_elo, date_start, date_finish) in data
+        ]
 
     return {
         'status': 'ok',
