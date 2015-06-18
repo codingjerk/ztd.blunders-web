@@ -10,8 +10,9 @@ def login_get():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-    session.authorize(request.form['username'], request.form['password'])
-    return redirect('/')
+    result = session.authorize(request.json['username'], request.json['password'])
+    
+    return jsonify(result)
 
 @app.route('/logout', methods = ['POST'])
 def logout():

@@ -23,11 +23,21 @@ def authorize(username, password):
             session['username'] = username
             session['user_id'] = postgre.getUserId(username)
 
-            return True
+            return {
+                'status': 'ok'
+            }
     except:
-        pass
+        return {
+            'status': 'error',
+            'field': 'username',
+            'message': 'Invalid username'
+        }
 
-    return False
+    return {
+        'status': 'error',
+        'field': 'password',
+        'message': 'Invalid password'
+    }
 
 def deauthorize():
     if isAnonymous(): return
