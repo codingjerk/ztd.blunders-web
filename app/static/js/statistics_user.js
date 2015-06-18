@@ -151,16 +151,16 @@
                     padMin: 0
                 }
             },
-            legend:{ 
-                show:true,
-                    renderer: $.jqplot.EnhancedLegendRenderer,
-                    location: 'n' ,
-                    placement : "outsideGrid",
-                    marginTop : "0px",
-                    rendererOptions: {
-                        numberRows: 1
-                    },
-                    labels: [ 'Failed to solve', 'Successfully solved']
+            legend: {
+                show: true,
+                renderer: $.jqplot.EnhancedLegendRenderer,
+                location: 'n',
+                placement: "outsideGrid",
+                marginTop: "0px",
+                rendererOptions: {
+                    numberRows: 1
+                },
+                labels: ['Failed to solve', 'Successfully solved']
             },
         });
     }

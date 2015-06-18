@@ -105,15 +105,13 @@
 })();
 
 (function updateUsersRatingChart() {
-
     function updateUsersRating(id, data){
-       data.unshift([1000, 0]) // Hack to scale x axis
-       data.push([2500,0]);
+        data.sort();
 
-       var xElo = data.map(function(el){return el[0];});
-       var yCount = data.map(function(el){return el[1];});
+        var xElo = data.map(function(el){return el[0];});
+        var yCount = data.map(function(el){return el[1];});
 
-       $.jqplot(id, [data], {
+        $.jqplot(id, [data], {
             title: "Users rating destribution",
             captureRightClick: true,
             seriesDefaults: {
@@ -133,7 +131,7 @@
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
                       // labelPosition: 'middle',
-                      angle: 90
+                        angle: 90
                     },
                     ticks: xElo
                 },
@@ -163,15 +161,20 @@
 })();
 
 (function updateBlundersRatingChart() {
+    function updateBlundersRating(id, data) {
+        // Sorting data, beacuse server returns unsorted data
+        // and jqplot doesn't work with unsorted data well
+        data.sort();
 
-    function updateBlundersRating(id, data){
-       data.unshift([1000, 0]) // Hack to scale x axis
-       data.push([3000,0]);
+        var xElo = data.map(function(el) {
+            return el[0];
+        });
 
-       var xElo = data.map(function(el){return el[0];});
-       var yCount = data.map(function(el){return el[1];});
+        var yCount = data.map(function(el) {
+            return el[1];
+        });
 
-       $.jqplot(id, [data], {
+        $.jqplot(id, [data], {
             title: "Blunders rating destribution",
             captureRightClick: true,
             seriesDefaults: {
@@ -191,7 +194,7 @@
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
                       // labelPosition: 'middle',
-                      angle: 90
+                        angle: 90
                     },
                     ticks: xElo
                 },
@@ -203,8 +206,7 @@
         });
     }
 
-    function onUpdateBlundersRatingRequest(response)
-    {
+    function onUpdateBlundersRatingRequest(response) {
         if (response.status !== 'ok') {
             // TODO: notify
             return;
