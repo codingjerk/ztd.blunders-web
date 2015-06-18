@@ -10,6 +10,12 @@ var utils = {};
         return str;
     }
 
+    Number.prototype.pad = function(size) {
+        var result = this + "";
+        while (result.length < size) result = "0" + result;
+        return result;
+    }
+
     Array.prototype.map = function(f, args) {
         var args = args || [];
 
@@ -71,5 +77,45 @@ var utils = {};
 
     module.fixDate = function(rawDate) {
         return new Date(rawDate);
+    }
+
+    module.timer = function(interval, callback) {
+        setTimeout(function() {
+            if (!callback()) return;
+            module.timer(interval, callback);
+        }, interval);
+    }
+
+    module.counter = function(interval, tickCallback) {
+        var that = {
+            startTime: null,
+            enabled: false,
+            
+            tick: tickCallback,
+
+            total: function () {
+                var secondsFromStart = (new Date() - that.startTime) / 1000;
+                return Math.round(secondsFromStart);
+            },
+
+            start: function () {
+                that.startTime = new Date();
+                that.enabled = true;
+
+                module.timer(interval, function () {
+                    if (!that.enabled) return false;
+
+                    that.tick();
+
+                    return true;
+                });
+            },
+
+            stop: function () {
+                that.enabled = false;
+            }
+        };
+
+        return that;
     }
 })(utils);
