@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, jsonify
 
 from app import app
 from app.db import postgre
@@ -10,12 +10,13 @@ def login_get():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-    # TODO: Return json authorize status
+    result = session.authorize(request.json['username'], request.json['password'])
+    
+    return jsonify(result)
 
-    session.authorize(request.form['username'], request.form['password'])
-    return redirect('/')
-
-@app.route('/logout')
+@app.route('/logout', methods = ['POST'])
 def logout():
     session.deauthorize()
-    return redirect('/')
+    return jsonify({
+        'status': 'ok'  
+    })

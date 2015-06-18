@@ -3,10 +3,13 @@
 {% block section %}
 	<form action="#" method="POST">
 	Username:<br>
-	<input type="text" name="username">
-	<br>
+	<input type="text" id="username"><br>
 	Password:<br>
-	<input type="password" name="password"><br>
-	<input type="submit" value="Submit">
+	<input type="password" id="password"><br>
+	<a href='#' id='login-button'>Login</a>
 	</form>
+{% endblock %}
+
+{% block script %}
+    <script src='static/js/login.js'></script>
 {% endblock %}
