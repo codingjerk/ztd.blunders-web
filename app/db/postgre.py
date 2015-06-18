@@ -114,7 +114,7 @@ def assignBlunderTask(user_id, blunder_id, type):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start):
+def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start, spent_time):
     if user_id is None: 
         raise Exception('postre.saveBlunderHistory for anonim')
     if(date_start is None):
@@ -128,9 +128,9 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date
     with PostgreConnection('w') as connection:
         connection.cursor.execute("""
             INSERT INTO blunder_history 
-                (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
-                VALUES (%s, %s, %s, %s, %s, %s, %s);
-            """, (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
+                (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, spent_time)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+            """, (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start, spent_time)
         )
 
         if connection.cursor.rowcount != 1:

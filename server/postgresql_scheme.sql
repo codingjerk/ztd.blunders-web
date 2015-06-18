@@ -152,6 +152,7 @@ CREATE TABLE blunder_history (
     user_line character varying(255) NOT NULL,
     date_start timestamp without time zone NOT NULL,
     date_finish timestamp without time zone DEFAULT now() NOT NULL,
+    spent_time integer NOT NULL,
     CONSTRAINT blunder_history_result_check CHECK ((result = ANY (ARRAY[0, 1])))
 );
 
@@ -430,7 +431,9 @@ SELECT pg_catalog.setval('blunder_favorites_id_seq', 43, true);
 -- Data for Name: blunder_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, date_finish) FROM stdin;
+COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, date_finish, spent_time) FROM stdin;
+209	121	55768f0283878c17d7ab5a5a	0	1607	1726	{Kg8}	2015-06-18 01:09:57.410498	2015-06-18 01:09:58.516172	1
+210	121	5576923683878c17d7ab5aa3	0	1596	1434	{Kf8}	2015-06-18 01:09:58.787269	2015-06-18 01:10:26.60509	6
 \.
 
 
@@ -438,7 +441,7 @@ COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, us
 -- Name: blunder_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_history_id_seq', 204, true);
+SELECT pg_catalog.setval('blunder_history_id_seq', 210, true);
 
 
 --
@@ -463,6 +466,7 @@ SELECT pg_catalog.setval('blunder_task_type_id_seq', 2, true);
 --
 
 COPY blunder_tasks (id, user_id, blunder_id, assign_date, type_id) FROM stdin;
+236	121	55764e0e83878c17d7ab551a	2015-06-18 01:10:26.813931	2
 \.
 
 
@@ -470,7 +474,7 @@ COPY blunder_tasks (id, user_id, blunder_id, assign_date, type_id) FROM stdin;
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_tasks_id_seq', 229, true);
+SELECT pg_catalog.setval('blunder_tasks_id_seq', 236, true);
 
 
 --
@@ -493,9 +497,9 @@ SELECT pg_catalog.setval('blunder_votes_id_seq', 23, true);
 --
 
 COPY users (id, username, password, role, registration, last_login, elo, email, salt) FROM stdin;
-121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-01 19:37:10.166601	1671	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
 122	demo	$2a$12$cqwAprmH0bZYi/J2pWnVSeiGZcvA4u9KKbuK40EN30I//zNPZA6.a	3	2015-06-03 16:38:04.173926	2015-06-10 01:34:45.360687	1291		$2a$12$cqwAprmH0bZYi/J2pWnVSe
 120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-17 19:32:55.518563	1164	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
+121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-18 01:08:50.44731	1573	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
 \.
 
 
