@@ -375,8 +375,8 @@
 
 	function commentOnReply(comment_id) {
 		return function() {
-			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-thumbs-up"></i> Submit</a>'
-				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-thumbs-up"></i> Cancel</a>'
+			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>'
+				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>'
 
 			editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
 
