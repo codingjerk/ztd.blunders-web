@@ -359,16 +359,28 @@
 			$(controls).css('visibility', 'hidden');
 			$(userinput).html(editField);
 
+			var textarea = $(userinput + '>div>textarea');
+
 			function closeReplyField() {
 				$(controls).css('visibility', 'visible');
 				$(userinput).html('');
 			}
 
+			function reply() {
+				sendComment(blunder.id, comment_id, textarea.val());
+				closeReplyField();
+			}
+
 			$(userinput + '>.cancel-comment-button').on('click', closeReplyField);
 
-			$(userinput + '>.submit-comment-button').on('click', function() {
-				sendComment(blunder.id, comment_id, $(userinput + '>div>textarea').val());
-				closeReplyField();
+			$(userinput + '>.submit-comment-button').on('click', reply);
+
+			textarea.keyup(function(event) {
+				var keyCode = event.keyCode || event.which;
+
+				if (keyCode === 13 && event.ctrlKey) { // Ctrl+Enter key 
+					reply();
+				}
 			});
 		}
 	}
