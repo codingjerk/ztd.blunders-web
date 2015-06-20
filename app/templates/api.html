@@ -1,5 +1,22 @@
 {% extends "layout.html" %}
 
 {% block section %}
-    <h1>This section is under construction</h1>
+    <h1>Ztd.Blunders Api Reference</h1>
+<b><pre><code class="nohighlight">/getRatedBlunder</code></pre></b>
+    <pre><code class="json">{
+    "simple": "Json Example",
+    "bool": true,
+    "num": 12            
+}</code></pre>
+{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+{% endblock %}
+
+{% block script %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/languages/json.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 {% endblock %}
