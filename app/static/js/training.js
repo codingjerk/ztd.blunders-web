@@ -359,16 +359,28 @@
 			$(controls).css('visibility', 'hidden');
 			$(userinput).html(editField);
 
+			var textarea = $(userinput + '>div>textarea');
+
 			function closeReplyField() {
 				$(controls).css('visibility', 'visible');
 				$(userinput).html('');
 			}
 
+			function reply() {
+				sendComment(blunder.id, comment_id, textarea.val());
+				closeReplyField();
+			}
+
 			$(userinput + '>.cancel-comment-button').on('click', closeReplyField);
 
-			$(userinput + '>.submit-comment-button').on('click', function() {
-				sendComment(blunder.id, comment_id, $(userinput + '>div>textarea').val());
-				closeReplyField();
+			$(userinput + '>.submit-comment-button').on('click', reply);
+
+			textarea.keyup(function(event) {
+				var keyCode = event.keyCode || event.which;
+
+				if (keyCode === 13 && event.ctrlKey) { // Ctrl+Enter key 
+					reply();
+				}
 			});
 		}
 	}
@@ -542,6 +554,33 @@
 
 	updateRating();
 
+	function previousMove() {
+		if (game.history().length <= 1) gotoRoot();
+		else gotoMove(getPv('active'), game.history().length - 2, getPv('active').length);
+	}
+
+	function nextMove() {
+		if (game.history().length >= getPv('active').length) return;
+		gotoMove(getPv('active'), game.history().length, getPv('active').length);
+	}
+
+	function showComments() {
+		$('#comments').removeClass('hidden').addClass('visible');
+		$('#comments-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+	}
+
+	function hideComments() {
+		$('#comments').removeClass('visible').addClass('hidden');
+		$('#comments-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
+	}
+
+	function switchComments() {
+		if ($('#comments').hasClass('hidden'))
+			showComments();
+		else
+			hideComments();
+	}
+
 	$('#nextBlunder').on('click', function() {
 		if (!blunder) {
 			return;
@@ -583,36 +622,13 @@
 		gotoRoot();
 	});
 
-	$('#previousMove').on('click', function() {
-		if (game.history().length <= 1) gotoRoot();
-		else gotoMove(getPv('active'), game.history().length - 2, getPv('active').length);
-	});
+	$('#previousMove').on('click', previousMove);
 
-	$('#nextMove').on('click', function() {
-		if (game.history().length >= getPv('active').length) return;
-		gotoMove(getPv('active'), game.history().length, getPv('active').length);
-	});
+	$('#nextMove').on('click', nextMove);
 
 	$('#lastMove').on('click', function() {
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
 	});
-
-	function showComments() {
-		$('#comments').removeClass('hidden').addClass('visible');
-		$('#comments-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
-	}
-
-	function hideComments() {
-		$('#comments').removeClass('visible').addClass('hidden');
-		$('#comments-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
-	}
-
-	function switchComments() {
-		if ($('#comments').hasClass('hidden'))
-			showComments();
-		else
-			hideComments();
-	}
 
 	$('#comments-spoiler').on('click', function() {
 		switchComments();
@@ -645,4 +661,16 @@
 		favoriteBlunder(blunder.id);
 	});
 
+	$(document).keydown(function(event) {
+		if (event.target.type === 'textarea') return;
+
+		var keyCode = event.keyCode || event.which;
+		var arrow = {left: 37, right: 39};
+
+		if (keyCode == arrow.left) {
+			previousMove();
+		} else if (keyCode == arrow.right) {
+			nextMove();
+		}
+	});
 })();

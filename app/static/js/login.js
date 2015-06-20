@@ -1,5 +1,13 @@
 (function setupListeners() {
-    $('#login-button').on('click', function () {
+    $('#login-button').on('click', login);
+    
+    $(document).keyup(function(event) {
+        if (event.keyCode === 13) {
+            login();
+        }
+    });
+
+    function login() {
         $.ajax({
             type: 'POST',
             url: "/login",
@@ -21,5 +29,5 @@
 
             location.replace(document.referrer);
         });
-    });
+    }
 })();
