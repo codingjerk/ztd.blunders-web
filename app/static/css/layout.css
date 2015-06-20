@@ -75,6 +75,18 @@ a:hover, a:active {
     text-decoration: underline;
 }
 
+.green {
+    color: #1fa67a;
+}
+
+.red {
+    color: rgb(217, 83, 79);
+}
+
+.super {
+    vertical-align: super;
+}
+
 @media screen and (max-width: 1024px) {
     nav {
         position: relative;

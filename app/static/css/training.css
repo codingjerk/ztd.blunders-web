@@ -287,14 +287,6 @@ a.move:active {
     opacity: 0; visibility:hidden;
 }
 
-.green {
-    color: #1fa67a;
-}
-
-.red {
-    color: rgb(217, 83, 79);
-}
-
 .submit-comment-button {
     margin-left: 10px;
     margin-right: 20px;
