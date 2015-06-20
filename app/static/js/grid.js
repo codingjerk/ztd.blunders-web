@@ -6,9 +6,17 @@ var grid = {};
             .format(cellsInRow, caption);
     }
 
-    var generateNamedRow = function(rowData, cellsInRow) {
+    var generateWide = function(rowData, cellsInRow) {
         return '<tr class="wide-row"><td class="wide-block-wrapper" colspan="{0}"><div id="{1}"></div></td></tr>'
             .format(cellsInRow, rowData.id);
+    }
+
+    var generatePager = function(rowData, cellsInRow) {
+        var content = '<div id="{0}-content"></div><div id="{1}-paginator"></div>'
+            .format(rowData.id, rowData.id);
+
+        return '<tr class="wide-row"><td class="wide-block-wrapper" colspan="{0}"><div id="{1}">{2}</div></td></tr>'
+            .format(cellsInRow, rowData.id, content);
     }
 
     var generateCell = function(cell, cellsInRow) {
@@ -20,10 +28,16 @@ var grid = {};
             '</td>').format(cellSize, cell.label, cell.id, cell.additional);
     }
 
-    var parseNamedRows = function(rowsData, cellsInRow) {
+    var parseWides = function(rowsData, cellsInRow) {
         return rowsData.shiftWhile(function(row){
             return (row.type === 'wide');
-        }).map(generateNamedRow, cellsInRow).join('');
+        }).map(generateWide, cellsInRow).join('');
+    }
+
+    var parsePagers = function(rowsData, cellsInRow) {
+        return rowsData.shiftWhile(function(row){
+            return (row.type === 'pager');
+        }).map(generatePager, cellsInRow).join('');
     }
 
     var parseCells = function(rowsData, cellsInRow) {
@@ -43,7 +57,8 @@ var grid = {};
     var generateRows = function(rowsData, cellsInRow) {
         var result = '';
         while (rowsData.length > 0) {
-            result += parseNamedRows(rowsData, cellsInRow);
+            result += parsePagers(rowsData, cellsInRow);
+            result += parseWides(rowsData, cellsInRow);
             result += parseCells(rowsData, cellsInRow);
         }
 
@@ -73,5 +88,25 @@ var grid = {};
                 $('#' + id).html(data[id]);
             }
         };
+    }
+
+    module.setupPager = function(id, itemsOnPage, listener) { 
+        var onPageClick = function(pageNumber, event) {
+            listener(pageNumber);
+        };
+
+        $("#{0}-paginator".format(id)).pagination({
+            items: 1,
+            itemsOnPage: itemsOnPage,
+            cssStyle: 'light-theme',
+            onPageClick: onPageClick
+        });
+
+        onPageClick(1, null);
+    }
+
+    module.updatePager = function(id, totalItems, content) { 
+        $("#{0}-content".format(id)).html(content);
+        $("#{0}-paginator".format(id)).pagination("updateItems", totalItems);
     }
 })(grid);

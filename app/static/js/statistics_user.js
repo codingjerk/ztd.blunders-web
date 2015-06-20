@@ -35,7 +35,7 @@
             caption: 'History',
             rows: [
                 {
-                    type: 'wide', 
+                    type: 'pager', 
                     id: 'blunder-history'
                 }
             ]
@@ -167,48 +167,30 @@
 })();
 
 (function updateBlunderHistory() {
-    var blundersPerPage = 10;
+    var itemsOnPage = 10;
+    var id = 'blunder-history';
 
-    var content = '<div id="blunder-history-content"></div><div id="blunder-history-paginator"></div>';
-    $("#blunder-history").html(content);
-
-    $("#blunder-history-paginator").pagination({
-        items: 1,
-        itemsOnPage: blundersPerPage,
-        cssStyle: 'light-theme',
-        onPageClick: function(pageNumber, event) {
-            getContent(pageNumber, blundersPerPage);
-        }
-    });
-
-    getContent(1, blundersPerPage);
-
-    function getContent(page, limit) {
+    grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
             url: "/statistics/getBlundersHistory",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
-                offset: (page - 1) * limit,
-                limit: limit
+                offset: (page - 1) * itemsOnPage,
+                limit: itemsOnPage
             })
-        }).done(onUpdateBlunderHistory);
-    }
+        }).done(function(response) {
+            if (response.status !== 'ok') return; // TODO: notify
 
-    function onUpdateBlunderHistory(response) {
-        if (response.status !== 'ok') return; // TODO: notify
+            var rows = response.data.blunders.map(function(b) {
+                var style = (b.result == 1)? "row-win": "row-fail";
+                return '<tr class={0}><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(style, b.blunder_id, b.result, b.blunder_elo);
+            }).join('');
 
-        var blunders = response.data.blunders;
+            var content = '<table>{0}</table>'.format(rows);
 
-        var rows = blunders.map(function(b) {
-            var style = (b.result == 1) ? "row-win" : "row-fail";
-            return '<tr class={0}><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(style, b.blunder_id, b.result, b.blunder_elo);
-        }).join('');
-
-        var content = '<table>{0}</table>'.format(rows);
-        $("#blunder-history-content").html(content);
-
-        $("#blunder-history-paginator").pagination("updateItems", response.data.total);
-    }
+            grid.updatePager(id, response.data.total, content);
+        });
+    });
 })();
