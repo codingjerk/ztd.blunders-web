@@ -38,7 +38,6 @@ var notify = {};
             "border-color": "rgb(212, 63, 58)",
             "background-color": "rgb(217, 83, 79)",
             "padding": "7px 15px",
-            "margin-left": "2px",
             "border-radius": "4px",
             "border-style": "solid",
             "border-width": "1px",
