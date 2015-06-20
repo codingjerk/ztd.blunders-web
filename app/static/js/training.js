@@ -64,8 +64,10 @@
 
 		$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
 		
-		getBlunderInfo(blunder.id);
-		if (finished) showComments();
+		if (finished) {
+			getBlunderInfo(blunder.id);
+			showComments();
+		}
 	}
 
 	var sendResult = function(callback) {
@@ -552,12 +554,19 @@
 	updateRating();
 
 	$('#nextBlunder').on('click', function() {
-		if (!finished) {
-			sendResult(getRatedBlunder);
+		if (!blunder) {
+			console.log('U SHAL NO PASSW');
 			return;
 		}
 
-		getRatedBlunder();
+		if (finished) {
+			getRatedBlunder();
+		} else {
+			sendResult(getRatedBlunder);
+		}
+
+		// Clearing blunder to know about unloaded state
+		blunder = undefined;
 	});
 
 	$('#goToGame').on('click', function() {
@@ -622,14 +631,29 @@
 	});
 
 	$('#likeButton').on('click', function() {
+		if (!blunder) {
+			notify.error('Blunder is not loaded yet');
+			return;
+		}
+
 		voteBlunder(blunder.id, 1);
 	});
 
 	$('#dislikeButton').on('click', function() {
+		if (!blunder) {
+			notify.error('Blunder is not loaded yet');
+			return;
+		}
+
 		voteBlunder(blunder.id, -1);
 	});
 
 	$('#favoriteButton').on('click', function() {
+		if (!blunder) {
+			notify.error('Blunder is not loaded yet');
+			return;
+		}
+
 		favoriteBlunder(blunder.id);
 	});
 
