@@ -26,35 +26,6 @@
 		$('#spent-time-value').html(spentTimeText);
 	});
 
-	$.notify.addStyle('error', {
-	  html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
-	  classes: {
-	    base: {
-    		"color": "#ffffff",
-    		"border-color": "rgb(212, 63, 58)",
-    		"background-color": "rgb(217, 83, 79)",
-    		"padding": "7px 15px",
-    		"margin-bottom": "15px",
-    		"margin-right": "55px",
-    		"border-radius": "4px",
-    		"border-style": "solid",
-    		"border-width": "1px",
-	    }
-	  }
-	});
-
-	function notifyError(text) {
-		if (text === undefined) return;
-
-		$.notify(
-			text, 
-			{
-				style: 'error',
-				position: 'bottom right',
-			}
-		);
-	}
-
 	function getPv(index) {
 		var result; 
 
@@ -78,7 +49,7 @@
 	var onResultAprooved = function(data) {
 		if (data.status !== 'ok') {
 			updateRating();
-			notifyError(data.message);
+			notify.error(data.message);
 			return;
 		}
 
@@ -319,7 +290,7 @@
 
 	function onBlunderRequest(response) {
 		if (response.status !== 'ok') {
-			notifyError(response.message);
+			notify.error(response.message);
 			return;
 		}
 
@@ -444,7 +415,7 @@
 
 	function onInfoRequest(response) {
 		if (response.status === 'error') {
-			notifyError(response.message);
+			notify.error(response.message);
 			return
 		}
 
