@@ -166,7 +166,7 @@
     }
 })();
 
-(function updateBlunderHistory() {
+(function setupBlunderHistoryPager() {
     var itemsOnPage = 10;
     var id = 'blunder-history';
 
