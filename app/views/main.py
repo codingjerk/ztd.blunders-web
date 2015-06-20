@@ -12,9 +12,9 @@ def faq():
 def about():
     return render_template('about.html', title = 'About', session = session)
 
-@app.route('/donate')
-def donate():
-    return render_template('donate.html', title = 'Donate', session = session)
+@app.route('/helpus')
+def helpus():
+    return render_template('helpus.html', title = 'Help us', session = session)
 
 @app.route('/termsOfUse')
 def termsOfUse():
