@@ -1,7 +1,12 @@
 (function() {
     function onResultAprooved(data) {
         if (data.status !== 'ok') {
-            notify.error(data.message);
+            if (data.field) {
+                notify.inplaceError(data.field, data.message);
+            } else {
+                notify.error(data.message);
+            }             
+            
             return;
         }
 
