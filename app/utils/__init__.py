@@ -36,7 +36,7 @@ def validateUsername(username):
     if len(username) < 3:
         return "Username must contains at least 3 letter" 
 
-    if not re.match("^[-a-z0-9!#$%&'*+/=?^_`{|}~]+(\.[-a-z0-9!#$%&'*+/=?^_`{|}~]+)*$", username):
+    if not re.match("^[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+(\.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*$", username):
         return "Your name is too strange"
 
     return None
