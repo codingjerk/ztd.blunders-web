@@ -29,4 +29,33 @@ var notify = {};
             }
         );
     }
+
+    $.notify.addStyle('inplace-error', {
+      html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
+      classes: {
+        base: {
+            "color": "#ffffff",
+            "border-color": "rgb(212, 63, 58)",
+            "background-color": "rgb(217, 83, 79)",
+            "padding": "7px 15px",
+            "margin-left": "2px",
+            "border-radius": "4px",
+            "border-style": "solid",
+            "border-width": "1px",
+            "white-space": "nowrap"
+        }
+      }
+    });
+
+    module.inplaceError = function(id, text) {
+        if (text === undefined) return;
+
+        $('#' + id).notify(
+            text, 
+            {
+                style: 'inplace-error',
+                position: 'right middle',
+            }
+        );
+    }
 })(notify);
