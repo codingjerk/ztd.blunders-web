@@ -67,7 +67,6 @@
 })();
 
 (function updateUsersStatistics() {
-
     function updateUsersOnlineList(id, users) {
         var usersLinks = users.map(function(user) {
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
@@ -137,7 +136,8 @@
                 },
                 yaxis: {
                     padMin: 0,
-                    tickInterval: 1
+                    tickInterval: 1,
+                    min: 0
                 }
             }
         });
