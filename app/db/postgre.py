@@ -185,13 +185,6 @@ def getAssignedBlunder(user_id, type):
         return blunder_id[0]
 
 def signupUser(username, salt, hash, email):
-    # TODO: Validation
-    if len(username) < 3: return {
-        'status': 'error', 
-        'field': 'username', 
-        'message': "Username is too short"
-    }
-
     with PostgreConnection('w') as connection:
         try:
             connection.cursor.execute("""
