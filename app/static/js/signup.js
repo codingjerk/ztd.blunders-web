@@ -1,7 +1,7 @@
 (function() {
     function onResultAprooved(data) {
         if (data.status !== 'ok') {
-            console.log(data); // TODO: Notify
+            notify.error(data.message);
             return;
         }
 
@@ -16,7 +16,7 @@
             data: JSON.stringify({
                 username: $('#username').val(),
                 password: $('#password').val(),
-                email:    $('#email').val(),
+                email:    $('#email').val()
             })
         }).done(onResultAprooved);
     });

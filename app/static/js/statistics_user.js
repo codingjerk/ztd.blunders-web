@@ -49,9 +49,10 @@
 (function updateProfile() {
     function onUpdateProfileRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
+
         grid.update(response.data);
     }
 
@@ -76,7 +77,11 @@
     }).done(onUpdateRatingChartRequest);
 
     function onUpdateRatingChartRequest(response) {
-        if (response.status !== 'ok') return; // TODO: notify
+        if (response.status !== 'ok') {
+            notify.error(response.message);
+            return;
+        }
+
         grid.update(response.data,  {'rating-statistics': drawRatingChart});
     } 
 
@@ -118,7 +123,11 @@
     }).done(onUpdateBlunderChartRequest);
 
     function onUpdateBlunderChartRequest(response) {
-        if (response.status !== 'ok') return; // TODO: notify
+        if (response.status !== 'ok') {
+            notify.error(response.message);
+            return;
+        }
+        
         grid.update(response.data, {'blunder-count-statistics': drawBlunderChart});
     } 
 
@@ -181,7 +190,10 @@
                 limit: itemsOnPage
             })
         }).done(function(response) {
-            if (response.status !== 'ok') return; // TODO: notify
+            if (response.status !== 'ok') {
+                notify.error(response.message);
+                return;
+            }
 
             var rows = response.data.blunders.map(function(b) {
                 var style = (b.result == 1)? "row-win": "row-fail";

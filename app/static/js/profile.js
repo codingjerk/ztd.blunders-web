@@ -1,7 +1,7 @@
 (function updateProfile() {
     function onUpdateProfileRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 

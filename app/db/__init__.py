@@ -2,7 +2,6 @@ from app.db import mongo, postgre
 
 from app.utils import elo
 
-# TODO: Calculate real elo
 def changeRating(user_id, blunder_id, success):
     if user_id is None: return
 

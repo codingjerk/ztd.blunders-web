@@ -543,7 +543,7 @@
 			url: "/getRating"
 		}).done(function(data) {
 			if (data.status !== 'ok') {
-				// TODO: Show warning!
+				notify.error(data.message);
 				return;
 			}
 
@@ -555,7 +555,6 @@
 
 	$('#nextBlunder').on('click', function() {
 		if (!blunder) {
-			console.log('U SHAL NO PASSW');
 			return;
 		}
 

@@ -10,7 +10,7 @@
             })
         }).done(function(data) {
             if (data.status !== 'ok') {
-                console.log('Unable to login', data);// TODO: notify                
+                notify.error(data.message);                
                 return;
             }
 

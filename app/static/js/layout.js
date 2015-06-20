@@ -6,7 +6,7 @@
             contentType: 'application/json'
         }).done(function(data) {
             if (data.status !== 'ok') {
-                console.log('Unable to logout!');// TODO: notify                
+                notify.error(data.message);               
                 return;
             }
 

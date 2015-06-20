@@ -89,7 +89,7 @@
 
     function onUpdateUsersRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
@@ -146,7 +146,7 @@
     function onUpdateUsersRatingRequest(response)
     {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
@@ -208,7 +208,7 @@
 
     function onUpdateBlundersRatingRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
