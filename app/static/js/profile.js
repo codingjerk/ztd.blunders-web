@@ -44,8 +44,7 @@
     }).done(onUpdateProfileRequest);
 })();
 
-function createItemGrid(columnsNum, rowsNum, data, model)
-{
+function createItemGrid(columnsNum, rowsNum, data, model) {
     var rows = data.chunk(columnsNum).map(function(part){
         var row = part.map(function(item){
             return '<td>{0}</td>'.format(model(item));
@@ -94,13 +93,13 @@ function createItemGrid(columnsNum, rowsNum, data, model)
             var content = createItemGrid(columnsRow, rowsNum, response.data.blunders, function(item){
                 var style = (item.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
                 var title = 'Date: {0}, Spent time: {1}'.format(item.date_start, utils.timePrettyFormat(item.spent_time));
-                return '<div class="{0}" id="board-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
+                return '<div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
             })
 
             grid.updatePager(id, response.data.total, content);
 
             response.data.blunders.forEach(function(b) {
-                var board = new ChessBoard('board-' + b.blunder_id,{
+                var board = new ChessBoard('board-history-' + b.blunder_id,{
                     draggable: false,
                     position: b.fen,
                     pieceTheme: pieceTheme
@@ -139,13 +138,13 @@ function createItemGrid(columnsNum, rowsNum, data, model)
 
             var content = createItemGrid(columnsRow, rowsNum, response.data.blunders, function(item){
                 var style = 'blunder-favorites-board';
-                return '<div class="{0}" id="board-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
+                return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
             })
 
             grid.updatePager(id, response.data.total, content);
 
             response.data.blunders.forEach(function(b) {
-                var board = new ChessBoard('board-' + b.blunder_id,{
+                var board = new ChessBoard('board-favorite-' + b.blunder_id, {
                     draggable: false,
                     position: b.fen,
                     pieceTheme: pieceTheme
