@@ -1,4 +1,5 @@
 from app.db import mongo, postgre
+from app.utils import chess
 
 from app.utils import elo
 
@@ -37,4 +38,29 @@ def getBlundersStatistics():
 
 def getGameByBlunderId(blunder_id):
     blunder = mongo.getBlunderById(blunder_id)
-    print(blunder)
+
+def getBlundersHistory(username, offset, limit):
+    total = postgre.getBlunderHistoryCount(username)
+    blunders = postgre.getBlundersHistory(username, offset, limit)
+
+    result = []
+    for blunder in blunders:
+        blunder_info = mongo.getBlunderById(blunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+
+        result.append({
+            "blunder_id": blunder['blunder_id'],
+            "fen": fen,
+            "result": blunder['result'],
+            "date_start": blunder['date_start'],
+            "spent_time": blunder['spent_time']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }

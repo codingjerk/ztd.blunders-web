@@ -603,7 +603,7 @@ def getBlundersByDate(username):
         }
     }
 
-def getBlundersHistory(username, offset, limit):
+def getBlunderHistoryCount(username):
     user_id = getUserId(username)
 
     with PostgreConnection('r') as connection:
@@ -622,14 +622,17 @@ def getBlundersHistory(username, offset, limit):
 
         (total,) = connection.cursor.fetchone()
 
+    return total
+
+def getBlundersHistory(username, offset, limit):
+    user_id = getUserId(username)
+
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT h.blunder_id,
                    h.result,
-                   h.blunder_elo,
-                   h.user_elo,
                    h.date_start,
-                   h.date_finish
+                   h.spent_time
             FROM blunder_history AS h
             WHERE h.user_id = %s
             LIMIT %s OFFSET %s"""
@@ -641,23 +644,14 @@ def getBlundersHistory(username, offset, limit):
         blunders = [
             {
                 "blunder_id": blunder_id,
-                "result": result,
-                "blunder_elo": blunder_elo,
-                "user_elo": user_elo,
+                "result": True if result == 1 else False,
                 "date_start": date_start,
-                "date_finish": date_finish,
+                "spent_time": spent_time
             } 
-            for (blunder_id, result, blunder_elo, user_elo, date_start, date_finish) in data
+            for (blunder_id, result, date_start, spent_time) in data
         ]
 
-    return {
-        'status': 'ok',
-        'username': username,
-        'data': {
-            "total": total,
-            "blunders": blunders
-        }
-    }
+    return blunders
 
 def lastActiveUsers(interval):
     with PostgreConnection('r') as connection:
