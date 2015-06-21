@@ -17,13 +17,11 @@
 	var finished = false;
 
 	var counter = utils.counter(1000, function () {
-		var total = counter.total()
-		var mins = Math.floor(total / 60);
-		var secs = Math.floor(total % 60);
+		var totalSeconds = counter.total()
+		
+		var formatted = utils.timePrettyFormat(totalSeconds)
 
-		var spentTimeText = mins + ':' + secs.pad(2);
-
-		$('#spent-time-value').html(spentTimeText);
+		$('#spent-time-value').html(formatted);
 	});
 
 	function getPv(index) {

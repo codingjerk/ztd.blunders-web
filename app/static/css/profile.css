@@ -102,10 +102,16 @@ section, #main-table {
     text-align: center;
 }
 
-.row-win {
-    background-color: #1fa67a;
+.blunder-history-board-win {
+    margin: 20px;
+    -webkit-box-shadow: 0px 0px 20px 10px #1fa67a;
+    -moz-box-shadow: 0px 0px 20px 10px #1fa67a;
+    box-shadow: 0px 0px 20px 10px #1fa67a;
 }
 
-.row-fail {
-    background-color: rgb(217, 83, 79);
+.blunder-history-board-fail {
+    margin: 20px;
+    -webkit-box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
+    -moz-box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
+    box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
 }

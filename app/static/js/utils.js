@@ -75,6 +75,29 @@ var utils = {};
         return result;
     }
 
+    Array.prototype.destructiveChunk = function(groupsize){
+        var sets = [], chunks, i = 0;
+        chunks = this.length / groupsize;
+     
+        while(i < chunks){
+            sets[i] = this.splice(0,groupsize);
+        i++;
+        }
+        
+        return sets;
+    };
+
+    Array.prototype.chunk = function (groupsize) {
+        var sets = [];
+        var chunks = this.length / groupsize;
+
+        for (var i = 0, j = 0; i < chunks; i++, j += groupsize) {
+          sets[i] = this.slice(j, j + groupsize);
+        }
+
+        return sets;
+    };
+
     module.fixDate = function(rawDate) {
         return new Date(rawDate);
     }
@@ -127,5 +150,15 @@ var utils = {};
             .replace(/"/g, '$quot;')
             .replace(/'/g, '&#039;')
             .replace(/\n/g, '<br/>');
+    }
+
+    module.timePrettyFormat = function(seconds)
+    {
+        var mins = Math.floor(seconds / 60);
+        var secs = Math.floor(seconds % 60);
+
+        var spentTimeText = mins + ':' + seconds.pad(2);
+
+        return spentTimeText;
     }
 })(utils);

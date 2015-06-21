@@ -36,8 +36,15 @@
 })();
 
 (function setupBlunderHistoryPager() {
-    var itemsOnPage = 10;
+    var itemsInRow = 3;
+    var itemRows = 2;
+    var itemsOnPage = itemsInRow * itemRows;
+    
     var id = 'blunder-history';
+
+    function pieceTheme(piece) {
+        return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
+    }
 
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
@@ -55,14 +62,28 @@
                 return;
             }
 
-            var rows = response.data.blunders.map(function(b) {
-                var style = (b.result == true)? "row-win": "row-fail";
-                return '<tr class={0}><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>'.format(style, b.blunder_id, b.result, b.fen, b.spent_time);
+            response.data.blunders.sort(function(a, b){return (a.date_start < b.date_start)}); // descending order
+            var rows = response.data.blunders.chunk(itemsInRow).map(function(part){
+                var row = part.map(function(b){
+                    var style = (b.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
+                    var title = 'Date: {0}, Spent time: {1}'.format(b.date_start, utils.timePrettyFormat(b.spent_time));
+                    return '<td><div class="{0}" id="board-{1}" title="{2}" style="width: 180px"></div></td>'.format(style, b.blunder_id, title);
+                }).join('');
+
+                return '<tr>{0}</tr>'.format(row);
             }).join('');
 
             var content = '<table>{0}</table>'.format(rows);
 
             grid.updatePager(id, response.data.total, content);
+
+            response.data.blunders.forEach(function(b) {
+                var board = new ChessBoard('board-' + b.blunder_id,{
+                    draggable: false,
+                    position: b.fen,
+                    pieceTheme: pieceTheme
+                });
+            })
         });
     });
 })();
