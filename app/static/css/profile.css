@@ -38,10 +38,9 @@ section, #main-table {
     vertical-align: top;
 }
 
-#user-join-date {
-    margin-top: 20px;
-    
-    border-top: 1px solid #dedede;
+#user-join-date, #user-last-activity-date {
+    margin-top: 5px;
+
     padding-top: 15px;
 
     text-align: center;
@@ -49,6 +48,7 @@ section, #main-table {
     font-size: 70%;
     color: #555;
 }
+
 
 #user-links {
     margin-top: 15px;

@@ -508,13 +508,16 @@ def getUserProfile(username):
 
     userJoinDate = getUserField(user_id, "to_char(registration, 'Month DD, YYYY')")
 
+    userLastActivity = lastUserActivity(username, 'Month DD, YYYY')
+
     return {
         'status': 'ok',
         'data': {
             'user-rating-value':     user_elo,
             'user-karma-value':      karma,
             'username-value':        username,
-            'user-join-value':       userJoinDate
+            'user-join-value':       userJoinDate,
+            'user-last-activity-value': userLastActivity
         }
     }
 
@@ -699,16 +702,31 @@ def getBlundersFavorites(username, offset, limit):
 
     return blunders
 
+def lastUserActivity(username, format):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.username,
+                   TO_CHAR(act.last_activity, %s) 
+            FROM vw_activities AS act
+            INNER JOIN users as u
+                ON act.user_id = u.id
+            WHERE u.username = %s;"""
+            , (format, username)
+        )
+
+        (_, last_activity) = connection.cursor.fetchone()
+
+        return last_activity;
+
 def lastActiveUsers(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.username,
-                   MAX(h.date_finish) AS date_last
-            FROM blunder_history AS h
-            INNER JOIN users AS u 
-                ON h.user_id = u.id
-            WHERE h.date_finish > NOW() - INTERVAL %s
-            GROUP BY u.username;"""
+                   act.last_activity 
+            FROM vw_activities AS act
+            INNER JOIN users as u
+                ON act.user_id = u.id
+            WHERE act.last_activity > NOW() - INTERVAL %s;"""
             , (interval,)
         )
 
