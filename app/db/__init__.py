@@ -64,3 +64,27 @@ def getBlundersHistory(username, offset, limit):
             "blunders": result
         }
     }
+
+def getBlundersFavorites(username, offset, limit):
+    total = postgre.getBlunderFavoritesCount(username)
+    blunders = postgre.getBlundersFavorites(username, offset, limit)
+
+    result = []
+    for blunder in blunders:
+        blunder_info = mongo.getBlunderById(blunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+
+        result.append({
+            "blunder_id": blunder['blunder_id'],
+            "fen": fen,
+            "assign_date": blunder['assign_date']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }

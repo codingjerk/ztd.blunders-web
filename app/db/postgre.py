@@ -653,6 +653,52 @@ def getBlundersHistory(username, offset, limit):
 
     return blunders
 
+def getBlunderFavoritesCount(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting favorites for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getBlundersFavorites(username, offset, limit):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT f.blunder_id,
+                   f.assign_date
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "assign_date": assign_date
+            } 
+            for (blunder_id, assign_date) in data
+        ]
+
+    return blunders
+
 def lastActiveUsers(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""

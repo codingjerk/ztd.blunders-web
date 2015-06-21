@@ -115,3 +115,16 @@ section, #main-table {
     -moz-box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
     box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
 }
+
+#blunder-favorites-content > table {
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+#blunder-favorites-content > table > tr > td {
+    text-align: center;
+}
+
+.blunder-favorites-board {
+    margin: 20px;
+}
