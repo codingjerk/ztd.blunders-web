@@ -210,23 +210,25 @@ function pieceTheme(piece) {
             };
 
             var rows = '';
-            for (var blunder_id in response.data.blunders) {
-                var blunder = response.data.blunders[blunder_id];
+            (function createRows() {
+                for (var blunder_id in response.data.blunders) {
+                    var blunder = response.data.blunders[blunder_id];
 
-                var style = 'comments-board';
-                var boardContent = '<div class="{0}" id="board-comment-{1}" style="width: 180px"></div>'.format(style, blunder_id);
-                
-                var commentContent = blunder.comments.map(commentMaker).join('');
+                    var style = 'comments-board';
+                    var boardContent = '<div class="{0}" id="board-comment-{1}" style="width: 180px"></div>'.format(style, blunder_id);
+                    
+                    var commentContent = blunder.comments.map(commentMaker).join('');
 
-                rows += '<tr><td>{0}</td><td class="blunder-comment-cell">{1}</td></tr>'.format(boardContent, commentContent);
-            }
+                    rows += '<tr><td>{0}</td><td class="blunder-comment-cell">{1}</td></tr>'.format(boardContent, commentContent);
+                }
+            })();
 
             var content = '<table>{0}</table>'.format(rows);
 
             grid.updatePager(id, response.data.total, content);
 
-            for (blunder_id in response.data.blunders) { // Defined upper
-                blunder = response.data.blunders[blunder_id]; // Defined upper
+            for (var blunder_id in response.data.blunders) {
+                var blunder = response.data.blunders[blunder_id];
 
                 var board = new ChessBoard('board-comment-{0}'.format(blunder_id), {
                     draggable: false,
