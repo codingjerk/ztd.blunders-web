@@ -162,7 +162,7 @@
                     numberRows: 1
                 },
                 labels: ['Failed to solve', 'Successfully solved']
-            },
+            }
         });
     }
 })();

@@ -384,15 +384,15 @@
 	}
 
 	function commentBuilder(data, comments) {
-		const header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
-		const body = '<div class="comment-body">{2}</div>';
-		const controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
-		const subcomments = '<ul class="comment-responses">{5}</ul>';
+		var header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
+		var body = '<div class="comment-body">{2}</div>';
+		var controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
+		var subcomments = '<ul class="comment-responses">{5}</ul>';
 
-		const likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
-		const dislikeButton = '<a href="#" class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
+		var likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
+		var dislikeButton = '<a href="#" class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
 		
-		const votesCount = data.likes - data.dislikes;
+		var votesCount = data.likes - data.dislikes;
 
 		var votesClass = "";
 		if (votesCount > 0) {
@@ -401,15 +401,15 @@
 			votesClass = 'red';
 		}
 
-		const voteData = '<span class="{0}">{1}</span>'.format(votesClass, votesCount);
+		var voteData = '<span class="{0}">{1}</span>'.format(votesClass, votesCount);
 
-		const commentRating = '<span class="comment-rating">{0} {1} {2}</span>'.format(dislikeButton, voteData, likeButton);
+		var commentRating = '<span class="comment-rating">{0} {1} {2}</span>'.format(dislikeButton, voteData, likeButton);
 
-		const comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
+		var comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
 
-		const replyButton = '<a id="comment-reply-button-{0}" href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
+		var replyButton = '<a id="comment-reply-button-{0}" href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
 
-		const subcommentsData = buildCommentReplies(comments, data.id);
+		var subcommentsData = buildCommentReplies(comments, data.id);
 
 		return comment.format(data.username, data.date, utils.escapeHtml(data.text), replyButton, commentRating, subcommentsData);
 	}
@@ -436,17 +436,17 @@
 		var gameInfo = '{0} ({1}) &#8211 {2} ({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
 		$('#source-game-info').html(gameInfo);
 
-		const successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
+		var successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
 
 		$('#blunder-rating').html(data.elo);
 		$('#success-played').html(data.successTries);
 		$('#total-played').html(data.totalTries);
 		$('#success-rate').html(successRate.toFixed(2));
 
-		const rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
-		const rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
+		var rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
+		var rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
 
-		const htmlData = rootControls + buildCommentReplies(data.comments, 0);
+		var htmlData = rootControls + buildCommentReplies(data.comments, 0);
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
 

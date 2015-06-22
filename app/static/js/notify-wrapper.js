@@ -13,7 +13,7 @@ var notify = {};
             "margin-right": "55px",
             "border-radius": "4px",
             "border-style": "solid",
-            "border-width": "1px",
+            "border-width": "1px"
         }
       }
     });
@@ -25,7 +25,7 @@ var notify = {};
             text, 
             {
                 style: 'error',
-                position: 'bottom right',
+                position: 'bottom right'
             }
         );
     }
@@ -53,7 +53,7 @@ var notify = {};
             text, 
             {
                 style: 'inplace-error',
-                position: 'right middle',
+                position: 'right middle'
             }
         );
     }
