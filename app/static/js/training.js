@@ -79,7 +79,9 @@
 			})
 		}).done(function(data) {
 			onResultAprooved(data);
-			callback && callback(data);
+			if (callback !== undefined) {
+				callback(data);
+			}
 		});
 
 		counter.stop();

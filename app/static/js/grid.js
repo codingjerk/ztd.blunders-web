@@ -72,14 +72,14 @@ var grid = {};
         return '<table class="details-block">{0}{1}</table>'.format(caption, body);
     };
 
-    module.generate = function(blocks, cellsInRow) {
-        var cellsInRow = cellsInRow || 3;
+    module.generate = function(blocks, acellsInRow) {
+        var cellsInRow = acellsInRow || 3;
 
         return blocks.map(generateBlock, [cellsInRow]).join('');
     };
 
-    module.update = function(data, rules) {
-        var rules = rules || {};
+    module.update = function(data, arules) {
+        var rules = arules || {};
 
         for (var id in data) {
             if (rules[id] !== undefined) {
@@ -87,7 +87,7 @@ var grid = {};
             } else {
                 $('#' + id).html(data[id]);
             }
-        };
+        }
     };
 
     module.setupPager = function(id, itemsOnPage, listener) { 

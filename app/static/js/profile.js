@@ -225,8 +225,8 @@ function pieceTheme(piece) {
 
             grid.updatePager(id, response.data.total, content);
 
-            for (var blunder_id in response.data.blunders) {
-                var blunder = response.data.blunders[blunder_id];
+            for (blunder_id in response.data.blunders) { // Defined upper
+                blunder = response.data.blunders[blunder_id]; // Defined upper
 
                 var board = new ChessBoard('board-comment-{0}'.format(blunder_id), {
                     draggable: false,
