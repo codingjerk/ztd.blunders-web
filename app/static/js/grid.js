@@ -12,10 +12,10 @@ var grid = {};
     }
 
     var generatePager = function(rowData, cellsInRow) {
-        var content = '<div id="{0}-content"></div><div id="{1}-paginator"></div>'
+        var content = '<div id="{0}-content"></div><div class="paginator" id="{1}-paginator"></div>'
             .format(rowData.id, rowData.id);
 
-        return '<tr class="wide-row"><td class="wide-block-wrapper" colspan="{0}"><div id="{1}">{2}</div></td></tr>'
+        return '<tr class="paginator-row"><td class="paginator-block-wrapper" colspan="{0}"><div id="{1}">{2}</div></td></tr>'
             .format(cellsInRow, rowData.id, content);
     }
 

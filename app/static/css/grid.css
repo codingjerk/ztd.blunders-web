@@ -25,10 +25,18 @@
     text-align: center;
 }
 
-.wide-block-wrapper {
+.wide-block-wrapper, .paginator-block-wrapper {
     border: 1px solid #dedede;
 
     padding: 10px 30px;
+}
+
+.paginator-block-wrapper {
+    text-align: center;
+}
+
+.paginator {
+    display: inline-block;
 }
 
 .cell-value {
