@@ -128,3 +128,14 @@ section, #main-table {
 .blunder-favorites-board {
     margin: 20px;
 }
+
+.blunder-comment {
+    margin-bottom: 20px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.comments-board {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

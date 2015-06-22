@@ -702,6 +702,54 @@ def getBlundersFavorites(username, offset, limit):
 
     return blunders
 
+def getCommentsByUserCount(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting comments for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getCommentsByUser(username, offset, limit):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT c.blunder_id,
+                   c.date,
+                   c.comment
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        comments = [
+            {
+                "blunder_id": blunder_id,
+                "date": date,
+                "text": text
+            } 
+            for (blunder_id, date, text) in data
+        ]
+
+    return comments
+
 def lastUserActivity(username, format):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""

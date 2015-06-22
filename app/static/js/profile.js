@@ -17,6 +17,15 @@
                     id: 'blunder-favorites'
                 }
             ]
+        },
+        {
+            caption: 'Comments',
+            rows: [
+                {
+                    type: 'pager', 
+                    id: 'user-comments'
+                }
+            ]
         }
     ];
 
@@ -44,10 +53,10 @@
     }).done(onUpdateProfileRequest);
 })();
 
-function generateTable(columnsNum, rowsNum, data, model) {
+function generateTable(columnsNum, rowsNum, data, viewGenerator) {
     var rows = data.chunk(columnsNum).map(function(part) {
         var row = part.map(function(item) {
-            return '<td>{0}</td>'.format(model(item));
+            return '<td>{0}</td>'.format(viewGenerator(item));
         }).join('');
 
         return '<tr>{0}</tr>'.format(row);
@@ -57,17 +66,25 @@ function generateTable(columnsNum, rowsNum, data, model) {
     return content;
 }
 
+function id(x) {
+    return x;
+}
+
 function sortByDate(data, options) {
     var options = options || {};
-    var field = options.field;
+    var address = options.address || id;
     var orderFactor = (options.reverse === true)? -1: +1;
 
     data.sort(function(elA, elB) {
-        var aDate = new Date(elA[field]);
-        var bDate = new Date(elB[field]);
+        var aDate = new Date(address(elA));
+        var bDate = new Date(address(elB));
 
         return (aDate - bDate) * orderFactor;
     });
+}
+
+function pieceTheme(piece) {
+    return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
 }
 
 (function setupBlunderHistoryPager() {
@@ -76,10 +93,6 @@ function sortByDate(data, options) {
     var itemsOnPage = columnsRow * rowsNum;
     
     var id = 'blunder-history';
-
-    function pieceTheme(piece) {
-        return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
-    }
 
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
@@ -98,7 +111,9 @@ function sortByDate(data, options) {
             }
 
             sortByDate(response.data.blunders, {
-                field: 'date_start',
+                address: function(blunder) {
+                    return blunder.date_start;
+                },
                 reverse: true
             });
 
@@ -128,10 +143,6 @@ function sortByDate(data, options) {
     
     var id = 'blunder-favorites';
 
-    function pieceTheme(piece) {
-        return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
-    }
-
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
@@ -149,11 +160,13 @@ function sortByDate(data, options) {
             }
 
             sortByDate(response.data.blunders, {
-                field: 'assign_date',
+                address: function(blunder) {
+                    return blunder.assign_date;
+                },
                 reverse: true
             });
 
-            var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item){
+            var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = 'blunder-favorites-board';
                 return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
             })
@@ -167,6 +180,58 @@ function sortByDate(data, options) {
                     pieceTheme: pieceTheme
                 });
             });
+        });
+    });
+})();
+
+(function setupComments() {
+    var itemsOnPage = 5;
+    
+    var id = 'user-comments';
+
+    grid.setupPager(id, itemsOnPage, function(page) {
+        $.ajax({
+            type: 'POST',
+            url: "/statistics/getCommentsByUser",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username: $.url('?user'),
+                offset: (page - 1) * itemsOnPage,
+                limit: itemsOnPage
+            })
+        }).done(function(response) {
+            if (response.status !== 'ok') {
+                notify.error(response.message);
+                return;
+            }
+
+            var rows = '';
+            for (var blunder_id in response.data.blunders) {
+                var blunder = response.data.blunders[blunder_id];
+
+                var style = 'comments-board';
+                var boardContent = '<div class="{0}" id="board-comment-{1}" style="width: 180px"></div>'.format(style, blunder_id);
+                
+                var commentContent = blunder.comments.map(function(comment) {
+                    return '<div class="blunder-comment">{0}</div>'.format(utils.escapeHtml(comment.text));
+                }).join('');
+
+                rows += '<tr><td>{0}</td><td class="blunder-comment-cell">{1}</td></tr>'.format(boardContent, commentContent);
+            }
+
+            var content = '<table>{0}</table>'.format(rows);
+
+            grid.updatePager(id, response.data.total, content);
+
+            for (var blunder_id in response.data.blunders) {
+                var blunder = response.data.blunders[blunder_id];
+
+                var board = new ChessBoard('board-comment-{0}'.format(blunder_id), {
+                    draggable: false,
+                    position: blunder.fen,
+                    pieceTheme: pieceTheme
+                });
+            }
         });
     });
 })();

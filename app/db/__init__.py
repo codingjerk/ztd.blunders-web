@@ -88,3 +88,37 @@ def getBlundersFavorites(username, offset, limit):
             "blunders": result
         }
     }
+
+def getCommentsByUser(username, offset, limit):
+    total = postgre.getCommentsByUserCount(username)
+    comments = postgre.getCommentsByUser(username, offset, limit)
+
+    result = {}
+    for comment in comments:
+        blunder_id = comment['blunder_id']
+
+        blunder_info = mongo.getBlunderById(blunder_id)
+        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+
+        if blunder_id not in result:
+            result[blunder_id] = {
+                "blunder_id": blunder_id,
+                "fen": fen,
+                "comments": []
+            }
+
+        result[blunder_id]['comments'].append(
+            {
+                "date": comment['date'],
+                "text": comment['text']
+            }
+        )
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }
