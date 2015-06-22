@@ -17,9 +17,9 @@
 	var finished = false;
 
 	var counter = utils.counter(1000, function () {
-		var totalSeconds = counter.total()
+		var totalSeconds = counter.total();
 		
-		var formatted = utils.timePrettyFormat(totalSeconds)
+		var formatted = utils.timePrettyFormat(totalSeconds);
 
 		$('#spent-time-value').html(formatted);
 	});
@@ -51,13 +51,12 @@
 			return;
 		}
 
+		var deltaClass = '';
 		if (data.delta > 0) {
-			var deltaClass = 'green';
+			deltaClass = 'green';
 			data.delta = '+{0}'.format(data.delta);
 		} else if (data.delta < 0) {
-			var deltaClass = 'red';
-		} else {
-			var deltaClass = ''
+			deltaClass = 'red';
 		}
 
 		$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
@@ -66,7 +65,7 @@
 			getBlunderInfo(blunder.id);
 			showComments();
 		}
-	}
+	};
 
 	var sendResult = function(callback) {
 		$.ajax({
@@ -84,7 +83,7 @@
 		});
 
 		counter.stop();
-	}
+	};
 
 	var setStatus = function(status) {
 		if (status === 'playing') {
@@ -100,7 +99,7 @@
 			$("#nextBlunder").html('<i class="fa fa-lg fa-caret-right"></i> Next blunder');
 			$("#status").html('<span id="successStatus"><i class="fa fa-check-circle"></i> Success!</span>');
 		}
-	}
+	};
 
 	var updateStatus = function() {
 		if (!finished) {
@@ -110,7 +109,7 @@
 				$('#status').html('<span id="blackTurnStatus">Black&nbspto&nbspmove</span>');
 			}
 		}
-	}
+	};
 
 	var lockAnimation = function(time) {
 		if (time === undefined) {
@@ -217,7 +216,7 @@
 		for (var i = 0; i < cutMoveNumber && i < pv.length; ++i) {
 			var move = pv[i];
 
-			if (i !== 0 && i % 2 == 0) {
+			if (i !== 0 && i % 2 === 0) {
 				text += '<span class="spacer"></span> ';
 			}
 
@@ -226,21 +225,21 @@
 				style += ' currentMove';
 			}
 			
-			if (i % 2 == 0) {
+			if (i % 2 === 0) {
 				var moveNumber = Math.floor(i / 2) + 1 + firstMoveIndex;
 				text += moveNumber + '.&nbsp';
 			}
 
 			var NAG = '';
-			if (i == 0) NAG = '?';
-			else if (i == 1) NAG = '!';
+			if (i === 0) NAG = '?';
+			else if (i === 1) NAG = '!';
 
 			if (pv[i] !== getPv('original')[i]) {
 				NAG = "??";
 				style += ' badMove';
 			}
 
-			if (i == 0 && firstMoveTurn === 'b') {
+			if (i === 0 && firstMoveTurn === 'b') {
 				text += '...';
 			}
 
@@ -249,12 +248,14 @@
 
 		$('#' + pv.tag).html(text);
 
-		for (var i = 0; i < cutMoveNumber; ++i) {
-			$('#' + pv.tag + "_child_" + i).on('click', (function(pv, cutter) {
-				return function() {
-					gotoMove(pv, cutter, cutMoveNumber);
-				};
-			})(pv, i));
+		var gotoMaker = function(pv, cutter) {
+			return function() {
+				gotoMove(pv, cutter, cutMoveNumber);
+			};
+		};
+
+		for (i = 0; i < cutMoveNumber; ++i) {
+			$('#' + pv.tag + "_child_" + i).on('click', gotoMaker(pv, i));
 		}
 	}
 
@@ -346,13 +347,13 @@
 
 	function commentOnReply(comment_id) {
 		return function() {
-			buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>'
-				+ '<a href="#" class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>'
+			var buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>' + 
+				'<a href="#" class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>';
 
-			editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
+			var editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
 
-			controls = '#comment-controls-' + comment_id;
-			userinput = '#comment-user-input-' + comment_id;
+			var controls = '#comment-controls-' + comment_id;
+			var userinput = '#comment-user-input-' + comment_id;
 
 			$(controls).css('visibility', 'hidden');
 			$(userinput).html(editField);
@@ -380,7 +381,7 @@
 					reply();
 				}
 			});
-		}
+		};
 	}
 
 	function commentBuilder(data, comments) {
@@ -417,10 +418,10 @@
 	function onInfoRequest(response) {
 		if (response.status === 'error') {
 			notify.error(response.message);
-			return
+			return;
 		}
 
-		data = response.data
+		data = response.data;
 
 		if (data.myFavorite) {
 			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
@@ -436,7 +437,7 @@
 		var gameInfo = '{0} ({1}) &#8211 {2} ({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
 		$('#source-game-info').html(gameInfo);
 
-		var successRate = (data.totalTries != 0)? (data.successTries * 100 / data.totalTries): 0; 
+		var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0; 
 
 		$('#blunder-rating').html(data.elo);
 		$('#success-played').html(data.successTries);

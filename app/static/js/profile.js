@@ -71,9 +71,9 @@ function id(x) {
 }
 
 function sortByDate(data, options) {
-    var options = options || {};
-    var address = options.address || id;
-    var orderFactor = (options.reverse === true)? -1: +1;
+    var opts = options || {};
+    var address = opts.address || id;
+    var orderFactor = (opts.reverse === true)? -1: +1;
 
     data.sort(function(elA, elB) {
         var aDate = new Date(address(elA));
@@ -131,7 +131,7 @@ function pieceTheme(piece) {
                     position: b.fen,
                     pieceTheme: pieceTheme
                 });
-            })
+            });
         });
     });
 })();
@@ -169,7 +169,7 @@ function pieceTheme(piece) {
             var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = 'blunder-favorites-board';
                 return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
-            })
+            });
 
             grid.updatePager(id, response.data.total, content);
 
@@ -205,6 +205,10 @@ function pieceTheme(piece) {
                 return;
             }
 
+            var commentMaker = function(comment) {
+                return '<div class="blunder-comment">{0}</div>'.format(utils.escapeHtml(comment.text));
+            };
+
             var rows = '';
             for (var blunder_id in response.data.blunders) {
                 var blunder = response.data.blunders[blunder_id];
@@ -212,9 +216,7 @@ function pieceTheme(piece) {
                 var style = 'comments-board';
                 var boardContent = '<div class="{0}" id="board-comment-{1}" style="width: 180px"></div>'.format(style, blunder_id);
                 
-                var commentContent = blunder.comments.map(function(comment) {
-                    return '<div class="blunder-comment">{0}</div>'.format(utils.escapeHtml(comment.text));
-                }).join('');
+                var commentContent = blunder.comments.map(commentMaker).join('');
 
                 rows += '<tr><td>{0}</td><td class="blunder-comment-cell">{1}</td></tr>'.format(boardContent, commentContent);
             }

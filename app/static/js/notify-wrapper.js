@@ -28,7 +28,7 @@ var notify = {};
                 position: 'bottom right'
             }
         );
-    }
+    };
 
     $.notify.addStyle('inplace-error', {
       html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
@@ -56,5 +56,5 @@ var notify = {};
                 position: 'right middle'
             }
         );
-    }
+    };
 })(notify);
