@@ -638,6 +638,7 @@ def getBlundersHistory(username, offset, limit):
                    h.spent_time
             FROM blunder_history AS h
             WHERE h.user_id = %s
+            ORDER BY h.date_start DESC
             LIMIT %s OFFSET %s"""
             , (user_id, limit, offset, )
         )
@@ -686,6 +687,7 @@ def getBlundersFavorites(username, offset, limit):
                    f.assign_date
             FROM blunder_favorites AS f
             WHERE f.user_id = %s
+            ORDER BY f.assign_date DESC
             LIMIT %s OFFSET %s"""
             , (user_id, limit, offset, )
         )
@@ -733,6 +735,7 @@ def getCommentsByUser(username, offset, limit):
                    c.comment
             FROM blunder_comments AS c
             WHERE c.user_id = %s
+            ORDER BY c.date DESC
             LIMIT %s OFFSET %s"""
             , (user_id, limit, offset,)
         )
