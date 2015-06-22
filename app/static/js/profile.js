@@ -1,23 +1,23 @@
 (function generateStructure() {
     var blocks = [
-    {
-        caption: 'Blunders history',
-        rows: [
-            {
-                type: 'pager', 
-                id: 'blunder-history'
-            }
-        ]
-    },
-    {
-        caption: 'Favorites',
-        rows: [
-            {
-                type: 'pager', 
-                id: 'blunder-favorites'
-            }
-        ]
-    }
+        {
+            caption: 'Blunders history',
+            rows: [
+                {
+                    type: 'pager', 
+                    id: 'blunder-history'
+                }
+            ]
+        },
+        {
+            caption: 'Favorites',
+            rows: [
+                {
+                    type: 'pager', 
+                    id: 'blunder-favorites'
+                }
+            ]
+        }
     ];
 
     var html = grid.generate(blocks, 3);
@@ -44,9 +44,9 @@
     }).done(onUpdateProfileRequest);
 })();
 
-function createItemGrid(columnsNum, rowsNum, data, model) {
-    var rows = data.chunk(columnsNum).map(function(part){
-        var row = part.map(function(item){
+function generateTable(columnsNum, rowsNum, data, model) {
+    var rows = data.chunk(columnsNum).map(function(part) {
+        var row = part.map(function(item) {
             return '<td>{0}</td>'.format(model(item));
         }).join('');
 
@@ -55,6 +55,19 @@ function createItemGrid(columnsNum, rowsNum, data, model) {
 
     var content = '<table>{0}</table>'.format(rows);
     return content;
+}
+
+function sortByDate(data, options) {
+    var options = options || {};
+    var field = options.field;
+    var orderFactor = (options.reverse === true)? -1: +1;
+
+    data.sort(function(elA, elB) {
+        var aDate = new Date(elA[field]);
+        var bDate = new Date(elB[field]);
+
+        return (aDate - bDate) * orderFactor;
+    });
 }
 
 (function setupBlunderHistoryPager() {
@@ -84,22 +97,21 @@ function createItemGrid(columnsNum, rowsNum, data, model) {
                 return;
             }
 
-            /*response.data.blunders.sort(function(a, b){
-                    var aDate = new Date(a);
-                    var bDate = new Date(b);
-                    return (aDate > bDate);
-                }); // descending order*/
+            sortByDate(response.data.blunders, {
+                field: 'date_start',
+                reverse: true
+            });
 
-            var content = createItemGrid(columnsRow, rowsNum, response.data.blunders, function(item){
+            var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = (item.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
                 var title = 'Date: {0}, Spent time: {1}'.format(item.date_start, utils.timePrettyFormat(item.spent_time));
                 return '<div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
-            })
+            });
 
             grid.updatePager(id, response.data.total, content);
 
             response.data.blunders.forEach(function(b) {
-                var board = new ChessBoard('board-history-' + b.blunder_id,{
+                var board = new ChessBoard('board-history-' + b.blunder_id, {
                     draggable: false,
                     position: b.fen,
                     pieceTheme: pieceTheme
@@ -136,7 +148,12 @@ function createItemGrid(columnsNum, rowsNum, data, model) {
                 return;
             }
 
-            var content = createItemGrid(columnsRow, rowsNum, response.data.blunders, function(item){
+            sortByDate(response.data.blunders, {
+                field: 'assign_date',
+                reverse: true
+            });
+
+            var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item){
                 var style = 'blunder-favorites-board';
                 return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
             })
@@ -149,7 +166,7 @@ function createItemGrid(columnsNum, rowsNum, data, model) {
                     position: b.fen,
                     pieceTheme: pieceTheme
                 });
-            })
+            });
         });
     });
 })();
