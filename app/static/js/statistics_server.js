@@ -1,6 +1,7 @@
 (function generateStructure() {
     var blocks = [
         {
+            id: 'users-block',
             caption: 'Users',
             rows: [
                 {
@@ -28,6 +29,7 @@
             ]
         },
         {
+            id: 'top-block',
             caption: 'Top 10',
             rows: [
                 {
@@ -37,6 +39,7 @@
             ]
         },
         {
+            id: 'blunders-block',
             caption: 'Blunders',
             rows: [
                 {
@@ -52,6 +55,7 @@
             ]
         },
         {
+            id: 'online-block',
             caption: 'Online',
             rows: [
                 {
@@ -234,3 +238,11 @@
         contentType: 'application/json',
     }).done(onUpdateBlundersRequest);
 })();
+
+(function setupSpoilers() {
+    grid.setupSpoiler('users-block');
+    grid.setupSpoiler('top-block');
+    grid.setupSpoiler('blunders-block');
+    grid.setupSpoiler('online-block');
+})();
+

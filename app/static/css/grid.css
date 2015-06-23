@@ -46,3 +46,20 @@
     font-size: 80%;
     color: #555;
 }
+
+.visible, .hidden {
+    transition: visibility 0s linear 0.2s, opacity 0.2s ease-in-out;
+}
+
+.visible {
+    transition-delay: 0s;
+    visibility: visible;
+    opacity: 1;
+    display: inline-grid;
+}
+
+.hidden {
+    opacity: 0; 
+    visibility:hidden;
+    display: none;
+}
