@@ -69,7 +69,12 @@ var grid = {};
         var caption = generateCaption(block.caption, cellsInRow);
         var body = generateRows(block.rows, cellsInRow);
 
-        return '<table class="details-block">{0}{1}</table>'.format(caption, body);
+        var idPart = '';
+        if (block.id) {
+            idPart = 'id={0}'.format(block.id);
+        }
+
+        return '<table {0} class="details-block">{1}{2}</table>'.format(idPart, caption, body);
     }
 
     module.generate = function(blocks, cellsInRow) {
@@ -109,4 +114,32 @@ var grid = {};
         $("#{0}-content".format(id)).html(content);
         $("#{0}-paginator".format(id)).pagination("updateItems", totalItems);
     }
+
+    module.updateSpoiler = function(id, state) {
+        var icon = $('#{0}-spoiler-icon'.format(id)); 
+        var content = $('#{0}>tbody>tr:not(:first-child)'.format(id));
+
+        if (state === undefined || state) {
+            content.removeClass('hidden').addClass('visible');
+            icon.removeClass('fa-angle-down').addClass('fa-angle-up');
+        } else {
+            content.removeClass('visible').addClass('hidden');
+            icon.removeClass('fa-angle-up').addClass('fa-angle-down');
+        }
+    };
+
+    module.setupSpoiler = function(id, state) {
+        var head = $('#{0}>tbody>tr:first-child>td'.format(id));
+        var newContent = '<i id="{0}-spoiler-icon" class="fa fa-angle-up"></i> {1}'.format(id, head.html());
+        var link = '<a href="#" id="{0}-spoiler-link">{1}</a>'.format(id, newContent);
+        head.html(link);
+
+        module.updateSpoiler(id, state);
+
+        $('#{0}-spoiler-link'.format(id)).on('click', function() {
+            var content = $('#{0}>tbody>tr:not(:first-child)'.format(id));
+            module.updateSpoiler(id, content.hasClass('hidden'));
+        });
+    };
 })(grid);
+
