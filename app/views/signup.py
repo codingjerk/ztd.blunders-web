@@ -17,7 +17,7 @@ def signup_post():
     if validateResult is not None:
         return jsonify(validateResult)
 
-    salt, hashPass = hash.new(username, password)
+    salt, hashPass = hash.new(password)
     status = postgre.signupUser(username, salt, hashPass, email)
 
     if status['status'] == 'ok':

@@ -1,6 +1,6 @@
 import psycopg2
 
-from app.utils import Roles
+from app.utils import roles
 
 class PostgreConnection:
     def __init__(self, type):
@@ -190,7 +190,7 @@ def signupUser(username, salt, hash, email):
             connection.cursor.execute("""
                 INSERT INTO users (username, salt, password, role, email, registration, last_login)
                 VALUES (%s, %s, %s, %s, %s, NOW(), NOW());
-                """, (username, salt, hash, Roles.USER, email)
+                """, (username, salt, hash, roles.USER, email)
             )
         except psycopg2.IntegrityError as e:
             return {

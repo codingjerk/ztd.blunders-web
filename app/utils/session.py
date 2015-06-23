@@ -21,7 +21,7 @@ def userID():
 
     return session['user_id']
 
-def authorize(username, password):
+def authorize(username, password): #pylint: disable=redefined-outer-name
     try:
         if postgre.autentithicateUser(username, hash.get(username, password)):
             session['username'] = username
@@ -30,7 +30,7 @@ def authorize(username, password):
             return {
                 'status': 'ok'
             }
-    except:
+    except Exception:
         return {
             'status': 'error',
             'field': 'username',

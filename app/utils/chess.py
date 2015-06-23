@@ -1,3 +1,4 @@
+#pylint: disable=import-self,no-member
 import chess
 
 def blunderStartPosition(fenBefore, blunderMove):
