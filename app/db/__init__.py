@@ -5,11 +5,11 @@ from app.utils import elo
 
 def changeRating(user_id, blunder_id, success):
     if user_id is None:
-        return
+        return None, None
 
     blunder = mongo.getBlunderById(blunder_id)
     if blunder is None:
-        return
+        return None, None
 
     blunder_elo = blunder['elo']
     user_elo = postgre.getRating(user_id)

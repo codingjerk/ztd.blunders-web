@@ -4,11 +4,11 @@ from bson.objectid import ObjectId
 
 from app import utils
 
-db = None #pylint: disable=global-statement
+db = None
 
 @utils.init
 def main():
-    global db
+    global db #pylint: disable=global-statement
 
     mongo = pymongo.MongoClient('localhost', 27017)
     db = mongo['chessdb']

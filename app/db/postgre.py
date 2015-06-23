@@ -807,7 +807,7 @@ def lastActiveUsers(interval):
 
         data = connection.cursor.fetchall()
 
-        users = [username for (username, _1) in data]
+        users = [username for (username, _1) in data] #pylint: disable=unused-variable
 
         return users
 

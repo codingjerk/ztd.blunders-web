@@ -51,13 +51,7 @@ def validateBlunder():
         spentTime
     )
 
-    try:
-        newElo, delta = db.changeRating(session.userID(), blunder_id, success)
-    except Exception:
-        return jsonify({
-            'status': 'error',
-            'message': 'Validation failed'
-        })
+    newElo, delta = db.changeRating(session.userID(), blunder_id, success)
 
     return jsonify({
         'status': 'ok',
