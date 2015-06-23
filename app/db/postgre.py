@@ -102,7 +102,8 @@ def getUsernameById(user_id):
         return result[0]
 
 def assignBlunderTask(user_id, blunder_id, type):
-    if user_id is None: return
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -136,7 +137,7 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date
             INSERT INTO blunder_history
             (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, spent_time)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
-            """, 
+            """,
             (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start, spent_time)
         )
 
@@ -144,7 +145,8 @@ def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date
             raise Exception('Failed to assign new blunder')
 
 def closeBlunderTask(user_id, blunder_id, type):
-    if user_id is None: return
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -173,7 +175,8 @@ def setRating(user_id, elo):
             raise Exception('Failed to assign new blunder')
 
 def getAssignedBlunder(user_id, type):
-    if user_id is None: return None
+    if user_id is None:
+        return None
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -187,7 +190,8 @@ def getAssignedBlunder(user_id, type):
         )
 
         blunder_id = connection.cursor.fetchone()
-        if blunder_id is None: return None
+        if blunder_id is None:
+            return None
 
         return blunder_id[0]
 
@@ -199,7 +203,7 @@ def signupUser(username, salt, hash, email):
                 VALUES (%s, %s, %s, %s, %s, NOW(), NOW());
                 """, (username, salt, hash, roles.USER, email)
             )
-        except psycopg2.IntegrityError as e:
+        except psycopg2.IntegrityError:
             return {
                 'status': 'error',
                 'field': 'username',
@@ -208,10 +212,11 @@ def signupUser(username, salt, hash, email):
 
         success = (connection.cursor.rowcount == 1)
 
-        if not success: return {
-            'status': 'error',
-            'message': "Unable to register user"
-        }
+        if not success:
+            return {
+                'status': 'error',
+                'message': "Unable to register user"
+            }
 
     return {'status': 'ok'}
 
@@ -270,7 +275,8 @@ def getBlunderComments(blunder_id):
     return result
 
 def isFavorite(user_id, blunder_id):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
@@ -344,7 +350,8 @@ def getBlunderCommentVotes(comment_id):
     return likes, dislikes
 
 def voteBlunder(user_id, blunder_id, vote):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -369,14 +376,15 @@ def voteBlunder(user_id, blunder_id, vote):
 
         if connection.cursor.rowcount != 1:
             raise Exception(
-                'Can not add vote for user id %s with blunder id %s' % 
+                'Can not add vote for user id %s with blunder id %s' %
                 (user_id, blunder_id)
             )
 
     return True
 
 def favoriteBlunder(user_id, blunder_id):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -400,14 +408,15 @@ def favoriteBlunder(user_id, blunder_id):
 
         if connection.cursor.rowcount != 1:
             raise Exception(
-                'Error inserting favorite for user id %s with blunder id %s' % 
+                'Error inserting favorite for user id %s with blunder id %s' %
                 (user_id, blunder_id)
             )
 
     return True
 
 def commentBlunder(user_id, blunder_id, parent_id, user_input):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -422,7 +431,8 @@ def commentBlunder(user_id, blunder_id, parent_id, user_input):
     return True
 
 def voteBlunderComment(user_id, comment_id, vote):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -465,7 +475,8 @@ def blunderCommentAuthor(comment_id):
         return user_id
 
 def getTaskStartDate(user_id, blunder_id, type):
-    if user_id is None: return
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -552,7 +563,7 @@ def getBlundersStatistics(username):
                 'message': 'Trying to get not exist user with name %s' % username
             }
 
-        (user_id, total, solved, failed) = connection.cursor.fetchone()
+        (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
