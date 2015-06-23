@@ -4,10 +4,12 @@ from app.utils import chess
 from app.utils import elo
 
 def changeRating(user_id, blunder_id, success):
-    if user_id is None: return
+    if user_id is None:
+        return
 
     blunder = mongo.getBlunderById(blunder_id)
-    if blunder is None: return
+    if blunder is None:
+        return
 
     blunder_elo = blunder['elo']
     user_elo = postgre.getRating(user_id)
@@ -20,11 +22,13 @@ def changeRating(user_id, blunder_id, success):
     return newUserElo, (newUserElo - user_elo)
 
 def getAssignedBlunder(user_id, type):
-    if user_id is None: return None
+    if user_id is None:
+        return None
 
     blunder_id = postgre.getAssignedBlunder(user_id, type)
 
-    if blunder_id is None: return None
+    if blunder_id is None:
+        return None
 
     return mongo.getBlunderById(blunder_id)
 
