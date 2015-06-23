@@ -10,11 +10,15 @@ def isAuthorized():
     return not isAnonymous()
 
 def username():
-    if isAnonymous(): return None
+    if isAnonymous():
+        return None
+
     return session['username']
 
 def userID():
-    if isAnonymous(): return None
+    if isAnonymous():
+        return None
+
     return session['user_id']
 
 def authorize(username, password):
@@ -40,6 +44,8 @@ def authorize(username, password):
     }
 
 def deauthorize():
-    if isAnonymous(): return
+    if isAnonymous():
+        return
+
     del session['username']
     del session['user_id']

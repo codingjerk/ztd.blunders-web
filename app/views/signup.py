@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, jsonify
+from flask import render_template, request, jsonify
 
 from app import app
 from app.db import postgre
@@ -11,7 +11,7 @@ def signup_get():
 
 @app.route('/signup', methods=['POST'])
 def signup_post():
-    username, password, email = request.json['username'], request.json['password'], request.json['email']
+    username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
 
     validateResult = utils.validateUser(username, password, email)
     if validateResult is not None:
