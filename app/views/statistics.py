@@ -3,6 +3,8 @@ from flask import render_template, request
 from app import app
 from app.utils import session
 
+@app.route('/')
+@app.route('/index')
 @app.route('/statistics', methods=['GET'])
 def statistics():
     username = request.args.get('user')
