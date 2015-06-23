@@ -33,10 +33,11 @@ def voteBlunder():
 
 @app.route('/favoriteBlunder', methods = ['POST'])
 def favoriteBlunder():
-    if session.isAnonymous(): return jsonify({
-        'status': 'error',
-        'message': 'Favorites allowed only for authorized user'
-    })
+    if session.isAnonymous():
+        return jsonify({
+            'status': 'error',
+            'message': 'Favorites allowed only for authorized user'
+        })
 
     try:
         blunder_id = request.json['blunder_id']

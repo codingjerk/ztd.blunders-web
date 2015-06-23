@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 
 from app import utils
 
-db = None
+db = None #pylint: disable=global-statement
 
 @utils.init
 def main():

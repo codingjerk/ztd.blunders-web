@@ -40,9 +40,6 @@ def getBlundersStatistics():
         }
     }
 
-def getGameByBlunderId(blunder_id):
-    blunder = mongo.getBlunderById(blunder_id)
-
 def getBlundersHistory(username, offset, limit):
     total = postgre.getBlunderHistoryCount(username)
     blunders = postgre.getBlundersHistory(username, offset, limit)
