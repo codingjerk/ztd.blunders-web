@@ -25,10 +25,18 @@
     text-align: center;
 }
 
-.wide-block-wrapper {
+.wide-block-wrapper, .paginator-block-wrapper {
     border: 1px solid #dedede;
 
     padding: 10px 30px;
+}
+
+.paginator-block-wrapper {
+    text-align: center;
+}
+
+.paginator {
+    display: inline-block;
 }
 
 .cell-value {
@@ -45,4 +53,21 @@
 .cell-additional {
     font-size: 80%;
     color: #555;
+}
+
+.visible, .hidden {
+    transition: visibility 0s linear 0.2s, opacity 0.2s ease-in-out;
+}
+
+.visible {
+    transition-delay: 0s;
+    visibility: visible;
+    opacity: 1;
+    display: inline-grid;
+}
+
+.hidden {
+    opacity: 0; 
+    visibility:hidden;
+    display: none;
 }

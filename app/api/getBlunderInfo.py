@@ -1,27 +1,43 @@
 from flask import jsonify, request
 
-import random
-
-from app import app, db
+from app import app
 from app.db import mongo, postgre
-from app import utils
 from app.utils import session
 
 def gameShortInfo(data):
+    whitePlayer = 'Unknown'
+    whiteElo = '?'
+    blackPlayer = 'Unknown'
+    blackElo = '?'
+
+    if data is not None:
+        if 'White'    in data:
+            whitePlayer = data['White']
+
+        if 'WhiteElo' in data:
+            whiteElo    = data['WhiteElo']
+
+        if 'Black'    in data:
+            blackPlayer = data['Black']
+
+        if 'BlackElo' in data:
+            blackElo    = data['BlackElo']
+
     return {
-        'White': data['White'] if 'White' in data else '???',
-        'WhiteElo': data['WhiteElo'] if 'WhiteElo' in data else '---',
-        'Black': data['Black'] if 'Black' in data else '???',
-        'BlackElo': data['BlackElo'] if 'BlackElo' in data else '---'
+        'White': whitePlayer,
+        'WhiteElo': whiteElo,
+        'Black': blackPlayer,
+        'BlackElo': blackElo,
     }
 
 def getBlunderInfoById(blunder_id):
     blunder = mongo.getBlunderById(blunder_id)
 
-    if blunder is None: return jsonify({
-        'status': 'error',
-        'message': 'Invalid blunder id',
-    })
+    if blunder is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'Invalid blunder id',
+        })
 
     elo = blunder['elo']
 
@@ -33,8 +49,7 @@ def getBlunderInfoById(blunder_id):
     likes, dislikes = postgre.getBlunderVotes(blunder_id)
 
     gameInfo = gameShortInfo(mongo.getGameById(blunder['pgn_id']))
-    print(gameInfo)
-    
+
     return jsonify({
         'status': 'ok',
         'data': {
@@ -50,17 +65,14 @@ def getBlunderInfoById(blunder_id):
         }
     })
 
-
 @app.route('/getBlunderInfo', methods=['POST'])
 def getBlunderInfo():
     try:
         blunder_id = request.json['blunder_id']
-    except:
+    except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Blunder id required'
         })
-        
-    return getBlunderInfoById(blunder_id)
 
-    
+    return getBlunderInfoById(blunder_id)

@@ -1,6 +1,7 @@
 (function generateStructure() {
     var blocks = [
         {
+            id: 'users-block',
             caption: 'Users',
             rows: [
                 {
@@ -28,6 +29,7 @@
             ]
         },
         {
+            id: 'top-block',
             caption: 'Top 10',
             rows: [
                 {
@@ -37,6 +39,7 @@
             ]
         },
         {
+            id: 'blunders-block',
             caption: 'Blunders',
             rows: [
                 {
@@ -52,6 +55,7 @@
             ]
         },
         {
+            id: 'online-block',
             caption: 'Online',
             rows: [
                 {
@@ -67,7 +71,6 @@
 })();
 
 (function updateUsersStatistics() {
-
     function updateUsersOnlineList(id, users) {
         var usersLinks = users.map(function(user) {
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
@@ -78,10 +81,10 @@
 
     function updateUsersTopList(id, users) {
         var usersList = users.map(function(user) {
-                    var username = user['username'];
-                    var elo = user['elo'];
-                    return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username,username,elo);
-                }).join('');
+            var username = user.username;
+            var elo = user.elo;
+            return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username, username, elo);
+        }).join('');
 
         var content = '<table>{0}</table>'.format(usersList);
         $('#' + id).html(content);
@@ -89,7 +92,7 @@
 
     function onUpdateUsersRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
@@ -105,15 +108,13 @@
 })();
 
 (function updateUsersRatingChart() {
-
     function updateUsersRating(id, data){
-       data.unshift([1000, 0]) // Hack to scale x axis
-       data.push([2500,0]);
+        data.sort();
 
-       var xElo = data.map(function(el){return el[0];});
-       var yCount = data.map(function(el){return el[1];});
+        var xElo = data.map(function(el){return el[0];});
+        var yCount = data.map(function(el){return el[1];});
 
-       $.jqplot(id, [data], {
+        $.jqplot(id, [data], {
             title: "Users rating destribution",
             captureRightClick: true,
             seriesDefaults: {
@@ -133,13 +134,14 @@
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
                       // labelPosition: 'middle',
-                      angle: 90
+                        angle: 90
                     },
                     ticks: xElo
                 },
                 yaxis: {
                     padMin: 0,
-                    tickInterval: 1
+                    tickInterval: 1,
+                    min: 0
                 }
             }
         });
@@ -148,7 +150,7 @@
     function onUpdateUsersRatingRequest(response)
     {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
@@ -158,20 +160,25 @@
     $.ajax({
         type: 'GET',
         url: "/statistics/getUsersByRating",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateUsersRatingRequest);
 })();
 
 (function updateBlundersRatingChart() {
+    function updateBlundersRating(id, data) {
+        // Sorting data, beacuse server returns unsorted data
+        // and jqplot doesn't work with unsorted data well
+        data.sort();
 
-    function updateBlundersRating(id, data){
-       data.unshift([1000, 0]) // Hack to scale x axis
-       data.push([3000,0]);
+        var xElo = data.map(function(el) {
+            return el[0];
+        });
 
-       var xElo = data.map(function(el){return el[0];});
-       var yCount = data.map(function(el){return el[1];});
+        var yCount = data.map(function(el) {
+            return el[1];
+        });
 
-       $.jqplot(id, [data], {
+        $.jqplot(id, [data], {
             title: "Blunders rating destribution",
             captureRightClick: true,
             seriesDefaults: {
@@ -191,7 +198,7 @@
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
                       // labelPosition: 'middle',
-                      angle: 90
+                        angle: 90
                     },
                     ticks: xElo
                 },
@@ -203,10 +210,9 @@
         });
     }
 
-    function onUpdateBlundersRatingRequest(response)
-    {
+    function onUpdateBlundersRatingRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
 
@@ -216,7 +222,7 @@
     $.ajax({
         type: 'GET',
         url: "/statistics/getBlundersByRating",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateBlundersRatingRequest);
 })();
 
@@ -229,6 +235,14 @@
     $.ajax({
         type: 'POST',
         url: "/statistics/getBlundersStatistics",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateBlundersRequest);
 })();
+
+(function setupSpoilers() {
+    grid.setupSpoiler('users-block');
+    grid.setupSpoiler('top-block');
+    grid.setupSpoiler('blunders-block');
+    grid.setupSpoiler('online-block');
+})();
+

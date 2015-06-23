@@ -271,7 +271,7 @@ a.move:active {
     margin-left: 20px;
 }
 
-#blunder-rating-container, #blunder-success-rate-container, #game-info-container {
+#blunder-rating-container, #blunder-success-rate-container, #game-info-container, #spent-time-container {
     margin-bottom: 7px;
 }
 
@@ -285,14 +285,6 @@ a.move:active {
 
 #comments.hidden {
     opacity: 0; visibility:hidden;
-}
-
-.green {
-    color: #1fa67a;
-}
-
-.red {
-    color: rgb(217, 83, 79);
 }
 
 .submit-comment-button {

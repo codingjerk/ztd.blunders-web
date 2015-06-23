@@ -30,15 +30,6 @@
                     id: 'blunder-count-statistics'
                 }
             ]
-        },
-        {
-            caption: 'History',
-            rows: [
-                {
-                    type: 'wide', 
-                    id: 'blunder-history'
-                }
-            ]
         }
     ];
 
@@ -49,9 +40,10 @@
 (function updateProfile() {
     function onUpdateProfileRequest(response) {
         if (response.status !== 'ok') {
-            // TODO: notify
+            notify.error(response.message);
             return;
         }
+
         grid.update(response.data);
     }
 
@@ -76,7 +68,11 @@
     }).done(onUpdateRatingChartRequest);
 
     function onUpdateRatingChartRequest(response) {
-        if (response.status !== 'ok') return; // TODO: notify
+        if (response.status !== 'ok') {
+            notify.error(response.message);
+            return;
+        }
+
         grid.update(response.data,  {'rating-statistics': drawRatingChart});
     } 
 
@@ -118,7 +114,11 @@
     }).done(onUpdateBlunderChartRequest);
 
     function onUpdateBlunderChartRequest(response) {
-        if (response.status !== 'ok') return; // TODO: notify
+        if (response.status !== 'ok') {
+            notify.error(response.message);
+            return;
+        }
+        
         grid.update(response.data, {'blunder-count-statistics': drawBlunderChart});
     } 
 
@@ -148,67 +148,21 @@
                     tickInterval: 'day'
                 },
                 yaxis: {
-                    padMin: 0
+                    padMin: 0,
+                    min: 0
                 }
             },
-            legend:{ 
-                show:true,
-                    renderer: $.jqplot.EnhancedLegendRenderer,
-                    location: 'n' ,
-                    placement : "outsideGrid",
-                    marginTop : "0px",
-                    rendererOptions: {
-                        numberRows: 1
-                    },
-                    labels: [ 'Failed to solve', 'Successfully solved']
-            },
+            legend: {
+                show: true,
+                renderer: $.jqplot.EnhancedLegendRenderer,
+                location: 'n',
+                placement: "outsideGrid",
+                marginTop: "0px",
+                rendererOptions: {
+                    numberRows: 1
+                },
+                labels: ['Failed to solve', 'Successfully solved']
+            }
         });
-    }
-})();
-
-(function updateBlunderHistory() {
-    var blundersPerPage = 10;
-
-    var content = '<div id="blunder-history-content"></div><div id="blunder-history-paginator"></div>';
-    $("#blunder-history").html(content);
-
-    $("#blunder-history-paginator").pagination({
-        items: 1,
-        itemsOnPage: blundersPerPage,
-        cssStyle: 'light-theme',
-        onPageClick: function(pageNumber, event) {
-            getContent(pageNumber, blundersPerPage);
-        }
-    });
-
-    getContent(1, blundersPerPage);
-
-    function getContent(page, limit) {
-        $.ajax({
-            type: 'POST',
-            url: "/statistics/getBlundersHistory",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                username: $.url('?user'),
-                offset: (page - 1) * limit,
-                limit: limit
-            })
-        }).done(onUpdateBlunderHistory);
-    }
-
-    function onUpdateBlunderHistory(response) {
-        if (response.status !== 'ok') return; // TODO: notify
-
-        var blunders = response.data.blunders;
-
-        var rows = blunders.map(function(b) {
-            var style = (b.result == 1) ? "row-win" : "row-fail";
-            return '<tr class={0}><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(style, b.blunder_id, b.result, b.blunder_elo);
-        }).join('');
-
-        var content = '<table>{0}</table>'.format(rows);
-        $("#blunder-history-content").html(content);
-
-        $("#blunder-history-paginator").pagination("updateItems", response.data.total);
     }
 })();

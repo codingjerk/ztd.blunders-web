@@ -1,4 +1,4 @@
-def getK(Ra, Rb):
+def getK(Ra, Rb): #pylint: disable=unused-argument
     Ka = 32
     Kb = 32
 
@@ -11,8 +11,8 @@ def calculate(Ra, Rb, success):
     Sa = 1 if success else 0
     Sb = 0 if success else 1
 
-    Qa = 10 ** (Ra / 400)
-    Qb = 10 ** (Rb / 400)
+    Qa = 10 ** (Ra / scaling)
+    Qb = 10 ** (Rb / scaling)
 
     Qab = Qa + Qb
 

@@ -5,7 +5,7 @@
 		<meta charset='utf-8'/>
 		<title>{{ title }}</title>
 		<link rel="stylesheet" href="static/css/layout.css">
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 
 		{% block style %}{% endblock %}
 	</head>
@@ -16,7 +16,6 @@
 				<li><a href="#"><i class="fa fa-exclamation-circle"></i> Blunders</a>
 					<ul>
 						<li><a href="/training"><i class="fa fa-check"></i> Training</a></li>
-						<li><a href="#"><i class="fa fa-search"></i> Search...</a></li>
 						<li><a href="download"><i class="fa fa-download"></i> Download</a></li>
 						<li><a href="/statistics"><i class="fa fa-line-chart"></i> Statistics</a></li>
 						<li><a href="/api"><i class="fa fa-code"></i> API</a></li>
@@ -30,7 +29,7 @@
 						<ul>
 							<li><a href="/profile?user={{session.username()}}"><i class="fa fa-file-text"></i> Profile</a></li>
 							<li><a href="/statistics?user={{session.username()}}"><i class="fa fa-line-chart"></i> Statistics</a></li>
-							<li><a href="/logout"><i class="fa fa-sign-out"></i> Log Out</a></li>
+							<li><a href="#" id="logout-button"><i class="fa fa-sign-out"></i> Log Out</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -49,16 +48,18 @@
 			<ul>
 				<li><a href="faq">FAQ</a></li>
 				<li><a href="termsOfUse">Terms of Use</a></li>
-				<li><a href="donate">Donate</a></li>
+				<li><a href="helpus">Help us</a></li>
 				<li><a href="about">About</a></li>
 				<li><a href="https://bitbucket.org/ziltoidteam">Ztd on Bitbucket</a></li>
 			</ul>
 		</footer>
 
 		
-		<script src="static/third-party/chessboardjs/js/jquery-1.10.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 		<script src="static/third-party/notifyjs/notify.min.js"></script>
+		<script src="static/js/notify-wrapper.js"></script>
     	<script src="static/js/utils.js"></script>
 		{% block script %}{% endblock %}
+		<script src="static/js/layout.js"></script>
 	</body>
 </html>

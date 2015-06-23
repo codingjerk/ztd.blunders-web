@@ -12,13 +12,18 @@ def faq():
 def about():
     return render_template('about.html', title = 'About', session = session)
 
-@app.route('/donate')
-def donate():
-    return render_template('donate.html', title = 'Donate', session = session)
+@app.route('/helpus')
+def helpus():
+    return render_template('helpus.html', title = 'Help us', session = session)
 
 @app.route('/termsOfUse')
 def termsOfUse():
-    return render_template('termsOfUse.html', title = 'Terms of Use', year = datetime.now().year, session = session)
+    return render_template(
+        'termsOfUse.html',
+        title = 'Terms of Use',
+        year = datetime.now().year,
+        session = session
+    )
 
 @app.route('/download')
 def download():

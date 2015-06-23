@@ -1,0 +1,13 @@
+[Unit]
+Description=Ztd Blunders
+Requires=postgresql-9.4.service mongod.service
+Wants=
+
+[Service]
+User=root
+WorkingDirectory=/home/supuser/web/chessdb-web
+ExecStart=/usr/bin/python3.4 /home/supuser/web/chessdb-web/run.py
+ExecStop=/bin/kill -SIGINT $MAINPID
+
+[Install]
+WantedBy=multi-user.target

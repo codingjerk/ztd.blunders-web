@@ -1,11 +1,12 @@
 import psycopg2
 
-USER_ROLE = 3
+from app.utils import roles
 
+#pylint: disable=too-few-public-methods
 class PostgreConnection:
     def __init__(self, type):
         self.type = type
-        assert(type in 'rw')
+        assert type in 'rw'
 
         self.connection = psycopg2.connect('dbname=chessdb user=postgres')
         self.cursor = self.connection.cursor()
@@ -24,14 +25,15 @@ class PostgreConnection:
         self.connection.close()
 
 def autentithicateUser(username, hash):
-    if username is None: return False
+    if username is None:
+        return False
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT *
-               FROM users 
-               WHERE username = %s AND password = %s;"""
-            , (username, hash)
+        connection.cursor.execute("""
+            SELECT *
+            FROM users
+            WHERE username = %s AND password = %s;
+            """, (username, hash)
         )
 
         users = connection.cursor.fetchall()
@@ -40,11 +42,11 @@ def autentithicateUser(username, hash):
 
     if success:
         with PostgreConnection('w') as connection:
-            connection.cursor.execute(
-                """UPDATE users 
-                   SET last_login = NOW()
-                   WHERE username = %s;"""
-                , (username,)
+            connection.cursor.execute("""
+                UPDATE users
+                SET last_login = NOW()
+                WHERE username = %s;
+                """, (username,)
             )
 
     return success
@@ -59,7 +61,8 @@ def getUserField(user_id, field):
         return connection.cursor.fetchone()[0]
 
 def getRating(user_id):
-    if user_id is None: return 0
+    if user_id is None:
+        return 0
 
     return getUserField(user_id, 'elo')
 
@@ -72,7 +75,7 @@ def getSalt(username):
     return getUserField(user_id, 'salt')
 
 def getUserId(username):
-    if username is None: 
+    if username is None:
         raise Exception('postre.getUserId for anonim')
 
     with PostgreConnection('r') as connection:
@@ -85,122 +88,145 @@ def getUserId(username):
 
 def getUsernameById(user_id):
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT username
-               FROM users 
-               WHERE id = %s;"""
-            , (user_id,)
+        connection.cursor.execute("""
+            SELECT username
+            FROM users
+            WHERE id = %s;
+            """, (user_id,)
         )
 
         result = connection.cursor.fetchone()
-        if result is None: raise Exception('User with id %d is not exist' % user_id)
+        if result is None:
+            raise Exception('User with id %d is not exist' % user_id)
 
         return result[0]
 
-def assignBlunderTask(user_id, blunder_id):
-    if user_id is None: return
+def assignBlunderTask(user_id, blunder_id, type):
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            'INSERT INTO blunder_tasks (user_id, blunder_id) VALUES (%s, %s);'
-            , (user_id, blunder_id)
+        connection.cursor.execute("""
+            INSERT INTO blunder_tasks (user_id, blunder_id, type_id)
+            VALUES (
+                %s,
+                %s,
+                (SELECT id FROM blunder_task_type WHERE name = %s)
+            );
+            """, (user_id, blunder_id, type)
         )
 
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start):
-    if user_id is None: 
+#pylint: disable=too-many-arguments
+def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start, spent_time):
+    if user_id is None:
         raise Exception('postre.saveBlunderHistory for anonim')
-    if(date_start is None):
+    if date_start is None:
         raise Exception('postre.saveBlunderHistory date start is not defined')
 
     user_elo = getRating(user_id)
     result = 1 if success else 0
 
-    if success: userLine = ''
+    if success:
+        userLine = ''
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """INSERT INTO blunder_history (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start)
-               VALUES (%s, %s, %s, %s, %s, %s, %s);"""
-            , (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start)
+        connection.cursor.execute("""
+            INSERT INTO blunder_history
+            (user_id, blunder_id, result, user_elo, blunder_elo, user_line, date_start, spent_time)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+            """,
+            (user_id, blunder_id, result, user_elo, blunder_elo, userLine, date_start, spent_time)
         )
 
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-def closeBlunderTask(user_id, blunder_id):
-    if user_id is None: return
+def closeBlunderTask(user_id, blunder_id, type):
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """DELETE FROM blunder_tasks
-               WHERE user_id = %s AND blunder_id = %s;"""
-            , (user_id, blunder_id)
+        connection.cursor.execute("""
+            DELETE FROM blunder_tasks
+            WHERE user_id = %s
+                AND blunder_id = %s
+                AND type_id = (SELECT id FROM blunder_task_type WHERE name = %s);
+            """, (user_id, blunder_id, type)
         )
 
         return connection.cursor.rowcount == 1
 
 def setRating(user_id, elo):
-    if user_id is None: 
+    if user_id is None:
         raise Exception('postre.setRating for anonim')
 
     with PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """UPDATE users
-               SET elo = %s
-               WHERE id = %s;"""
-            , (elo, user_id)
+        connection.cursor.execute("""
+            UPDATE users
+            SET elo = %s
+            WHERE id = %s;
+            """, (elo, user_id)
         )
 
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
-
-def getAssignedBlunder(user_id):
-    if user_id is None: return None
+def getAssignedBlunder(user_id, type):
+    if user_id is None:
+        return None
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT blunder_id
-               FROM blunder_tasks
-               WHERE user_id = %s;"""
-            , (user_id,)
+        connection.cursor.execute("""
+            SELECT blunder_id
+            FROM blunder_tasks AS bt
+            INNER JOIN blunder_task_type AS btt
+                ON bt.type_id = btt.id
+            WHERE bt.user_id = %s
+                AND btt.name = %s;
+            """, (user_id, type)
         )
 
         blunder_id = connection.cursor.fetchone()
-        if blunder_id is None: return None
+        if blunder_id is None:
+            return None
 
         return blunder_id[0]
 
 def signupUser(username, salt, hash, email):
-    # TODO: Validation
-    if len(username) < 3: return {'status': 'error', 'field': 'username', 'message': "Username is too short"}
-
     with PostgreConnection('w') as connection:
         try:
-            connection.cursor.execute(
-                """INSERT INTO users (username, salt, password, role, email, registration, last_login)
-                   VALUES (%s, %s, %s, %s, %s, NOW(), NOW());"""
-                , (username, salt, hash, USER_ROLE, email)
+            connection.cursor.execute("""
+                INSERT INTO users (username, salt, password, role, email, registration, last_login)
+                VALUES (%s, %s, %s, %s, %s, NOW(), NOW());
+                """, (username, salt, hash, roles.USER, email)
             )
-        except psycopg2.IntegrityError as e:
-            return {'status': 'error', 'field': 'username', 'message': 'Already registered'}
+        except psycopg2.IntegrityError:
+            return {
+                'status': 'error',
+                'field': 'username',
+                'message': 'Already registered'
+            }
 
         success = (connection.cursor.rowcount == 1)
 
-        if not success: return {'status': 'error', 'message': "Unable to register user"}
+        if not success:
+            return {
+                'status': 'error',
+                'message': "Unable to register user"
+            }
 
     return {'status': 'ok'}
 
 def getTries(blunder_id):
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT * 
-               FROM blunder_history
-               WHERE blunder_id = %s;"""
-            , (blunder_id,)
+        connection.cursor.execute("""
+            SELECT *
+            FROM blunder_history
+            WHERE blunder_id = %s;
+            """, (blunder_id,)
         )
 
         total = connection.cursor.rowcount
@@ -219,18 +245,18 @@ def getBlunderComments(blunder_id):
     result = []
 
     with PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            """SELECT id, date, parent_id, user_id, comment
-               FROM blunder_comments
-               WHERE blunder_id = %s"""
-            , (blunder_id,)
+        connection.cursor.execute("""
+            SELECT id, date, parent_id, user_id, comment
+            FROM blunder_comments
+            WHERE blunder_id = %s
+            """, (blunder_id,)
         )
 
         comments = connection.cursor.fetchall()
 
         for comment in comments:
             comment_id, date, parent_id, user_id, text = comment
-            username = getUsernameById(user_id) 
+            username = getUsernameById(user_id)
             likes, dislikes = getBlunderCommentVotes(comment_id)
 
             pythonComment = {
@@ -249,7 +275,8 @@ def getBlunderComments(blunder_id):
     return result
 
 def isFavorite(user_id, blunder_id):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
@@ -323,7 +350,8 @@ def getBlunderCommentVotes(comment_id):
     return likes, dislikes
 
 def voteBlunder(user_id, blunder_id, vote):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -334,7 +362,7 @@ def voteBlunder(user_id, blunder_id, vote):
             , (vote, blunder_id, user_id)
         )
 
-        count = connection.cursor.rowcount 
+        count = connection.cursor.rowcount
 
         if count == 1:
             return True
@@ -346,13 +374,17 @@ def voteBlunder(user_id, blunder_id, vote):
             , (user_id, blunder_id, vote)
         )
 
-        if connection.cursor.rowcount != 1: 
-            raise Exception('Can not add vote for user id %s with blunder id %s' % (user_id, blunder_id))
+        if connection.cursor.rowcount != 1:
+            raise Exception(
+                'Can not add vote for user id %s with blunder id %s' %
+                (user_id, blunder_id)
+            )
 
     return True
 
 def favoriteBlunder(user_id, blunder_id):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -375,12 +407,16 @@ def favoriteBlunder(user_id, blunder_id):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Error inserting favorite for user id %s with blunder id %s' % (user_id, blunder_id))
+            raise Exception(
+                'Error inserting favorite for user id %s with blunder id %s' %
+                (user_id, blunder_id)
+            )
 
     return True
 
 def commentBlunder(user_id, blunder_id, parent_id, user_input):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -395,7 +431,8 @@ def commentBlunder(user_id, blunder_id, parent_id, user_input):
     return True
 
 def voteBlunderComment(user_id, comment_id, vote):
-    if user_id is None: return False
+    if user_id is None:
+        return False
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -416,7 +453,7 @@ def voteBlunderComment(user_id, comment_id, vote):
             , (user_id, comment_id, vote)
         )
 
-        if connection.cursor.rowcount != 1: 
+        if connection.cursor.rowcount != 1:
             raise Exception('Can not add comment vote for user id %s' % (user_id))
 
     return True
@@ -437,17 +474,23 @@ def blunderCommentAuthor(comment_id):
 
         return user_id
 
-def getTaskStartDate(user_id, blunder_id):
-    if user_id is None: return
+def getTaskStartDate(user_id, blunder_id, type):
+    if user_id is None:
+        return
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute(
-            """SELECT assign_date FROM blunder_tasks
-               WHERE user_id = %s AND blunder_id = %s;"""
-            , (user_id, blunder_id)
+            """SELECT assign_date
+               FROM blunder_tasks AS bt
+               INNER JOIN blunder_task_type AS btt
+                   ON bt.type_id = btt.id
+               WHERE bt.user_id = %s
+                 AND bt.blunder_id = %s
+                 AND btt.name = %s;"""
+            , (user_id, blunder_id, type)
         )
 
-        if(connection.cursor.rowcount != 1):
+        if connection.cursor.rowcount != 1:
             return None
 
         (assign_date,) = connection.cursor.fetchone()
@@ -473,11 +516,11 @@ def getUserProfile(username):
 
         (user_id, username, user_elo) = connection.cursor.fetchone()
 
-       
+
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT SUM(bcv.vote)
-            FROM blunder_comments as bc INNER JOIN blunder_comments_votes as bcv 
+            FROM blunder_comments as bc INNER JOIN blunder_comments_votes as bcv
                 ON bc.id = bcv.comment_id WHERE bc.user_id = %s;"""
             , (user_id,))
 
@@ -489,18 +532,20 @@ def getUserProfile(username):
 
     userJoinDate = getUserField(user_id, "to_char(registration, 'Month DD, YYYY')")
 
+    userLastActivity = lastUserActivity(username, 'Month DD, YYYY')
+
     return {
         'status': 'ok',
         'data': {
             'user-rating-value':     user_elo,
             'user-karma-value':      karma,
             'username-value':        username,
-            'user-join-value':       userJoinDate
+            'user-join-value':       userJoinDate,
+            'user-last-activity-value': userLastActivity
         }
     }
 
 def getBlundersStatistics(username):
-
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.id,
@@ -518,7 +563,7 @@ def getBlundersStatistics(username):
                 'message': 'Trying to get not exist user with name %s' % username
             }
 
-        (user_id, total, solved, failed) = connection.cursor.fetchone()
+        (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
@@ -530,15 +575,13 @@ def getBlundersStatistics(username):
         }
     }
 
-
-
 def getRatingByDate(username):
     user_id = getUserId(username)
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date, 
-                   AVG(b.user_elo) 
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date,
+                   AVG(b.user_elo)
             FROM blunder_history AS b
             GROUP BY date, b.user_id HAVING b.user_id = %s;"""
             , (user_id,)
@@ -550,7 +593,7 @@ def getRatingByDate(username):
     return {
         'status': 'ok',
         'username': username,
-        'data' : { 
+        'data' : {
             'rating-statistics': rating
         }
     }
@@ -560,7 +603,7 @@ def getBlundersByDate(username):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date, 
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date,
                    COUNT(b.id) as total,
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
@@ -571,9 +614,9 @@ def getBlundersByDate(username):
 
         data = connection.cursor.fetchall()
 
-        total = [[date, total] for (date, total, _1, _2) in data]
-        solved = [[date, solved] for (date, _1, solved, _2) in data]
-        failed = [[date, failed] for (date, _1, _2, failed) in data]
+        total = [[date, total] for (date, total, _1, _2) in data]     #pylint: disable=unused-variable
+        solved = [[date, solved] for (date, _1, solved, _2) in data]  #pylint: disable=unused-variable
+        failed = [[date, failed] for (date, _1, _2, failed) in data]  #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
@@ -587,7 +630,7 @@ def getBlundersByDate(username):
         }
     }
 
-def getBlundersHistory(username, offset, limit):
+def getBlunderHistoryCount(username):
     user_id = getUserId(username)
 
     with PostgreConnection('r') as connection:
@@ -606,75 +649,184 @@ def getBlundersHistory(username, offset, limit):
 
         (total,) = connection.cursor.fetchone()
 
+    return total
+
+def getBlundersHistory(username, offset, limit):
+    user_id = getUserId(username)
+
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT h.blunder_id,
                    h.result,
-                   h.blunder_elo,
-                   h.user_elo,
                    h.date_start,
-                   h.date_finish
+                   h.spent_time
             FROM blunder_history AS h
             WHERE h.user_id = %s
+            ORDER BY h.date_start DESC
             LIMIT %s OFFSET %s"""
             , (user_id, limit, offset, )
         )
 
         data = connection.cursor.fetchall()
 
-        blunders = [{
-                     "blunder_id": blunder_id,
-                     "result": result,
-                     "blunder_elo": blunder_elo,
-                     "user_elo": user_elo,
-                     "date_start": date_start,
-                     "date_finish": date_finish,
-                    } for (blunder_id, result, blunder_elo, user_elo, date_start, date_finish) in data]
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "result": True if result == 1 else False,
+                "date_start": date_start,
+                "spent_time": spent_time
+            }
+            for (blunder_id, result, date_start, spent_time) in data
+        ]
 
-    return {
-        'status': 'ok',
-        'username': username,
-        'data': {
-            "total": total,
-            "blunders": blunders
-        }
-    }
+    return blunders
+
+def getBlunderFavoritesCount(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting favorites for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getBlundersFavorites(username, offset, limit):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT f.blunder_id,
+                   f.assign_date
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s
+            ORDER BY f.assign_date DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "assign_date": assign_date
+            }
+            for (blunder_id, assign_date) in data
+        ]
+
+    return blunders
+
+def getCommentsByUserCount(username):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting comments for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getCommentsByUser(username, offset, limit):
+    user_id = getUserId(username)
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT c.blunder_id,
+                   c.date,
+                   c.comment
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s
+            ORDER BY c.date DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        comments = [
+            {
+                "blunder_id": blunder_id,
+                "date": date,
+                "text": text
+            }
+            for (blunder_id, date, text) in data
+        ]
+
+    return comments
+
+def lastUserActivity(username, format):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.username,
+                   TO_CHAR(act.last_activity, %s)
+            FROM vw_activities AS act
+            INNER JOIN users as u
+                ON act.user_id = u.id
+            WHERE u.username = %s;"""
+            , (format, username)
+        )
+
+        (_, last_activity) = connection.cursor.fetchone()
+
+        return last_activity
 
 def lastActiveUsers(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.username,
-                   MAX(h.date_finish) AS date_last
-            FROM blunder_history AS h
-            INNER JOIN users AS u 
-                ON h.user_id = u.id
-            WHERE h.date_finish > NOW() - INTERVAL %s
-            GROUP BY u.username;"""
+                   act.last_activity
+            FROM vw_activities AS act
+            INNER JOIN users as u
+                ON act.user_id = u.id
+            WHERE act.last_activity > NOW() - INTERVAL %s;"""
             , (interval,)
         )
 
         data = connection.cursor.fetchall()
 
-        users = [username for (username, _1) in data]
+        users = [username for (username, _1) in data] #pylint: disable=unused-variable
 
-        return users;
+        return users
 
 def getUsersTop(number):
     with PostgreConnection('r') as connection:
-            connection.cursor.execute("""
-                SELECT u.username,
-                       u.elo
-                FROM users AS u
-                ORDER BY u.elo DESC
-                LIMIT %s"""
-                , (number,)
-            )
+        connection.cursor.execute("""
+            SELECT u.username,
+                   u.elo
+            FROM users AS u
+            ORDER BY u.elo DESC
+            LIMIT %s"""
+            , (number,)
+        )
 
-            data = connection.cursor.fetchall()
+        data = connection.cursor.fetchall()
 
-            top = [{'username':username, 'elo':elo} for (username, elo) in data]
+        top = [{'username':username, 'elo':elo} for (username, elo) in data]
 
-    return top;
+    return top
 
 def getUsersStatistics():
     with PostgreConnection('r') as connection:
@@ -687,7 +839,7 @@ def getUsersStatistics():
     users_day = lastActiveUsers('1 HOUR')
     users_week = lastActiveUsers('1 WEEK')
     users_top = getUsersTop(10)
-    
+
     return {
         'status': 'ok',
         'data': {
@@ -703,8 +855,8 @@ def getUsersByRating(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.elo - MOD(u.elo, %s) AS elo_category,
-                   COUNT(u.id) 
-            FROM users AS u 
+                   COUNT(u.id)
+            FROM users AS u
             GROUP BY elo_category;"""
             , (interval,)
         )

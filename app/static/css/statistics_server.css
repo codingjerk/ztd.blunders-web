@@ -6,3 +6,9 @@
 #users-online-list > a {
     font-size: 80%;
 }
+
+#users-top-list > table {
+    size: 100%;
+    margin-left: auto; 
+    margin-right: auto;
+}
