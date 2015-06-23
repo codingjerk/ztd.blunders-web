@@ -1,8 +1,10 @@
 import random
 import pymongo
+from datetime import timedelta
 from bson.objectid import ObjectId 
 
 from app import utils
+from app.utils import cache
 
 @utils.init
 def main():
@@ -32,6 +34,7 @@ def getGameById(game_id):
 def setRating(blunder_id, rating):
     db['filtered_blunders'].update({'_id': ObjectId(blunder_id)}, {'$set': {'elo': rating}})
 
+@cache.cached(timedelta(days = 1))
 def getBlandersByRating(interval):
     result = db['filtered_blunders'].aggregate([ 
         {'$project':{'elo':'$elo','mod':{'$mod':['$elo', interval]}}},
