@@ -156,7 +156,7 @@ var utils = {};
         var mins = Math.floor(seconds / 60);
         var secs = Math.floor(seconds % 60);
 
-        var spentTimeText = mins + ':' + seconds.pad(2);
+        var spentTimeText = mins + ':' + secs.pad(2);
 
         return spentTimeText;
     };
