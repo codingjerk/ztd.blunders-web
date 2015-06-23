@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#pylint: disable=superfluous-parens
+
 from flask import Flask
 
 app = Flask(__name__)

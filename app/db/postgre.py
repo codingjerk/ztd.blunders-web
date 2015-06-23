@@ -5,7 +5,7 @@ from app.utils import roles
 class PostgreConnection:
     def __init__(self, type):
         self.type = type
-        assert(type in 'rw')
+        assert type in 'rw'
 
         self.connection = psycopg2.connect('dbname=chessdb user=postgres')
         self.cursor = self.connection.cursor()
@@ -117,7 +117,7 @@ def assignBlunderTask(user_id, blunder_id, type):
 def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start, spent_time):
     if user_id is None: 
         raise Exception('postre.saveBlunderHistory for anonim')
-    if(date_start is None):
+    if date_start is None:
         raise Exception('postre.saveBlunderHistory date start is not defined')
 
     user_elo = getRating(user_id)
@@ -466,7 +466,7 @@ def getTaskStartDate(user_id, blunder_id, type):
             , (user_id, blunder_id, type)
         )
 
-        if(connection.cursor.rowcount != 1):
+        if connection.cursor.rowcount != 1:
             return None
 
         (assign_date,) = connection.cursor.fetchone()
