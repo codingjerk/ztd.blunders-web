@@ -38,10 +38,9 @@ section, #main-table {
     vertical-align: top;
 }
 
-#user-join-date {
-    margin-top: 20px;
-    
-    border-top: 1px solid #dedede;
+#user-join-date, #user-last-activity-date {
+    margin-top: 5px;
+
     padding-top: 15px;
 
     text-align: center;
@@ -49,6 +48,7 @@ section, #main-table {
     font-size: 70%;
     color: #555;
 }
+
 
 #user-links {
     margin-top: 15px;
@@ -87,4 +87,55 @@ section, #main-table {
 #rating-chart {
     width: 100%;
     height: 200px;
+}
+
+#blunder-history-content {
+    padding: 20px;
+}
+
+#blunder-history-content > table {
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+#blunder-history-content > table > tr > td {
+    text-align: center;
+}
+
+.blunder-history-board-win {
+    margin: 20px;
+    -webkit-box-shadow: 0px 0px 20px 10px #1fa67a;
+    -moz-box-shadow: 0px 0px 20px 10px #1fa67a;
+    box-shadow: 0px 0px 20px 10px #1fa67a;
+}
+
+.blunder-history-board-fail {
+    margin: 20px;
+    -webkit-box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
+    -moz-box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
+    box-shadow: 0px 0px 20px 10px rgb(217, 83, 79);
+}
+
+#blunder-favorites-content > table {
+    margin-left:auto; 
+    margin-right:auto;
+}
+
+#blunder-favorites-content > table > tr > td {
+    text-align: center;
+}
+
+.blunder-favorites-board {
+    margin: 20px;
+}
+
+.blunder-comment {
+    margin-bottom: 20px;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.comments-board {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }

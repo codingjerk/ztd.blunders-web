@@ -81,10 +81,10 @@
 
     function updateUsersTopList(id, users) {
         var usersList = users.map(function(user) {
-                    var username = user['username'];
-                    var elo = user['elo'];
-                    return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username,username,elo);
-                }).join('');
+            var username = user.username;
+            var elo = user.elo;
+            return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username, username, elo);
+        }).join('');
 
         var content = '<table>{0}</table>'.format(usersList);
         $('#' + id).html(content);
@@ -160,7 +160,7 @@
     $.ajax({
         type: 'GET',
         url: "/statistics/getUsersByRating",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateUsersRatingRequest);
 })();
 
@@ -222,7 +222,7 @@
     $.ajax({
         type: 'GET',
         url: "/statistics/getBlundersByRating",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateBlundersRatingRequest);
 })();
 
@@ -235,7 +235,7 @@
     $.ajax({
         type: 'POST',
         url: "/statistics/getBlundersStatistics",
-        contentType: 'application/json',
+        contentType: 'application/json'
     }).done(onUpdateBlundersRequest);
 })();
 

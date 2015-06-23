@@ -7,7 +7,7 @@ from app.db import postgre
 def getUserProfile():
     try:
         username = request.json['username']
-    except:
+    except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Username required'

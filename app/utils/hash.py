@@ -8,7 +8,7 @@ def get(username, password):
 
     return passHash.decode()
 
-def new(username, password):
+def new(password):
     salt = bcrypt.gensalt(rounds = 12)
     passHash = bcrypt.hashpw(password.encode(), salt)
 

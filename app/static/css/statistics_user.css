@@ -2,24 +2,3 @@ section, #details {
     left: -200px;
     width: 1200px;
 }
-
-#blunder-history-content {
-    padding: 20px;
-}
-
-#blunder-history-content > table {
-    margin-left:auto; 
-    margin-right:auto;
-}
-
-#blunder-history-content > table > tr > td {
-    text-align: center;
-}
-
-.row-win {
-    background-color: #1fa67a;
-}
-
-.row-fail {
-    background-color: rgb(217, 83, 79);
-}

@@ -1,12 +1,8 @@
-from flask import jsonify, request
+from flask import jsonify
 
-import random
-
-from app import app, db
-from app.db import mongo, postgre
-from app import utils
+from app import app
+from app.db import postgre
 
 @app.route('/statistics/getUsersStatistics', methods=['GET'])
 def getUsersStatistics():
     return jsonify(postgre.getUsersStatistics())
-    

@@ -1,16 +1,17 @@
 from flask import jsonify, request
 
-import random
-
 from app import app, db
-from app.db import mongo, postgre
-from app import utils
+from app.db import postgre
 
 @app.route('/statistics/getBlundersStatistics', methods=['POST'])
 def getBlundersStatistics():
+    username = None
     try:
         username = request.json['username']
-        return jsonify(postgre.getBlundersStatistics(username)) # user statistics
-    except:
+    except Exception:
+        pass
+
+    if username is None:
         return jsonify(db.getBlundersStatistics())              # server statistics
-    
+    else:
+        return jsonify(postgre.getBlundersStatistics(username)) # user statistics
