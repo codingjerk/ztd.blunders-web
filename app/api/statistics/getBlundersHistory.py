@@ -1,10 +1,6 @@
 from flask import jsonify, request
 
-import random
-
 from app import app, db
-from app.db import mongo, postgre
-from app import utils
 
 @app.route('/statistics/getBlundersHistory', methods = ['POST'])
 def getBlundersHistory():
@@ -12,11 +8,10 @@ def getBlundersHistory():
         username = request.json['username']
         offset = request.json['offset']
         limit = request.json['limit']
-    except:
+    except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Username, offset and limit required'
         })
 
     return jsonify(db.getBlundersHistory(username, offset, limit))
-    

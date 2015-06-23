@@ -18,7 +18,12 @@ def helpus():
 
 @app.route('/termsOfUse')
 def termsOfUse():
-    return render_template('termsOfUse.html', title = 'Terms of Use', year = datetime.now().year, session = session)
+    return render_template(
+        'termsOfUse.html',
+        title = 'Terms of Use',
+        year = datetime.now().year,
+        session = session
+    )
 
 @app.route('/download')
 def download():

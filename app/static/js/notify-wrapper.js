@@ -13,7 +13,7 @@ var notify = {};
             "margin-right": "55px",
             "border-radius": "4px",
             "border-style": "solid",
-            "border-width": "1px",
+            "border-width": "1px"
         }
       }
     });
@@ -25,10 +25,10 @@ var notify = {};
             text, 
             {
                 style: 'error',
-                position: 'bottom right',
+                position: 'bottom right'
             }
         );
-    }
+    };
 
     $.notify.addStyle('inplace-error', {
       html: "<div><i class='fa fa-exclamation-circle'></i> <span data-notify-text/></div>",
@@ -53,8 +53,8 @@ var notify = {};
             text, 
             {
                 style: 'inplace-error',
-                position: 'right middle',
+                position: 'right middle'
             }
         );
-    }
+    };
 })(notify);

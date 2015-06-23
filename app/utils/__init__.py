@@ -1,16 +1,9 @@
 import re
 
-class Roles:
-    ADMIN = 0
-    USER = 3
-
-class TaskTypes:
-    RATED = 'rated'
-    EXPLORE = 'explore'
-
-"""Decorator, that calls function on module import"""
 def init(func):
-    func();
+    """Decorator, that calls function on module import"""
+
+    func()
     return func
 
 def jsonifyBlunder(data):
@@ -29,14 +22,16 @@ def jsonifyBlunder(data):
 
             'elo': data['elo']
         }
-
     }
 
 def validateUsername(username):
     if len(username) < 3:
-        return "Username must contains at least 3 letter" 
+        return "Username must contains at least 3 letter"
 
-    if not re.match("^[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+(\.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*$", username):
+    # TODO: Use precompiled regexes
+    usernameRegex = "^[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+(\\.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*$"
+
+    if not re.match(usernameRegex, username):
         return "Your name is too strange"
 
     return None
@@ -48,33 +43,40 @@ def validatePassword(password):
     return None
 
 def validateEmail(email):
-    if len(email.strip()) == 0: return
+    if len(email.strip()) == 0:
+        return None
 
-    if not re.match('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$', email):
+    # TODO: Use precompiled regexes
+    emailRegex = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$'
+
+    if not re.match(emailRegex, email):
         return "Invalid email"
 
     return None
 
 def validateUser(username, password, email):
     usernameValidation = validateUsername(username)
-    if usernameValidation is not None: return {
-        'status': 'error',
-        'field': 'username', 
-        'message': usernameValidation
-    }
+    if usernameValidation is not None:
+        return {
+            'status': 'error',
+            'field': 'username',
+            'message': usernameValidation
+        }
 
     passwordValidation = validatePassword(password)
-    if passwordValidation is not None: return {
-        'status': 'error',
-        'field': 'password', 
-        'message': passwordValidation
-    }
+    if passwordValidation is not None:
+        return {
+            'status': 'error',
+            'field': 'password',
+            'message': passwordValidation
+        }
 
     emailValidation = validateEmail(email)
-    if emailValidation is not None: return {
-        'status': 'error',
-        'field': 'email', 
-        'message': emailValidation
-    }
+    if emailValidation is not None:
+        return {
+            'status': 'error',
+            'field': 'email',
+            'message': emailValidation
+        }
 
     return None

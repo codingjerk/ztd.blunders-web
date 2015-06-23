@@ -1,0 +1,2 @@
+RATED = 'rated'
+EXPLORE = 'explore'

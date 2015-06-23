@@ -10,16 +10,17 @@ MAX_MESSAGE_SIZE = 500
 
 @app.route('/commentBlunder', methods = ['POST'])
 def commentBlunder():
-    if session.isAnonymous(): return jsonify({
-        'status': 'error',
-        'message': 'Commenting allowed only for authorized user'
-    })
+    if session.isAnonymous():
+        return jsonify({
+            'status': 'error',
+            'message': 'Commenting allowed only for authorized user'
+        })
 
     try:
         blunder_id = request.json['blunder_id']
         comment_id = request.json['comment_id']
         user_input = request.json['user_input']
-    except:
+    except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Blunder id, input and comment_id required'
@@ -36,9 +37,9 @@ def commentBlunder():
             'message': 'Input length can\'t be greater than %d' % MAX_MESSAGE_SIZE
         })
 
-    if not postgre.commentBlunder(session.userID(), blunder_id, comment_id, user_input): 
+    if not postgre.commentBlunder(session.userID(), blunder_id, comment_id, user_input):
         return jsonify({
-            'status': 'error', 
+            'status': 'error',
             'message': "Can't comment blunder"
         })
 
