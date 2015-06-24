@@ -36,7 +36,7 @@ SET default_with_oids = false;
 CREATE TABLE blunder_comments (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    blunder_id character varying(255) NOT NULL,
+    blunder_id character(24) NOT NULL,
     date timestamp without time zone DEFAULT now() NOT NULL,
     parent_id integer,
     comment text NOT NULL
@@ -110,7 +110,7 @@ ALTER SEQUENCE blunder_comments_votes_id_seq OWNED BY blunder_comments_votes.id;
 CREATE TABLE blunder_favorites (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    blunder_id character varying(255) NOT NULL,
+    blunder_id character(24) NOT NULL,
     assign_date timestamp without time zone DEFAULT now() NOT NULL
 );
 
@@ -145,11 +145,11 @@ ALTER SEQUENCE blunder_favorites_id_seq OWNED BY blunder_favorites.id;
 CREATE TABLE blunder_history (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    blunder_id character varying(255) NOT NULL,
+    blunder_id character(24) NOT NULL,
     result integer NOT NULL,
     user_elo integer NOT NULL,
     blunder_elo integer NOT NULL,
-    user_line character varying(255) NOT NULL,
+    user_line text NOT NULL,
     date_start timestamp without time zone NOT NULL,
     date_finish timestamp without time zone DEFAULT now() NOT NULL,
     spent_time integer NOT NULL,
@@ -186,7 +186,7 @@ ALTER SEQUENCE blunder_history_id_seq OWNED BY blunder_history.id;
 
 CREATE TABLE blunder_task_type (
     id integer NOT NULL,
-    name character varying(20) NOT NULL
+    name text NOT NULL
 );
 
 
@@ -220,7 +220,7 @@ ALTER SEQUENCE blunder_task_type_id_seq OWNED BY blunder_task_type.id;
 CREATE TABLE blunder_tasks (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    blunder_id character varying(255) NOT NULL,
+    blunder_id character(24) NOT NULL,
     assign_date timestamp without time zone DEFAULT now() NOT NULL,
     type_id integer NOT NULL
 );
@@ -255,7 +255,7 @@ ALTER SEQUENCE blunder_tasks_id_seq OWNED BY blunder_tasks.id;
 
 CREATE TABLE blunder_votes (
     id integer NOT NULL,
-    blunder_id character varying(255) NOT NULL,
+    blunder_id character(24) NOT NULL,
     assign_date timestamp without time zone DEFAULT now() NOT NULL,
     vote integer NOT NULL,
     user_id integer NOT NULL,
@@ -292,14 +292,14 @@ ALTER SEQUENCE blunder_votes_id_seq OWNED BY blunder_votes.id;
 
 CREATE TABLE users (
     id integer NOT NULL,
-    username character varying(255) NOT NULL,
-    password character varying(255) NOT NULL,
+    username text NOT NULL,
+    password text NOT NULL,
     role integer NOT NULL,
     registration timestamp without time zone NOT NULL,
     last_login timestamp without time zone NOT NULL,
     elo integer DEFAULT 1500 NOT NULL,
-    email character varying(255) DEFAULT ''::character varying NOT NULL,
-    salt character varying(255) NOT NULL
+    email text DEFAULT ''::character varying NOT NULL,
+    salt text NOT NULL
 );
 
 
@@ -429,7 +429,7 @@ COPY blunder_comments (id, user_id, blunder_id, date, parent_id, comment) FROM s
 -- Name: blunder_comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_comments_id_seq', 27, true);
+SELECT pg_catalog.setval('blunder_comments_id_seq', 33, true);
 
 
 --
@@ -459,7 +459,7 @@ COPY blunder_favorites (id, user_id, blunder_id, assign_date) FROM stdin;
 -- Name: blunder_favorites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_favorites_id_seq', 45, true);
+SELECT pg_catalog.setval('blunder_favorites_id_seq', 69, true);
 
 
 --
@@ -474,7 +474,7 @@ COPY blunder_history (id, user_id, blunder_id, result, user_elo, blunder_elo, us
 -- Name: blunder_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_history_id_seq', 225, true);
+SELECT pg_catalog.setval('blunder_history_id_seq', 295, true);
 
 
 --
@@ -506,7 +506,7 @@ COPY blunder_tasks (id, user_id, blunder_id, assign_date, type_id) FROM stdin;
 -- Name: blunder_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_tasks_id_seq', 270, true);
+SELECT pg_catalog.setval('blunder_tasks_id_seq', 344, true);
 
 
 --
@@ -521,7 +521,7 @@ COPY blunder_votes (id, blunder_id, assign_date, vote, user_id) FROM stdin;
 -- Name: blunder_votes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('blunder_votes_id_seq', 23, true);
+SELECT pg_catalog.setval('blunder_votes_id_seq', 31, true);
 
 
 --
@@ -529,9 +529,10 @@ SELECT pg_catalog.setval('blunder_votes_id_seq', 23, true);
 --
 
 COPY users (id, username, password, role, registration, last_login, elo, email, salt) FROM stdin;
-122	demo	$2a$12$cqwAprmH0bZYi/J2pWnVSeiGZcvA4u9KKbuK40EN30I//zNPZA6.a	3	2015-06-03 16:38:04.173926	2015-06-10 01:34:45.360687	1291		$2a$12$cqwAprmH0bZYi/J2pWnVSe
-121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-18 01:08:50.44731	1573	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
-120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-20 14:48:53.284645	1186	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
+122	demo	$2a$12$cqwAprmH0bZYi/J2pWnVSeiGZcvA4u9KKbuK40EN30I//zNPZA6.a	3	2015-06-03 16:38:04.173926	2015-06-21 16:38:27.589153	1268		$2a$12$cqwAprmH0bZYi/J2pWnVSe
+120	JackalSh	$2a$12$2lOJlAl0eLr8DqyId6236.1ZGbFhTgIel79qUoAxbj0.nLQoiOwmC	0	2015-05-28 03:24:31.500694	2015-06-24 17:44:23.074658	1293	jackalsh@gmail.com	$2a$12$2lOJlAl0eLr8DqyId6236.
+124	Username	$2b$12$9n/1YKYiFpgDLwjyoM.BXuhNCxWJutEUtUGe111.G8t2O/64EdWe.	3	2015-06-21 17:09:19.804923	2015-06-21 17:09:20.281245	1500		$2b$12$9n/1YKYiFpgDLwjyoM.BXu
+121	Failuref	$2a$12$pXj7c8krKAGjM2dGLO6UoubtDLHKVNy4eQL/R9FvawhimxaVwwRsa	0	2015-05-28 03:25:05.64194	2015-06-23 12:14:11.988801	1324	chezstov@gmail.com	$2a$12$pXj7c8krKAGjM2dGLO6Uou
 \.
 
 
@@ -539,7 +540,7 @@ COPY users (id, username, password, role, registration, last_login, elo, email, 
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('users_id_seq', 122, true);
+SELECT pg_catalog.setval('users_id_seq', 124, true);
 
 
 --
