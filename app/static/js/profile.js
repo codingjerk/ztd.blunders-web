@@ -123,7 +123,7 @@ function pieceTheme(piece) {
                 return '<div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
             });
 
-            if (responce.data.total === 0) {
+            if (response.data.total === 0) {
                 content = utils.generateTooFewDataMessage('There will be your games history');
             }
 
@@ -175,7 +175,7 @@ function pieceTheme(piece) {
                 return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
             });
 
-            if (responce.data.total === 0) {
+            if (response.data.total === 0) {
                 content = utils.generateTooFewDataMessage('There will be your favorites');
             }
 
@@ -233,7 +233,7 @@ function pieceTheme(piece) {
 
             var content = '<table>{0}</table>'.format(rows);
 
-            if (responce.data.total === 0) {
+            if (respose.data.total === 0) {
                 content = utils.generateTooFewDataMessage('There will be your comments');
             }
 
