@@ -77,6 +77,12 @@
     } 
 
     function drawRatingChart(id, data) {
+        if (data.length === 0) {
+            utils.insertTooFewDataMessage(id, 'There will be your rating chart');
+
+            return;
+        }
+
         var chart = data.mapIndex(0, utils.fixDate);
         
         $.jqplot(id, [data], {
@@ -122,6 +128,12 @@
     } 
 
     function drawBlunderChart(id, data) {
+        if (data.total.length === 0) {
+            utils.insertTooFewDataMessage(id, 'There will be your game history');
+
+            return;
+        }
+
         var failed = data.failed.mapIndex(0, utils.fixDate);
         var solved = data.solved.mapIndex(0, utils.fixDate);
 

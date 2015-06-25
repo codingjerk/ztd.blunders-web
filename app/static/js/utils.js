@@ -175,5 +175,14 @@ var utils = {};
         ticks.unshift(ticks[0] - tickSize);
         ticks.push(ticks[ticks.length - 1] + tickSize);
     };
+
+    module.generateTooFewDataMessage = function(message) {
+        return '<div style="width: 100%; line-height: 300px; font-size: 200%; color: #CCC;' +
+            ' text-align: center;">{0}</div>'.format(message);
+    };
+
+    module.insertTooFewDataMessage = function(id, message) {
+        $('#{0}'.format(id)).html(module.generateTooFewDataMessage(message));
+    };
 })(utils);
 
