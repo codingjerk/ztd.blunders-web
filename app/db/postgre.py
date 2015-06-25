@@ -557,13 +557,10 @@ def getBlundersStatistics(username):
             , (username,)
         )
 
-        if connection.cursor.rowcount != 1:
-            return {
-                'status': 'error',
-                'message': 'Trying to get not exist user with name %s' % username
-            }
-
-        (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
+        if connection.cursor.rowcount != 1: # New user, no records in blunder_history
+            total, solved, failed = 0, 0, 0
+        else:
+            (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
