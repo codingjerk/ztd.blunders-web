@@ -160,4 +160,20 @@ var utils = {};
 
         return spentTimeText;
     };
+
+    module.normalizeTicks = function(ticks, tickSize) {
+        var delta = 0;
+
+        for (var i = 1; i < ticks.length; ++i) {
+            delta = ticks[i] - ticks[i-1];
+
+            if (delta > tickSize) {
+                ticks.splice(i, 0, ticks[i-1] + tickSize);
+            }
+        }
+
+        ticks.unshift(ticks[0] - tickSize);
+        ticks.push(ticks[ticks.length - 1] + tickSize);
+    };
 })(utils);
+

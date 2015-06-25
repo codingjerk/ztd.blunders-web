@@ -114,6 +114,8 @@
         var xElo = data.map(function(el){return el[0];});
         var yCount = data.map(function(el){return el[1];});
 
+        utils.normalizeTicks(xElo, 50);
+
         $.jqplot(id, [data], {
             title: "Users rating destribution",
             captureRightClick: true,
@@ -177,6 +179,8 @@
         var yCount = data.map(function(el) {
             return el[1];
         });
+
+        utils.normalizeTicks(xElo, 50);
 
         $.jqplot(id, [data], {
             title: "Blunders rating destribution",
