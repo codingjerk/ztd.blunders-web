@@ -125,6 +125,17 @@
         var failed = data.failed.mapIndex(0, utils.fixDate);
         var solved = data.solved.mapIndex(0, utils.fixDate);
 
+        var firstDate = Math.min(failed[0][0], solved[0][0]);
+        var lastDate = Math.max(failed[0][0], solved[0][0]);
+
+        var oneHourInMs = 1000 * 60 * 60;
+
+        var prevDate = new Date(firstDate - oneHourInMs);
+        var nextDate = new Date(lastDate + 25 * oneHourInMs);
+
+        failed.unshift([prevDate, 0]);
+        failed.push([nextDate, 0]);
+
         $.jqplot(id, [failed, solved], {
             title: "Blunder success / failed dynamics",
             stackSeries: true,
