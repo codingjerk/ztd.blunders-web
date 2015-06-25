@@ -123,6 +123,10 @@ function pieceTheme(piece) {
                 return '<div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
             });
 
+            if (responce.data.total === 0) {
+                content = utils.generateTooFewDataMessage('There will be your games history');
+            }
+
             grid.updatePager(id, response.data.total, content);
 
             response.data.blunders.forEach(function(b) {
@@ -170,6 +174,10 @@ function pieceTheme(piece) {
                 var style = 'blunder-favorites-board';
                 return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
             });
+
+            if (responce.data.total === 0) {
+                content = utils.generateTooFewDataMessage('There will be your favorites');
+            }
 
             grid.updatePager(id, response.data.total, content);
 
@@ -224,6 +232,10 @@ function pieceTheme(piece) {
             })();
 
             var content = '<table>{0}</table>'.format(rows);
+
+            if (responce.data.total === 0) {
+                content = utils.generateTooFewDataMessage('There will be your comments');
+            }
 
             grid.updatePager(id, response.data.total, content);
 
