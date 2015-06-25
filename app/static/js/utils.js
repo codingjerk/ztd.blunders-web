@@ -160,4 +160,12 @@ var utils = {};
 
         return spentTimeText;
     };
+
+    module.insertTooFewDataMessage = function(id, message) {
+        $('#{0}'.format(id)).html(
+            '<div style="width: 100%; line-height: 300px; font-size: 200%; color: #CCC;' +
+            ' text-align: center;">{0}</div>'.format(message)
+        );
+    }
 })(utils);
+
