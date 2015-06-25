@@ -233,7 +233,7 @@ function pieceTheme(piece) {
 
             var content = '<table>{0}</table>'.format(rows);
 
-            if (respose.data.total === 0) {
+            if (response.data.total === 0) {
                 content = utils.generateTooFewDataMessage('There will be your comments');
             }
 
