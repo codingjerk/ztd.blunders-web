@@ -137,18 +137,25 @@
         var failed = data.failed.mapIndex(0, utils.fixDate);
         var solved = data.solved.mapIndex(0, utils.fixDate);
 
+	function sortDate(a, b) {
+		return new Date(a[0]) - new Date(b[0]);
+	}
+
+	failed.sort(sortDate);
+	solved.sort(sortDate);
+
         var firstDate = Math.min(
-			failed[0][0] || (new Date()), 
-			solved[0][0] || (new Date())
-		);
+		failed[0][0] || (new Date()), 
+		solved[0][0] || (new Date())
+	);
         var lastDate = Math.max(
-			failed[failed.length - 1][0] || 0, 
-			solved[solved.length - 1][0] || 0
-		);
+		failed[failed.length - 1][0] || 0, 
+		solved[solved.length - 1][0] || 0
+	);
 
         var oneHourInMs = 1000 * 60 * 60;
 
-        var prevDate = new Date(firstDate - oneHourInMs);
+        var prevDate = new Date(firstDate - 23 * oneHourInMs);
         var nextDate = new Date(lastDate + 24 * oneHourInMs);
 
         failed.unshift([prevDate, 0]);
