@@ -2,14 +2,19 @@
 
 {% block section %}
     <form action="#" method="POST">
-    <input type="text" placeholder="Username" id="username" name="username"><br>
-    <input type="password" placeholder="Password" id="password" name="password"><br>
-    <input type="text" placeholder="Email (optional)" id="email" name="email"><br>
+    <input type="text" placeholder="Pick a username" id="username" name="username">
+    <input type="password" placeholder="Create a password" id="password" name="password">
+    <input type="text" placeholder="Enter your email (optional)" id="email" name="email">
 
-    <input id="submit" type="button" value="Sign Up!">
+	<a id="submit" href="#">Sign Up!</a>
     </form>
 {% endblock %}
 
 {% block script %}
     <script src='static/js/signup.js'></script>
 {% endblock %}
+
+{% block style %}
+	<link rel="stylesheet" href="static/css/signup.css">
+{% endblock %}
+

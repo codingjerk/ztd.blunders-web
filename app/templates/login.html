@@ -2,10 +2,14 @@
 
 {% block section %}
 	<form action="#" method="POST">
-	<input type="text" placeholder="Username" id="username"><br>
-	<input type="password" placeholder="Password" id="password"><br>
+	<input type="text" placeholder="Your username" id="username">
+	<input type="password" placeholder="Your password" id="password">
 	<a href='#' id='login-button'>Login</a>
 	</form>
+{% endblock %}
+
+{% block style %}
+	<link rel="stylesheet" href="static/css/login.css">
 {% endblock %}
 
 {% block script %}
