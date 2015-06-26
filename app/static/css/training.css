@@ -305,3 +305,8 @@ a.move:active {
 		width: auto;
 	}
 }
+
+@media screen and (max-width: 1720px) {section {left: -200px;}}
+@media screen and (max-width: 1520px) {section {left: -100px;}}
+@media screen and (max-width: 1320px) {section {left: 0px;}}
+
