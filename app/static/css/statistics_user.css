@@ -1,4 +1,15 @@
-section, #details {
-    left: -200px;
-    width: 1200px;
+section {
+    left: 100px;
+    max-width: 1200px;
+	width: 90%;
+}
+
+@media screen and (max-width: 1820px) {section {left: 150px;}}
+@media screen and (max-width: 1620px) {section {width: 70%;}}
+@media screen and (max-width: 1420px) {section {width: 70%;}}
+@media screen and (max-width: 1024px) {
+	section {width: 100%; margin: 0px 0px 100px 0px; padding-bottom: 100px; left: 0px; display: initial;}
+	section>div {
+		width: 100%;
+	}
 }
