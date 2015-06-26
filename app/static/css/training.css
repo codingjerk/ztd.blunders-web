@@ -294,3 +294,14 @@ a.move:active {
 
 .submit-comment-cancel {
 }
+
+@media screen and (max-width: 1024px) {
+	section {
+		left: 0;
+		width: 100%;
+	}
+
+	#info-block {
+		width: auto;
+	}
+}

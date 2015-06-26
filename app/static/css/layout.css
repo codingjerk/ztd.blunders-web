@@ -114,11 +114,15 @@ a:hover, a:active {
     }
 
     #user-bar {
-        position: absolute;
+        position: relative;
         bottom: auto;
         right: 30px;
         margin-top: 0;
     }
+
+	#user-bar > li {
+		margin-right: 20px;
+	}
 
     #user-bar > li > ul {
         display: none;
