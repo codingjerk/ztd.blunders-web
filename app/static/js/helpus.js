@@ -8,6 +8,11 @@
         $('#send-button').on('click', function() {
             var message = $('textarea').val();
 
+            if (message.trim().length === 0) {
+                notify.error("Can't send empty message");
+                return;
+            }
+
             $.ajax({
                 type: 'POST',
                 url: "/api/send-feedback",
