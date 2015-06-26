@@ -9,14 +9,6 @@ from app.utils import session
 def main():
     return render_template('main.html', title = 'Ztd.Blunders', session = session)
 
-@app.route('/faq')
-def faq():
-    return render_template('faq.html', title = 'FAQ', session = session)
-
-@app.route('/about')
-def about():
-    return render_template('about.html', title = 'About', session = session)
-
 @app.route('/helpus')
 def helpus():
     return render_template('helpus.html', title = 'Help us', session = session)
