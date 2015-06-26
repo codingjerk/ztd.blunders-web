@@ -16,6 +16,43 @@ h2 {
 }
 
 textarea {
+	padding: 7px;
+
+	border-radius: 2px;
+
     width: 500px;
     height: 200px;
 }
+
+#feedback-container {
+	text-align: center;
+}
+
+input[type="button"], input[type="submit"] {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    padding: 10px 50px;
+
+    color: #ffffff;
+
+    border-color: rgb(57, 172, 37);
+    background-color: rgb(37, 172, 77);
+
+    font-weight: bold;
+
+    text-decoration: none;
+
+	margin: 10px 0px;
+
+	display: inline-block;
+}
+
+input[type="button"]:hover, input[type="submit"]:hover {
+    color: rgb(37, 172, 77);
+    background-color: #fff;
+
+	cursor: pointer;
+}
+
