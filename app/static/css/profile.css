@@ -1,6 +1,11 @@
-section, #main-table {
-    left: -300px;
-    width: 1200px;
+section {
+    max-width: 70%;
+}
+#main-table {
+	width: 100%;
+}
+section {
+	right: 0;
 }
 
 #username-value {
@@ -138,4 +143,12 @@ section, #main-table {
 .comments-board {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+@media screen and (max-width: 2920px) {section {left: 150px;}}
+@media screen and (max-width: 1024px) {
+	section {width: 100%; margin: 0px; left: 0px; display: initial;}
+	section>table {
+		width: 100%;
+	}
 }
