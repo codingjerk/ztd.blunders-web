@@ -287,6 +287,40 @@ ALTER SEQUENCE blunder_votes_id_seq OWNED BY blunder_votes.id;
 
 
 --
+-- Name: feedback; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE feedback (
+    id integer NOT NULL,
+    message text NOT NULL,
+    date timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE feedback OWNER TO postgres;
+
+--
+-- Name: feedback_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE feedback_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE feedback_id_seq OWNER TO postgres;
+
+--
+-- Name: feedback_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE feedback_id_seq OWNED BY feedback.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -414,6 +448,13 @@ ALTER TABLE ONLY blunder_votes ALTER COLUMN id SET DEFAULT nextval('blunder_vote
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
+ALTER TABLE ONLY feedback ALTER COLUMN id SET DEFAULT nextval('feedback_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
@@ -525,6 +566,22 @@ SELECT pg_catalog.setval('blunder_votes_id_seq', 31, true);
 
 
 --
+-- Data for Name: feedback; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY feedback (id, message, date) FROM stdin;
+1	Hello! I am american buissnesmen and want to give you guys all my money!	2015-06-26 07:37:28.433028
+\.
+
+
+--
+-- Name: feedback_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('feedback_id_seq', 1, true);
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -629,6 +686,14 @@ ALTER TABLE ONLY blunder_votes
 
 ALTER TABLE ONLY blunder_votes
     ADD CONSTRAINT blunder_votes_user_id_blunder_id_key UNIQUE (user_id, blunder_id);
+
+
+--
+-- Name: feedback_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY feedback
+    ADD CONSTRAINT feedback_pkey PRIMARY KEY (id);
 
 
 --
