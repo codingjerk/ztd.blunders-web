@@ -4,6 +4,11 @@ from flask import render_template
 from app import app
 from app.utils import session
 
+@app.route('/')
+@app.route('/index')
+def main():
+    return render_template('main.html', title = 'Ztd.Blunders', session = session)
+
 @app.route('/faq')
 def faq():
     return render_template('faq.html', title = 'FAQ', session = session)

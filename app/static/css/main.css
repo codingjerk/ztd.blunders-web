@@ -1,0 +1,153 @@
+html, body, div {
+    padding: 0px;
+    margin: 0px;
+
+    font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: #0f6bb4;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #4fabf4;
+}
+
+img {
+    margin-bottom: 20px;
+}
+
+.color-block {
+    padding: 70px 20px;
+
+    text-align: center;
+    color: #fff;
+
+    background-color: #0f6bb4;
+}
+
+.color-block > .header {
+    font-size: 175%;
+
+    margin-bottom: 10px;
+}
+
+.color-block > .sub-header {
+    font-size: 120%;
+    color: rgb(186, 204, 227);
+    font-weight: normal;
+}
+
+.content {
+    text-align: justify;
+
+    text-indent: 40px;
+
+    display: table;
+}
+
+#buttons {
+    display: block;
+
+    text-indent: 0px;
+    text-align: center;
+    margin-top: 50px;
+}
+
+#signup-button {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    padding: 15px 50px;
+
+    color: #ffffff;
+
+    border-color: rgb(57, 172, 37);
+    background-color: rgb(37, 172, 77);
+
+    font-weight: bold;
+
+    margin-right: 12px;
+
+    text-decoration: none;
+}
+
+#playnow-button {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    padding: 15px 50px;
+
+    margin-left: 12px;
+
+    color: #ffffff;
+
+    border-color: rgb(186, 204, 227);
+    
+    text-decoration: none;
+}
+
+#signup-button:hover {
+    color: rgb(37, 172, 77);
+    background-color: #fff;
+}
+
+#playnow-button:hover {
+    color: #0f6bb4;
+    background-color: #fff;
+}
+
+.white-block {
+    padding: 70px 20px;
+
+    text-align: center;
+    color: #333;
+
+    background-color: #fff;
+
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 40em;
+    margin-top: 20px;
+}
+
+.white-block > .header {
+    font-size: 175%;
+
+    margin-bottom: 10px;
+}
+
+.white-block > .sub-header {
+    font-size: 120%;
+    color: #333;
+    font-weight: normal;
+}
+
+.white-block > .content {
+    margin-top: 20px;
+}
+
+.number {
+    color: #000;
+    font-size: 102%;
+}
+
+.white-block>i {
+    font-size: 700%;
+    color: #0f6bb4;
+    text-shadow: 4px 3px 0px #0f4b94, 9px 8px 0px rgba(0, 0, 0, 0.15);
+}
+
+.white-block:nth-child(even)>i {
+    float: left;
+    margin-right: 30px;
+}
+
+.white-block:nth-child(odd)>i {
+    float: right;
+    margin-left: 30px;
+}
