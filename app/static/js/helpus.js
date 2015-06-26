@@ -26,7 +26,7 @@
                     return;
                 }
 
-                $('#feedback-container').html('Thanks for your feedback!')
+                $('#feedback-container').html('<span id="thanks">Thanks for your feedback!</span>');
             });
         });
     });
