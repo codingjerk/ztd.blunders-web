@@ -1,4 +1,4 @@
-from app.db import mongo, postgre
+from app.db import postgre
 from app.utils import chess
 
 from app.utils import elo

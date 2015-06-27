@@ -1,7 +1,7 @@
 from flask import jsonify
 
 from app import app, db
-from app.db import mongo, postgre
+from app.db import postgre
 from app import utils
 from app.utils import session, tasks
 

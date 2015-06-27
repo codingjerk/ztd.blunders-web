@@ -544,11 +544,12 @@ def blunderCommentAuthor(comment_id):
 def countBlunders():
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
-            """SELECT reltuples FROM pg_class WHERE oid = 'blunders'::regclass;"""
-        )# TODO: bad method?
+            """SELECT c.blunders_upper_limit - c.blunders_lower_limit + 1
+               FROM configuration AS c;"""
+        )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Cant count blunders')
+            raise Exception('Can not count blunders')
 
         (count,) = connection.cursor.fetchone()
 
@@ -994,7 +995,6 @@ def getBlandersByRating(interval):
 
         destribution = [[elo_category, count] for (elo_category, count) in data]
 
-    print(destribution)
     return {
         'status': 'ok',
         'data': {
