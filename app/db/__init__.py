@@ -16,8 +16,8 @@ def changeRating(user_id, blunder_id, success):
 
     newUserElo, newBlunderElo = elo.calculate(user_elo, blunder_elo, success)
 
-    postgre.setRating(user_id, newUserElo)
-    postgre.setRating(blunder_id, newBlunderElo)
+    postgre.setRatingUser(user_id, newUserElo)
+    postgre.setRatingBlunder(blunder_id, newBlunderElo)
 
     return newUserElo, (newUserElo - user_elo)
 

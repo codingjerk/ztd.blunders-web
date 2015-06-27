@@ -1,11 +1,8 @@
-import random
 import pymongo
 
-from datetime import timedelta
 from bson.objectid import ObjectId
 
 from app import utils
-from app.utils import cache
 
 db = None
 

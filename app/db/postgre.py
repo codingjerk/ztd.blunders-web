@@ -4,7 +4,7 @@ from app.utils import roles
 from app.utils import cache
 from datetime import timedelta
 
-#pylint: disable=too-few-public-methods
+#pylint: disable=too-few-public-methods, too-many-lines
 class PostgreConnection:
     def __init__(self, type):
         self.type = type
@@ -113,19 +113,20 @@ def getRandomBlunder():
         if connection.cursor.rowcount != 1:
             raise Exception('Fail to get random blunder')
 
-        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = connection.cursor.fetchone()
+        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = 
+            connection.cursor.fetchone()
 
     return {
         'id': id,
-        'forced_line': forced_line, 
-        'pv': pv, 
-        'elo': elo, 
-        'fen_before': fen_before, 
-        'blunder_move': blunder_move, 
-        'move_index': move_index, 
+        'forced_line': forced_line,
+        'pv': pv,
+        'elo': elo,
+        'fen_before': fen_before,
+        'blunder_move': blunder_move,
+        'move_index': move_index,
         'pgn_id': pgn_id
     }
-        
+
 
 def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None:
@@ -225,18 +226,19 @@ def getBlunderById(blunder_id):
         )
 
         if connection.cursor.rowcount != 1:
-            return None;
+            return None
 
-        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = connection.cursor.fetchone()
+        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = 
+            connection.cursor.fetchone()
 
         return {
             'id': id,
-            'forced_line': forced_line, 
-            'pv': pv, 
-            'elo': elo, 
-            'fen_before': fen_before, 
-            'blunder_move': blunder_move, 
-            'move_index': move_index, 
+            'forced_line': forced_line,
+            'pv': pv,
+            'elo': elo,
+            'fen_before': fen_before,
+            'blunder_move': blunder_move,
+            'move_index': move_index,
             'pgn_id': pgn_id
         }
 

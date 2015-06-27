@@ -1,13 +1,12 @@
 from flask import jsonify
 
-from app import app, db
+from app import app
 from app.db import postgre
 from app import utils
 from app.utils import session, tasks
 
 def assignNewBlunder():
-    #blunder = mongo.randomBlunder()
-    blunder = postgre.getRandomBlunder();
+    blunder = postgre.getRandomBlunder()
 
     postgre.assignBlunderTask(session.userID(), str(blunder['id']), tasks.RATED)
 
