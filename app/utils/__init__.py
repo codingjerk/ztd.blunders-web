@@ -10,15 +10,15 @@ def jsonifyBlunder(data):
     return {
         'status': 'ok',
         'data': {
-            'id': str(data['_id']),
+            'id': str(data['id']),
             'pgn_id': str(data['pgn_id']),
             'move_index': data['move_index'],
 
-            'forcedLine': data['forcedLine'],
+            'forcedLine': data['forced_line'],
             'pv': data['pv'],
 
-            'fenBefore': data['fenBefore'],
-            'blunderMove': data['blunderMove'],
+            'fenBefore': data['fen_before'],
+            'blunderMove': data['blunder_move'],
 
             'elo': data['elo']
         }

@@ -1,8 +1,10 @@
 import psycopg2
 
 from app.utils import roles
+from app.utils import cache
+from datetime import timedelta
 
-#pylint: disable=too-few-public-methods
+#pylint: disable=too-few-public-methods, too-many-lines
 class PostgreConnection:
     def __init__(self, type):
         self.type = type
@@ -101,6 +103,39 @@ def getUsernameById(user_id):
 
         return result[0]
 
+def getRandomBlunder():
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute("""
+            SELECT * FROM GET_RANDOM_BLUNDER();
+            """
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Fail to get random blunder')
+
+        (
+            id,
+            forced_line,
+            pv,
+            elo,
+            fen_before,
+            blunder_move,
+            move_index,
+            pgn_id
+        ) = connection.cursor.fetchone()
+
+    return {
+        'id': id,
+        'forced_line': forced_line,
+        'pv': pv,
+        'elo': elo,
+        'fen_before': fen_before,
+        'blunder_move': blunder_move,
+        'move_index': move_index,
+        'pgn_id': pgn_id
+    }
+
+
 def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None:
         return
@@ -159,9 +194,9 @@ def closeBlunderTask(user_id, blunder_id, type):
 
         return connection.cursor.rowcount == 1
 
-def setRating(user_id, elo):
+def setRatingUser(user_id, elo):
     if user_id is None:
-        raise Exception('postre.setRating for anonim')
+        raise Exception('postre.setRatingUser for anonim')
 
     with PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -172,7 +207,56 @@ def setRating(user_id, elo):
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Failed to assign new blunder')
+            raise Exception('Failed to change rating for user')
+
+def setRatingBlunder(blunder_id, newBlunderElo):
+    if blunder_id is None:
+        raise Exception('postre.setRatingBlunder for anonim')
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute("""
+            UPDATE blunders
+            SET elo = %s
+            WHERE id = %s;
+            """, (newBlunderElo, blunder_id)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to change rating for blunder')
+
+def getBlunderById(blunder_id):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT b.id, b.forced_line, b.pv, b.elo, b.fen_before, b.blunder_move, b.move_index, b.pgn_id
+            FROM blunders AS b
+            WHERE b.id = %s
+            """, (blunder_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return None
+
+        (
+            id,
+            forced_line,
+            pv,
+            elo,
+            fen_before,
+            blunder_move,
+            move_index,
+            pgn_id
+        ) = connection.cursor.fetchone()
+
+        return {
+            'id': id,
+            'forced_line': forced_line,
+            'pv': pv,
+            'elo': elo,
+            'fen_before': fen_before,
+            'blunder_move': blunder_move,
+            'move_index': move_index,
+            'pgn_id': pgn_id
+        }
 
 def getAssignedBlunder(user_id, type):
     if user_id is None:
@@ -180,7 +264,7 @@ def getAssignedBlunder(user_id, type):
 
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT blunder_id
+            SELECT bt.blunder_id
             FROM blunder_tasks AS bt
             INNER JOIN blunder_task_type AS btt
                 ON bt.type_id = btt.id
@@ -189,11 +273,12 @@ def getAssignedBlunder(user_id, type):
             """, (user_id, type)
         )
 
-        blunder_id = connection.cursor.fetchone()
-        if blunder_id is None:
+        if connection.cursor.rowcount != 1:
             return None
 
-        return blunder_id[0]
+        (blunder_id,) = connection.cursor.fetchone()
+
+        return getBlunderById(blunder_id)
 
 def signupUser(username, salt, hash, email):
     with PostgreConnection('w') as connection:
@@ -473,6 +558,20 @@ def blunderCommentAuthor(comment_id):
         (user_id,) = connection.cursor.fetchone()
 
         return user_id
+
+def countBlunders():
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """SELECT c.blunders_upper_limit - c.blunders_lower_limit + 1
+               FROM configuration AS c;"""
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Can not count blunders')
+
+        (count,) = connection.cursor.fetchone()
+
+        return count
 
 def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None:
@@ -899,3 +998,24 @@ def saveFeedback(message):
         'status': 'ok'
     }
 
+@cache.cached(timedelta(days = 1))
+def getBlandersByRating(interval):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT (b.elo - b.elo %% %s) AS elo_category,
+                   COUNT(b.id) as count FROM blunders AS b
+            GROUP BY elo_category
+            ORDER BY elo_category;"""
+            , (interval,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        destribution = [[elo_category, count] for (elo_category, count) in data]
+
+    return {
+        'status': 'ok',
+        'data': {
+            'blunders-rating-destribution' : destribution
+        }
+    }
