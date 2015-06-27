@@ -274,7 +274,7 @@ def getAssignedBlunder(user_id, type):
         )
 
         if connection.cursor.rowcount != 1:
-            return None;
+            return None
 
         (blunder_id,) = connection.cursor.fetchone()
 
