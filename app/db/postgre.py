@@ -113,8 +113,16 @@ def getRandomBlunder():
         if connection.cursor.rowcount != 1:
             raise Exception('Fail to get random blunder')
 
-        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = 
-            connection.cursor.fetchone()
+        (
+            id,
+            forced_line,
+            pv,
+            elo,
+            fen_before,
+            blunder_move,
+            move_index,
+            pgn_id
+        ) = connection.cursor.fetchone()
 
     return {
         'id': id,
@@ -228,8 +236,16 @@ def getBlunderById(blunder_id):
         if connection.cursor.rowcount != 1:
             return None
 
-        (id, forced_line, pv, elo, fen_before, blunder_move, move_index, pgn_id) = 
-            connection.cursor.fetchone()
+        (
+            id,
+            forced_line,
+            pv,
+            elo,
+            fen_before,
+            blunder_move,
+            move_index,
+            pgn_id
+        ) = connection.cursor.fetchone()
 
         return {
             'id': id,
