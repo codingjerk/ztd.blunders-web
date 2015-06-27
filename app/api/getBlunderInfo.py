@@ -31,7 +31,7 @@ def gameShortInfo(data):
     }
 
 def getBlunderInfoById(blunder_id):
-    blunder = mongo.getBlunderById(blunder_id)
+    blunder = postgre.getBlunderById(blunder_id)
 
     if blunder is None:
         return jsonify({

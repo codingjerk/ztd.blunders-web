@@ -7,7 +7,7 @@ def changeRating(user_id, blunder_id, success):
     if user_id is None:
         return None, None
 
-    blunder = mongo.getBlunderById(blunder_id)
+    blunder = postgre.getBlunderById(blunder_id)
     if blunder is None:
         return None, None
 
@@ -17,26 +17,15 @@ def changeRating(user_id, blunder_id, success):
     newUserElo, newBlunderElo = elo.calculate(user_elo, blunder_elo, success)
 
     postgre.setRating(user_id, newUserElo)
-    mongo.setRating(blunder_id, newBlunderElo)
+    postgre.setRating(blunder_id, newBlunderElo)
 
     return newUserElo, (newUserElo - user_elo)
-
-def getAssignedBlunder(user_id, type):
-    if user_id is None:
-        return None
-
-    blunder_id = postgre.getAssignedBlunder(user_id, type)
-
-    if blunder_id is None:
-        return None
-
-    return mongo.getBlunderById(blunder_id)
 
 def getBlundersStatistics():
     return {
         'status': 'ok',
         'data': {
-            'total-blunders-value' : mongo.countBlunders()
+            'total-blunders-value' : postgre.countBlunders()
         }
     }
 
@@ -46,8 +35,8 @@ def getBlundersHistory(username, offset, limit):
 
     result = []
     for blunder in blunders:
-        blunder_info = mongo.getBlunderById(blunder['blunder_id'])
-        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+        blunder_info = postgre.getBlunderById(blunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
 
         result.append({
             "blunder_id": blunder['blunder_id'],
@@ -72,8 +61,8 @@ def getBlundersFavorites(username, offset, limit):
 
     result = []
     for blunder in blunders:
-        blunder_info = mongo.getBlunderById(blunder['blunder_id'])
-        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+        blunder_info = postgre.getBlunderById(blunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
 
         result.append({
             "blunder_id": blunder['blunder_id'],
@@ -98,8 +87,8 @@ def getCommentsByUser(username, offset, limit):
     for comment in comments:
         blunder_id = comment['blunder_id']
 
-        blunder_info = mongo.getBlunderById(blunder_id)
-        fen = chess.blunderStartPosition(blunder_info['fenBefore'], blunder_info['blunderMove'])
+        blunder_info = postgre.getBlunderById(blunder_id)
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
 
         if blunder_id not in result:
             result[blunder_id] = {

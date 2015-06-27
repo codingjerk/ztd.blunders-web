@@ -4,15 +4,35 @@ from app import app, db
 from app.db import mongo, postgre
 from app.utils import session, tasks
 
+from app.utils import elo
+
 def compareLines(blunder_id, userLine):
-    data = mongo.getBlunderById(blunder_id)
+    data = postgre.getBlunderById(blunder_id)
     if data == None:
         return
 
-    originalLine = [data['blunderMove']] + data['forcedLine']
+    originalLine = [data['blunder_move']] + data['forced_line']
 
     # TODO: Compare using pychess
     return originalLine == userLine
+
+def changeRating(user_id, blunder_id, success):
+    if user_id is None:
+        return None, None
+
+    blunder = postgre.getBlunderById(blunder_id)
+    if blunder is None:
+        return None, None
+
+    blunder_elo = blunder['elo']
+    user_elo = postgre.getRating(user_id)
+
+    newUserElo, newBlunderElo = elo.calculate(user_elo, blunder_elo, success)
+
+    postgre.setRatingUser(user_id, newUserElo)
+    postgre.setRatingBlunder(blunder_id, newBlunderElo)
+
+    return newUserElo, (newUserElo - user_elo)
 
 @app.route('/validateBlunder', methods = ['POST'])
 def validateBlunder():
@@ -39,7 +59,7 @@ def validateBlunder():
 
     success = compareLines(blunder_id, userLine)
 
-    blunder = mongo.getBlunderById(blunder_id)
+    blunder = postgre.getBlunderById(blunder_id)
 
     postgre.saveBlunderHistory(
         session.userID(),
@@ -51,7 +71,7 @@ def validateBlunder():
         spentTime
     )
 
-    newElo, delta = db.changeRating(session.userID(), blunder_id, success)
+    newElo, delta = changeRating(session.userID(), blunder_id, success)
 
     return jsonify({
         'status': 'ok',
