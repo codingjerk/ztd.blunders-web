@@ -1,7 +1,7 @@
 from flask import jsonify, request
 
 from app import app
-from app.db import postgre
+from app.db import mongo, postgre
 from app.utils import session
 
 def gameShortInfo(data):
