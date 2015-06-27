@@ -65,7 +65,9 @@ var grid = {};
         return result;
     };
 
-    var generateBlock = function(block, cellsInRow) {
+    var generateBlock = function(block) {
+        var cellsInRow = block.cells || 3;
+
         var caption = generateCaption(block.caption, cellsInRow);
         var body = generateRows(block.rows, cellsInRow);
 
@@ -77,10 +79,8 @@ var grid = {};
         return '<table {0} class="details-block">{1}{2}</table>'.format(idPart, caption, body);
     };
 
-    module.generate = function(blocks, acellsInRow) {
-        var cellsInRow = acellsInRow || 3;
-
-        return blocks.map(generateBlock, [cellsInRow]).join('');
+    module.generate = function(blocks) {
+        return blocks.map(generateBlock).join('');
     };
 
     module.update = function(data, arules) {

@@ -13,12 +13,9 @@ span#info-block {
     left: 550px;
     top: 80px;
 
-    border-left: 1px solid #ddd;
-    border-radius: 5px;
-
     padding: 20px;
     height: 400px;
-    width: 700px;
+    width: 500px;
 }
 
 div#mainBoard {

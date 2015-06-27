@@ -29,7 +29,7 @@
         }
     ];
 
-    var html = grid.generate(blocks, 3);
+    var html = grid.generate(blocks);
     $('#details').html(html);
 })();
 

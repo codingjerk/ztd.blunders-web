@@ -436,15 +436,20 @@
 		$('#dislikes').html(data.dislikes);
 
 		var info = data['game-info'];
-		var gameInfo = '{0} ({1}) &#8211 {2} ({3})'.format(info.White, info.WhiteElo, info.Black, info.BlackElo);
-		$('#source-game-info').html(gameInfo);
+		grid.update({
+			'white-name-value': info.White,
+			'white-elo-value':  info.WhiteElo,
+			'black-name-value': info.Black,
+			'black-elo-value':  info.BlackElo
+		});
 
 		var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0; 
-
-		$('#blunder-rating').html(data.elo);
-		$('#success-played').html(data.successTries);
-		$('#total-played').html(data.totalTries);
-		$('#success-rate').html(successRate.toFixed(2));
+		grid.update({
+			'blunder-rating': data.elo,
+			'success-played': data.successTries,
+			'total-played': data.totalTries,
+			'success-rate': successRate.toFixed(1)
+		});
 
 		var rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
 		var rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
@@ -566,20 +571,11 @@
 	}
 
 	function showComments() {
-		$('#comments').removeClass('hidden').addClass('visible');
-		$('#comments-icon').removeClass('fa-angle-down').addClass('fa-angle-up');
+		grid.updateSpoiler('comments-block', true);
 	}
 
 	function hideComments() {
-		$('#comments').removeClass('visible').addClass('hidden');
-		$('#comments-icon').removeClass('fa-angle-up').addClass('fa-angle-down');
-	}
-
-	function switchComments() {
-		if ($('#comments').hasClass('hidden'))
-			showComments();
-		else
-			hideComments();
+		grid.updateSpoiler('comments-block', false);
 	}
 
 	$('#nextBlunder').on('click', function() {
@@ -631,10 +627,6 @@
 		gotoMove(getPv('active'), getPv('active').length - 1, getPv('active').length);
 	});
 
-	$('#comments-spoiler').on('click', function() {
-		switchComments();
-	});
-
 	$('#likeButton').on('click', function() {
 		if (!blunder) {
 			notify.error('Blunder is not loaded yet');
@@ -674,4 +666,100 @@
 			nextMove();
 		}
 	});
+})();
+
+(function setupRightPanel() {
+	var model = [
+        {
+            id: 'game-block',
+            caption: 'Game',
+            cells: 2,
+            rows: [
+                {
+                    type: 'cell',
+                    label: 'White',
+                    id: 'white-name-value',
+                    additional: 'player'
+                },
+                {
+                    type: 'cell',
+                    label: 'Black',
+                    id: 'black-name-value',
+                    additional: 'Elo'
+                },
+                {
+                    type: 'cell',
+                    label: 'White',
+                    id: 'white-elo-value',
+                    additional: 'player'
+                },
+                {
+                    type: 'cell',
+                    label: 'Black',
+                    id: 'black-elo-value',
+                    additional: 'Elo'
+                }
+            ]
+        },
+        {
+            id: 'blunder-block',
+            caption: 'Blunder',
+            cells: 3,
+            rows: [
+                {
+                    type: 'cell',
+                    label: 'Rating',
+                    id: 'blunder-rating',
+                    additional: 'Elo'
+                },
+                {
+                    type: 'cell',
+                    label: '',
+                    id: 'dummy',
+                    additional: ''
+                },
+                {
+                    type: 'cell',
+                    label: 'Spent',
+                    id: 'spent-time-value',
+                    additional: 'time'
+                },
+                {
+                    type: 'cell',
+                    label: 'Success',
+                    id: 'success-played',
+                    additional: 'played'
+                },
+                {
+                    type: 'cell',
+                    label: 'Total',
+                    id: 'total-played',
+                    additional: 'played'
+                },
+                {
+                    type: 'cell',
+                    label: 'Success rate',
+                    id: 'success-rate',
+                    additional: 'percents'
+                }
+            ]
+        },
+        {
+            id: 'comments-block',
+            caption: 'Comments',
+            rows: [
+                {
+                    type: 'wide',
+                    id: 'comments'
+                }
+            ]
+        }
+    ];
+
+    var content = grid.generate(model);
+    $('#info-block').html(content);
+
+    grid.setupSpoiler('comments-block', false);
+    grid.setupSpoiler('blunder-block', true);
+    grid.setupSpoiler('game-block', true);
 })();

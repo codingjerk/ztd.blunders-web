@@ -103,6 +103,8 @@ var utils = {};
     };
 
     module.timer = function(interval, callback) {
+        if (!callback()) return;
+
         setTimeout(function() {
             if (!callback()) return;
             module.timer(interval, callback);
