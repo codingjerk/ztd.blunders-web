@@ -1,4 +1,7 @@
-# Ztd.Blunders Web
+# Readme
+
+## Try it online
+Ztd.Blunders available in [blunders.ztd.io](http://blunders.ztd.io) and this is main server site. 
 
 ## Introducing
 Ztd.Blunders is the software for deployment a Web server for solving chess problems. This is OpenSource project written with use of Flask, PostgreSQL, MongoDB and several other tools and libs. To use it you will need special prepared databases, you will not find them in this repository.
