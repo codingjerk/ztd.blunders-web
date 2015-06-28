@@ -28,12 +28,20 @@ textarea {
 	text-align: center;
 }
 
-input[type="button"], input[type="submit"], span#thanks {
+#donate-block {
+    vertical-align: top;
+}
+
+#paypal-donate-form, a#webmoney-donate {
+    display: inline-block;
+}
+
+input[type="button"], input[type="submit"], span#thanks, a#webmoney-donate {
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
 
-    padding: 10px 50px;
+    padding: 10px 0px;
 
     color: #ffffff;
 
@@ -44,12 +52,13 @@ input[type="button"], input[type="submit"], span#thanks {
 
     text-decoration: none;
 
-	margin: 10px 0px;
-
 	display: inline-block;
+
+    font-size: 0.9em;
+    min-width: 13em;
 }
 
-input[type="button"]:hover, input[type="submit"]:hover {
+input[type="button"]:hover, input[type="submit"]:hover, a#webmoney-donate:hover {
     color: rgb(37, 172, 77);
     background-color: #fff;
 

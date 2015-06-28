@@ -30,4 +30,8 @@
             });
         });
     });
+
+    $('#webmoney-donate').on('click', function() {
+        location.href = "http://events.webmoney.ru/social/donate.aspx?groupUID=c60a5228-a142-447e-a57e-ac717065f74e";
+    });
 })();
