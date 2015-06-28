@@ -9,13 +9,22 @@
     <p>We are not living in ideal world and maintaining a server costs money. You can help us by donating so we will afford to use more powerful hardware.
     Some of our ideas, for example integrating chess engine in to service for education and hints, just can't be implemented without this.</p>
     <div id="donate-block">
-    	<form id="paypal-donate-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick">
-        <input type="hidden" name="hosted_button_id" value="KY7ENH3YY2VE8">
-        <input type="submit" name="submit" value="Donate&#13;&#10;via PayPal">
-        <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+    	<form id="paypal-donate-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="KY7ENH3YY2VE8">
+            <input type="submit" name="submit" value="Donate&#13;&#10;via PayPal">
         </form>
         <input type="button" id='webmoney-donate' value="Donate&#13;&#10;via WebMoney"></input>
+        <form id="yandex-donate-form" method="POST" target="_blank" action="https://money.yandex.ru/quickpay/confirm.xml">
+            <input name="receiver" type="hidden" value="410013256459116">
+            <input name="quickpay-form" type="hidden" value="small">
+            <input name="referer" type="hidden" value="">
+            <input name="is-inner-form" type="hidden" value="true">
+            <input type="hidden" name="targets" value="Ztd.Blunders">
+            <input id='yandex-sum-value' type="hidden" name="sum" value="" maxlength="8">
+            <input type="hidden" name="successURL" value="http://blunders.ztd.io/">
+            <input id='yandex-donate-submit' type="submit" class="b-button__input" value="Donate&#13;&#10;via Yandex.Money"></input>
+        </form>
     </div>
     <h2>Leave Feedback</h2>
     <p>You can help us to improve the service. If you have any skills or resources to help this project

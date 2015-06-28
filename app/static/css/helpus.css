@@ -32,8 +32,13 @@ textarea {
     vertical-align: top;
 }
 
-#paypal-donate-form, a#webmoney-donate {
+#paypal-donate-form, a#webmoney-donate, #yandex-donate-form, #card-donate-form {
     display: inline-block;
+}
+
+form {
+    margin: 0px;
+    padding: 0px;
 }
 
 input[type="button"], input[type="submit"], span#thanks, a#webmoney-donate {
@@ -55,7 +60,9 @@ input[type="button"], input[type="submit"], span#thanks, a#webmoney-donate {
 	display: inline-block;
 
     font-size: 0.9em;
-    min-width: 13em;
+    min-width: 12em;
+
+    margin: 5px 5px;
 }
 
 input[type="button"]:hover, input[type="submit"]:hover, a#webmoney-donate:hover {
