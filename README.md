@@ -33,14 +33,23 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     We can use special repository from PostgreSQL maintainers. Current available version is 9.4.  
     Source: http://www.postgresql.org/download/linux/redhat/#  
     ```bash
-    $ yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-1.noarch.rpm  
+    $ yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-1.noarch.rpm
+    ```
+    ```bash
     $ sudo yum install postgresql94.x86_64postgresql94-server.x86_64postgresql94-devel.x86_64  
+    ```
+    ```bash
     $ /usr/pgsql-9.4/bin/postgresql94-setup initdb  
-    $ systemctl enable postgresql-9.4.service Edit config file to allow local login.  
-    $ vi /var/lib/pgsql/9.4/data/pg_hba.conf```
+    ```
+    ```bash
+    $ systemctl enable postgresql-9.4.service Edit config file to allow local login.
+    ```
+    ```bash  
+    $ vi /var/lib/pgsql/9.4/data/pg_hba.conf
+    ```
 
     Find and edit rules to allow password less connection with.
-    ```
+    ```bash
     # "local" is for Unix domain socket connections only
     local all all trust
     # IPv4 local connections:
