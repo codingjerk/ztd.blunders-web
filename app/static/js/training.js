@@ -685,13 +685,13 @@
                     type: 'cell',
                     label: 'Black',
                     id: 'black-name-value',
-                    additional: 'Elo'
+                    additional: 'player'
                 },
                 {
                     type: 'cell',
                     label: 'White',
                     id: 'white-elo-value',
-                    additional: 'player'
+                    additional: 'Elo'
                 },
                 {
                     type: 'cell',
