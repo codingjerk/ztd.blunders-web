@@ -135,7 +135,7 @@
                     renderer: $.jqplot.CategoryAxisRenderer,
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
-                      // labelPosition: 'middle',
+                        formatString:'%d',
                         angle: 90
                     },
                     ticks: xElo
@@ -201,7 +201,7 @@
                     renderer: $.jqplot.CategoryAxisRenderer,
                     tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                     tickOptions: {
-                      // labelPosition: 'middle',
+                        formatString:'%d',
                         angle: 90
                     },
                     ticks: xElo
