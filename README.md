@@ -84,10 +84,10 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     You should see secret.key file created in the repository. Don't replace this key during server work as it can corrupt your user's sessions.
 
 6. Installing dependencies for flask project.  
-    ```bash$ sudo pip3.4 install Flask```  
+    ```bash$ sudo pip install Flask```  
 
 7. Install Python driver for MongoDB  
-    ```bash$ sudo pip3.4 install pymongo```  
+    ```bash$ sudo pip install pymongo```  
 
 8. We need to install Python driver for PostgreSQL.  
     ```bash$ sudo yum install gcc python34u-devel libpqxx libpqxx-devel```  
