@@ -1,13 +1,18 @@
 {% extends "layout.html" %}
 
 {% block section %}
-    <form action="#" method="POST">
-    <input type="text" placeholder="Pick a username" id="username" name="username">
-    <input type="password" placeholder="Create a password" id="password" name="password">
-    <input type="text" placeholder="Enter your email (optional)" id="email" name="email">
+	<div id="form">
+	
+		<div id="avatar-wrapper"><img id="avatar" src="static/img/default-avatar.png"/></div>
 
-	<a id="submit" href="#">Sign Up!</a>
-    </form>
+	    <form action="#" method="POST">
+		    <input type="text" placeholder="Pick a username" id="username" name="username">
+		    <input type="password" placeholder="Create a password" id="password" name="password">
+		    <input type="text" placeholder="Enter your email (optional)" id="email" name="email">
+
+			<a id="submit" href="#">Sign Up!</a>
+	    </form>
+    </div>
 {% endblock %}
 
 {% block script %}

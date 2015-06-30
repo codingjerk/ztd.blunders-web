@@ -1,11 +1,16 @@
 {% extends "layout.html" %}
 
 {% block section %}
-	<form action="#" method="POST">
-	<input type="text" placeholder="Your username" id="username">
-	<input type="password" placeholder="Your password" id="password">
-	<a href='#' id='login-button'>Login</a>
-	</form>
+	<div id="form">
+	
+		<div id="avatar-wrapper"><img id="avatar" src="static/img/default-avatar.png"/></div>
+
+		<form action="#" method="POST">
+		<input type="text" placeholder="Your username" id="username">
+		<input type="password" placeholder="Your password" id="password">
+		<a href='#' id='login-button'>Login</a>
+		</form>
+    </div>
 {% endblock %}
 
 {% block style %}

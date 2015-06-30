@@ -1,3 +1,33 @@
+div#form {
+	border-radius: 2px;
+	border: 1px solid #dedede;
+	border-bottom: 3px solid #dedede;
+
+	background-color: #eee;
+
+	padding: 40px 20px;
+
+	margin: 30px;
+
+	width: 280px;
+
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#avatar-wrapper {
+	width: 140px;
+
+	margin-left: auto;
+	margin-right: auto;
+
+	margin-bottom: 20px;
+}
+
+#avatar {
+	width: 100%;
+}
+
 input[type="text"], input[type="password"] {
 	padding: 7px;
 	border: 1px solid #dedede;
