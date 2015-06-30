@@ -27,9 +27,12 @@
     <div class="color-block">
         <img id="logo" src="static/img/logo-110px.png">
         <div class="header">Explore chess with Ztd.Blunders</div>
-        <div class="sub-header">Anywhere. Open Source. Totaly Free.</div>
+        <div class="sub-header">User-Friendly. Open Source. Totaly Free.</div>
         <div id="buttons" class="content">
-            <a id="signup-button" href="/signup">Sign Up</a> <a id="playnow-button" href="/training">Play Now</a>
+            {% if not session.isAuthorized() %}
+                <a id="signup-button" href="/signup">Sign Up</a>
+            {% endif %}
+            <a id="playnow-button" href="/training">Play Now</a>
         </div>
     </div>
     <div class="white-block">

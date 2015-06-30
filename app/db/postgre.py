@@ -615,19 +615,46 @@ def getUserProfile(username):
 
         (user_id, username, user_elo) = connection.cursor.fetchone()
 
-
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT SUM(bcv.vote)
             FROM blunder_comments as bc INNER JOIN blunder_comments_votes as bcv
                 ON bc.id = bcv.comment_id WHERE bc.user_id = %s;"""
-            , (user_id,))
+            , (user_id,)
+        )
 
         (commentLikeSum,) = connection.cursor.fetchone()
         if commentLikeSum is None:
             commentLikeSum = 0
 
-        karma = commentLikeSum * 2 + 10
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+             SELECT COUNT(id)
+             FROM blunder_comments_votes AS bvc
+                WHERE bvc.user_id = %s;"""
+            , (user_id,)
+        )
+
+        (commentVoteSum,) = connection.cursor.fetchone()
+        if commentVoteSum is None:
+            commentVoteSum = 0
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+             SELECT COUNT(id) 
+             FROM blunder_votes AS bv 
+                WHERE bv.user_id = %s;"""
+            , (user_id,)
+        )
+
+        (voteSum,) = connection.cursor.fetchone()
+        if voteSum is None:
+            voteSum = 0
+
+    favoriteCount = getBlunderFavoritesCount(user_id)
+    commentCount = getCommentsByUserCount(user_id)
+
+    karma = 10 + commentLikeSum * 5 + commentCount * 2 + voteSum + favoriteCount + commentVoteSum
 
     userJoinDate = getUserField(user_id, "to_char(registration, 'Month DD, YYYY')")
 
@@ -726,9 +753,7 @@ def getBlundersByDate(username):
         }
     }
 
-def getBlunderHistoryCount(username):
-    user_id = getUserId(username)
-
+def getBlunderHistoryCount(user_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT COUNT(id)
@@ -747,9 +772,7 @@ def getBlunderHistoryCount(username):
 
     return total
 
-def getBlundersHistory(username, offset, limit):
-    user_id = getUserId(username)
-
+def getBlundersHistory(user_id, offset, limit):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT h.blunder_id,
@@ -777,9 +800,7 @@ def getBlundersHistory(username, offset, limit):
 
     return blunders
 
-def getBlunderFavoritesCount(username):
-    user_id = getUserId(username)
-
+def getBlunderFavoritesCount(user_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT COUNT(id)
@@ -798,9 +819,7 @@ def getBlunderFavoritesCount(username):
 
     return total
 
-def getBlundersFavorites(username, offset, limit):
-    user_id = getUserId(username)
-
+def getBlundersFavorites(user_id, offset, limit):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT f.blunder_id,
@@ -824,9 +843,7 @@ def getBlundersFavorites(username, offset, limit):
 
     return blunders
 
-def getCommentsByUserCount(username):
-    user_id = getUserId(username)
-
+def getCommentsByUserCount(user_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT COUNT(id)
@@ -845,9 +862,7 @@ def getCommentsByUserCount(username):
 
     return total
 
-def getCommentsByUser(username, offset, limit):
-    user_id = getUserId(username)
-
+def getCommentsByUser(user_id, offset, limit):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT c.blunder_id,

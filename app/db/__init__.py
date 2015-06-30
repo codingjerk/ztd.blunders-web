@@ -30,8 +30,16 @@ def getBlundersStatistics():
     }
 
 def getBlundersHistory(username, offset, limit):
-    total = postgre.getBlunderHistoryCount(username)
-    blunders = postgre.getBlundersHistory(username, offset, limit)
+    try:
+        user_id = postgre.getUserId(username)
+    except Exception:
+        return {
+            'status': 'error',
+            'message': 'Trying to get not exist user with name %s' % username
+        }
+
+    total = postgre.getBlunderHistoryCount(user_id)
+    blunders = postgre.getBlundersHistory(user_id, offset, limit)
 
     result = []
     for blunder in blunders:
@@ -56,8 +64,16 @@ def getBlundersHistory(username, offset, limit):
     }
 
 def getBlundersFavorites(username, offset, limit):
-    total = postgre.getBlunderFavoritesCount(username)
-    blunders = postgre.getBlundersFavorites(username, offset, limit)
+    try:
+        user_id = postgre.getUserId(username)
+    except Exception:
+        return {
+            'status': 'error',
+            'message': 'Trying to get not exist user with name %s' % username
+        }
+
+    total = postgre.getBlunderFavoritesCount(user_id)
+    blunders = postgre.getBlundersFavorites(user_id, offset, limit)
 
     result = []
     for blunder in blunders:
@@ -80,13 +96,22 @@ def getBlundersFavorites(username, offset, limit):
     }
 
 def getCommentsByUser(username, offset, limit):
-    total = postgre.getCommentsByUserCount(username)
-    comments = postgre.getCommentsByUser(username, offset, limit)
+    try:
+        user_id = postgre.getUserId(username)
+    except Exception:
+        return {
+            'status': 'error',
+            'message': 'Trying to get not exist user with name %s' % username
+        }
+
+    total = postgre.getCommentsByUserCount(user_id)
+    comments = postgre.getCommentsByUser(user_id, offset, limit)
 
     result = {}
     for comment in comments:
         blunder_id = comment['blunder_id']
 
+        # TODO: Don't send many requests for every blunder
         blunder_info = postgre.getBlunderById(blunder_id)
         fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
 
