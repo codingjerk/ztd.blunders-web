@@ -111,7 +111,8 @@ def getCommentsByUser(username, offset, limit):
     for comment in comments:
         blunder_id = comment['blunder_id']
 
-        blunder_info = postgre.getBlunderById(blunder_id) # TODO: Don't send many requests for every blunder:
+        # TODO: Don't send many requests for every blunder
+        blunder_info = postgre.getBlunderById(blunder_id)
         fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
 
         if blunder_id not in result:
