@@ -1,1 +1,1 @@
-from app.views import main, training, login, signup, profile, statistics
+from app.views import main, training, login, signup, profile, statistic

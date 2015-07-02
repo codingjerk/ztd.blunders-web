@@ -97,7 +97,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getBlundersHistory",
+            url: "/statistic/getBlundersHistory",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -150,7 +150,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getBlundersFavorites",
+            url: "/statistic/getBlundersFavorites",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -200,7 +200,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getCommentsByUser",
+            url: "/statistic/getCommentsByUser",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),

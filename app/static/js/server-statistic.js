@@ -70,7 +70,7 @@
     $('#details').html(html);
 })();
 
-(function updateUsersStatistics() {
+(function updateUsersStatistic() {
     function updateUsersOnlineList(id, users) {
         var usersLinks = users.map(function(user) {
             return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
@@ -102,7 +102,7 @@
 
     $.ajax({
         type: 'GET',
-        url: "/statistics/getUsersStatistics",
+        url: "/statistic/getUsersStatistic",
         contentType: 'application/json'
     }).done(onUpdateUsersRequest);
 })();
@@ -161,7 +161,7 @@
 
     $.ajax({
         type: 'GET',
-        url: "/statistics/getUsersByRating",
+        url: "/statistic/getUsersByRating",
         contentType: 'application/json'
     }).done(onUpdateUsersRatingRequest);
 })();
@@ -225,7 +225,7 @@
 
     $.ajax({
         type: 'GET',
-        url: "/statistics/getBlundersByRating",
+        url: "/statistic/getBlundersByRating",
         contentType: 'application/json'
     }).done(onUpdateBlundersRatingRequest);
 })();
@@ -238,7 +238,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/statistics/getBlundersStatistics",
+        url: "/statistic/getBlundersStatistic",
         contentType: 'application/json'
     }).done(onUpdateBlundersRequest);
 })();

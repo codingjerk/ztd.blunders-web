@@ -21,7 +21,7 @@ def changeRating(user_id, blunder_id, success):
 
     return newUserElo, (newUserElo - user_elo)
 
-def getBlundersStatistics():
+def getBlundersStatistic():
     return {
         'status': 'ok',
         'data': {

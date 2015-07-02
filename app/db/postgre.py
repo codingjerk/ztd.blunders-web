@@ -671,7 +671,7 @@ def getUserProfile(username):
         }
     }
 
-def getBlundersStatistics(username):
+def getBlundersStatistic(username):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.id,
@@ -717,7 +717,7 @@ def getRatingByDate(username):
         'status': 'ok',
         'username': username,
         'data' : {
-            'rating-statistics': rating
+            'rating-statistic': rating
         }
     }
 
@@ -745,7 +745,7 @@ def getBlundersByDate(username):
         'status': 'ok',
         'username': username,
         'data': {
-            'blunder-count-statistics': {
+            'blunder-count-statistic': {
                 'total' : total,
                 'solved': solved,
                 'failed': failed
@@ -939,7 +939,7 @@ def getUsersTop(number):
 
     return top
 
-def getUsersStatistics():
+def getUsersStatistic():
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
                 SELECT COUNT(id)

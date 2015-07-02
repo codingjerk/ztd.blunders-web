@@ -5,7 +5,7 @@
             rows: [
                 {
                     type: 'wide', 
-                    id: 'rating-statistics'
+                    id: 'rating-statistic'
                 },
                 {
                     type: 'cell',
@@ -27,7 +27,7 @@
                 },
                 {
                     type: 'wide', 
-                    id: 'blunder-count-statistics'
+                    id: 'blunder-count-statistic'
                 }
             ]
         }
@@ -49,7 +49,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/statistics/getBlundersStatistics",
+        url: "/statistic/getBlundersStatistic",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -60,7 +60,7 @@
 (function updateRatingChart() {
     $.ajax({
         type: 'POST',
-        url: "/statistics/getRatingByDate",
+        url: "/statistic/getRatingByDate",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -73,7 +73,7 @@
             return;
         }
 
-        grid.update(response.data,  {'rating-statistics': drawRatingChart});
+        grid.update(response.data,  {'rating-statistic': drawRatingChart});
     } 
 
     function drawRatingChart(id, data) {
@@ -111,7 +111,7 @@
 (function updateBlunderChart() {
     $.ajax({
         type: 'POST',
-        url: "/statistics/getBlundersByDate",
+        url: "/statistic/getBlundersByDate",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -124,7 +124,7 @@
             return;
         }
         
-        grid.update(response.data, {'blunder-count-statistics': drawBlunderChart});
+        grid.update(response.data, {'blunder-count-statistic': drawBlunderChart});
     } 
 
     function drawBlunderChart(id, data) {

@@ -2,7 +2,7 @@ from flask import jsonify, request
 
 from app import app, db
 
-@app.route('/statistics/getBlundersHistory', methods = ['POST'])
+@app.route('/statistic/getBlundersHistory', methods = ['POST'])
 def getBlundersHistory():
     try:
         username = request.json['username']
