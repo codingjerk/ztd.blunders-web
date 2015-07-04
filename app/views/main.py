@@ -31,10 +31,10 @@ def api():
     return render_template('api.html', title = 'API', session = session)
 
 @app.errorhandler(404)
-def notFound(error):
+def notFound(error): #pylint: disable=unused-argument
     return render_template('404.html', title = '404', session = session)
 
 @app.errorhandler(500)
 @app.errorhandler(503)
-def internalError(error):
+def internalError(error): #pylint: disable=unused-argument
     return render_template('50x.html', title = 'Something went wrong', session = session)
