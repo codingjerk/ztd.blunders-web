@@ -522,8 +522,8 @@
 
 		sync.ajax({
             id: 'loading-spin',
-            url: '/getRatedBlunder',
-            data: {},
+            url: '/api/get-blunder',
+            data: {type: 'rated'},
             onDone: onBlunderRequest
         });
 	}

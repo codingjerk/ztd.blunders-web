@@ -12,7 +12,7 @@ def assignNewBlunder():
 
     return blunder
 
-@app.route('/getRatedBlunder', methods = ['POST'])
+@app.route('/api/get-blunder', methods = ['POST'])
 def getRatedBlunder():
     blunder = postgre.getAssignedBlunder(session.userID(), tasks.RATED)
 
