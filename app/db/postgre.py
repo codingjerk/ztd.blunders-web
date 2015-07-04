@@ -974,12 +974,12 @@ def getUsersByRating(interval):
 
         data = connection.cursor.fetchall()
 
-        destribution = [[elo_category, count] for (elo_category, count) in data]
+        distribution = [[elo_category, count] for (elo_category, count) in data]
 
     return {
         'status': 'ok',
         'data': {
-            'users-rating-destribution': destribution
+            'users-rating-distribution': distribution
         }
     }
 
@@ -1026,11 +1026,11 @@ def getBlandersByRating(interval):
 
         data = connection.cursor.fetchall()
 
-        destribution = [[elo_category, count] for (elo_category, count) in data]
+        distribution = [[elo_category, count] for (elo_category, count) in data]
 
     return {
         'status': 'ok',
         'data': {
-            'blunders-rating-destribution' : destribution
+            'blunders-rating-distribution' : distribution
         }
     }

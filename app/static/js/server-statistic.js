@@ -6,7 +6,7 @@
             rows: [
                 {
                     type: 'wide', 
-                    id: 'users-rating-destribution'
+                    id: 'users-rating-distribution'
                 },
                 {
                     type: 'cell',
@@ -44,7 +44,7 @@
             rows: [
                 {
                     type: 'wide', 
-                    id: 'blunders-rating-destribution'
+                    id: 'blunders-rating-distribution'
                 },
                 {
                     type: 'cell',
@@ -117,7 +117,7 @@
         utils.normalizeTicks(xElo, 50);
 
         $.jqplot(id, [data], {
-            title: "Users rating destribution",
+            title: "Users rating distribution",
             captureRightClick: true,
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
@@ -156,7 +156,7 @@
             return;
         }
 
-        grid.update(response.data, {"users-rating-destribution" : updateUsersRating});
+        grid.update(response.data, {"users-rating-distribution" : updateUsersRating});
     }
 
     $.ajax({
@@ -183,7 +183,7 @@
         utils.normalizeTicks(xElo, 50);
 
         $.jqplot(id, [data], {
-            title: "Blunders rating destribution",
+            title: "Blunders rating distribution",
             captureRightClick: true,
             seriesDefaults: {
                 renderer: $.jqplot.BarRenderer,
@@ -220,7 +220,7 @@
             return;
         }
 
-        grid.update(response.data, {"blunders-rating-destribution" : updateBlundersRating});
+        grid.update(response.data, {"blunders-rating-distribution" : updateBlundersRating});
     }
 
     $.ajax({
