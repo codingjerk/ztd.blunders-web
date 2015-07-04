@@ -47,7 +47,7 @@
 						<ul>
 							<li><a href="/profile?user={{session.username()}}"><i class="fa fa-file-text"></i> Profile</a></li>
 							<li><a href="/statistic?user={{session.username()}}"><i class="fa fa-line-chart"></i> Statistic</a></li>
-							<li><a href="#" id="logout-button"><i class="fa fa-sign-out"></i> Log Out</a></li>
+							<li><a href="#" id="logout-button"><span id="logout-icon"><i class="fa fa-sign-out"></i></span> Log Out</a></li>
 						</ul>
 					</li>
 				</ul>
@@ -75,6 +75,7 @@
 		<script src="static/third-party/notifyjs/dist/notify.min.js"></script>
 		<script src="static/js/notify-wrapper.js"></script>
     	<script src="static/js/utils.js"></script>
+		<script src='static/js/sync.js'></script>
 		{% block script %}{% endblock %}
 		<script src="static/js/layout.js"></script>
 	</body>

@@ -70,21 +70,21 @@
 	var sendResult = function(callback) {
 		grid.updateSpoiler('help-block', false);
 
-		$.ajax({
-			type: 'POST',
-			url: "/validateBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/validateBlunder',
+            data: {
 				id: blunder.id,
 				line: getPv('user'),
 				spentTime: counter.total()
-			})
-		}).done(function(data) {
-			onResultAprooved(data);
-			if (callback !== undefined) {
-				callback(data);
+			},
+            onDone: function(data) {
+				onResultAprooved(data);
+				if (callback !== undefined) {
+					callback(data);
+				}
 			}
-		});
+        });
 
 		counter.stop();
 	};
@@ -163,9 +163,9 @@
 		var bestMove = getPv(0)[gameLength - 1];
 
 		if (move.san !== bestMove) {
+			setStatus('failed');
 			sendResult();
 
-			setStatus('failed');
 			updatePv(getPv('original'));
 
 			var bestMoveAsObject = getMoveByIndex(getPv('original'), gameLength);
@@ -175,9 +175,9 @@
 		}
 
 		if (gameLength === getPv(0).length) {
+			setStatus('finished');
 			sendResult();
 
-			setStatus('finished');
 			return;
 		}
 
@@ -511,10 +511,12 @@
 	}
 
 	function getRatedBlunder() {
-		$.ajax({
-			type: 'POST',
-			url: "/getRatedBlunder"
-		}).done(onBlunderRequest);
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/getRatedBlunder',
+            data: {},
+            onDone: onBlunderRequest
+        });
 	}
 
 	function getBlunderInfo(blunder_id) {
@@ -529,26 +531,26 @@
 	}
 
 	function voteBlunder(blunder_id, vote) {
-		$.ajax({
-			type: 'POST',
-			url: "/voteBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/voteBlunder',
+            data: {
 				blunder_id: blunder_id,
 				vote: vote
-			})
-		}).done(onInfoRequest);
+			},
+            onDone: onInfoRequest
+        });
 	}
 
 	function favoriteBlunder(blunder_id) {
-		$.ajax({
-			type: 'POST',
+		sync.ajax({
+            id: 'loading-spin',
 			url: "/favoriteBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+			data: {
 				blunder_id: blunder_id
-			})
-		}).done(onInfoRequest);
+			},
+			onDone: onInfoRequest
+		});
 	}
 
 	function sendComment(blunder_id, comment_id, text) {

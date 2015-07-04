@@ -1,16 +1,18 @@
 (function setupListeners() {
     $('#logout-button').on('click', function () {
-        $.ajax({
-            type: 'POST',
-            url: "/logout",
-            contentType: 'application/json'
-        }).done(function(data) {
-            if (data.status !== 'ok') {
-                notify.error(data.message);               
-                return;
-            }
+        sync.ajax({
+            id: 'logout-icon',
+            url: '/logout',
+            data: {},
+            onDone: function(data) {
+                if (data.status !== 'ok') {
+                    notify.error(data.message);               
+                    return;
+                }
 
-            location.reload();
+                location.reload();
+            }
         });
     });
+
 })();

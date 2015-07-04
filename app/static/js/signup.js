@@ -8,16 +8,16 @@
     });
 
     function signup() {
-        $.ajax({
-            type: 'POST',
-            url: "/signup",
-            contentType: 'application/json',
-            data: JSON.stringify({
+        sync.ajax({
+            id: 'submit',
+            url: '/signup',
+            data: {
                 username: $('#username').val(),
                 password: $('#password').val(),
                 email:    $('#email').val()
-            })
-        }).done(onResultAprooved);
+            },
+            onDone: onResultAprooved
+        });
     }
 
     function onResultAprooved(data) {
