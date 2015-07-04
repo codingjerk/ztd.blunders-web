@@ -4,3 +4,6 @@
 [submodule "app/static/third-party/js-url"]
 	path = app/static/third-party/js-url
 	url = https://github.com/websanova/js-url.git
+[submodule "app/static/third-party/simplePagination"]
+	path = app/static/third-party/simplePagination
+	url = https://github.com/flaviusmatis/simplePagination.js.git
