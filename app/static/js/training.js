@@ -68,6 +68,7 @@
 	};
 
 	var sendResult = function(callback) {
+		history.replaceState({}, null, '/explore/' + blunder.id);
 		grid.updateSpoiler('help-block', false);
 
 		sync.ajax({
@@ -510,7 +511,15 @@
 		});
 	}
 
+	window.onpopstate = function(event) {
+		location.reload();
+    };
+
 	function getRatedBlunder() {
+		if ($.url('path') !== '/training') {
+			history.pushState({}, null, '/training');
+		}
+
 		sync.ajax({
             id: 'loading-spin',
             url: '/getRatedBlunder',
