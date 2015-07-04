@@ -1,0 +1,330 @@
+section {
+    width: 400px;
+    max-width: auto;
+    left: -300px;
+}
+
+span#info-block {
+    font-size: 80%;
+}
+
+span#info-block {
+    position: absolute;
+    left: 550px;
+    top: 0px;
+
+    padding: 20px;
+    height: 400px;
+    width: 500px;
+}
+
+div#mainBoard {
+    width: 400px;
+    height: 400px;
+}
+
+.active-star-icon {
+    color: #e3cf7a;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+#moves, #rightMoves {
+    width: 360px;
+    margin-top: 30px;
+
+    margin-right: 20px;
+    margin-left: 20px;
+
+    font-size: 90%;
+}
+
+table {
+    margin-top: 20px;
+    width: 400px;
+    margin-left: -2px;
+}
+
+td#status {
+    text-align: left;
+
+    padding-left: 5px;
+}
+
+td#controlButtons {
+    text-align: right;
+    padding-right: 5px;
+}
+
+td#blunderControls {
+    text-align: left;
+
+    width: inherit;
+
+    padding-left: 5px;
+}
+
+td#ratingControls {
+    text-align: right;
+    width: auto;
+
+    padding-right: 15px;
+
+    font-size: 120%;
+}
+
+#favoriteButton {
+    color: #333;
+    margin-left: 17px;
+}
+
+#likes, #dislikes, #favorites {
+    font-size: 52%;
+    vertical-align: middle;
+}
+
+#likeButton {
+    margin-left: 2px;
+}
+
+#likeButton:hover, #likes:hover, .comment-like-button:hover {
+    color: #1fa67a;
+    text-decoration: none;
+}
+
+#dislikeButton:hover, #dislikes:hover, .comment-dislike-button:hover {
+    color: rgb(217, 83, 79);
+    text-decoration: none;
+}
+
+#favoriteButton:hover, #favorites:hover {
+    color: #e3cf7a;
+    text-decoration: none;
+}
+
+#boardControls {
+    padding-top: 0px;
+
+    width: 400px;
+    margin-top: 0px;
+}
+
+#blunderControls {
+    width: 400px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#help {
+    color: #333333;
+
+    margin: 5px 15px;
+
+    font-size: 120%;
+
+    text-align: justify;
+}
+
+#failedStatus, #successStatus, #blackTurnStatus, #whiteTurnStatus {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+#failedStatus {
+    color: #ffffff;
+
+    border-color: rgb(212, 63, 58);
+    background-color: rgb(217, 83, 79);
+}
+
+#successStatus {
+    color: #ffffff;
+
+    border-color: #1b926c;
+    background-color: #1fa67a;
+}
+
+#blackTurnStatus {
+    color: #dedede;
+
+    border-color: #555555;
+    background-color: #333333;
+}
+
+#whiteTurnStatus {
+    color: #333333;
+
+    border-color: #dedede;
+    background-color: #ededed;
+}
+
+#rating {
+    font-size: 80%;
+    vertical-align: super;
+}
+
+a.move:link {
+    text-decoration: none;
+    padding: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+a.move:visited {
+    text-decoration: none;
+    padding: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+a.move:hover {
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 5px;
+    padding: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+a.move:active {
+    text-decoration: none;
+    border: solid 1px;
+    border-radius: 5px;
+    padding: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.control {
+    margin: 5px;
+}
+
+.blunderControl {
+    margin: 10px;
+}
+
+.spacer {
+    margin-right: 5px;
+}
+
+.currentMove {
+    font-weight: 600;
+}
+
+.badMove {
+    color: #E33;
+}
+
+.goodMove {
+    color: rgb(60, 202, 97);
+}
+
+.highlight, .highlight1-32417, .highlight2-9c5d2 {
+  -webkit-box-shadow: inset 0 0 100px 3px rgba(255, 255, 0, 0.4);
+  -moz-box-shadow: inset 0 0 100px 3px rgba(255, 255, 0, 0.4);
+  box-shadow: inset 0 0 100px 3px rgba(255, 255, 0, 0.4);
+}
+
+.good-highlight {
+  -webkit-box-shadow: inset 0 0 100px 3px rgba(10, 235, 50, 0.6);
+  -moz-box-shadow: inset 0 0 100px 3px rgba(10, 235, 50, 0.6);
+  box-shadow: inset 0 0 100px 3px rgba(10, 235, 50, 0.6);
+}
+
+.bad-highlight {
+  -webkit-box-shadow: inset 0 0 100px 3px rgba(238, 51, 51, 0.7);
+  -moz-box-shadow: inset 0 0 100px 3px rgba(238, 51, 51, 0.7);
+  box-shadow: inset 0 0 100px 3px rgba(238, 51, 51, 0.7);
+}
+
+#comments {
+    margin-left: -20px;
+    margin-top: -2px;
+}
+
+.comment-header {
+    margin-left: 10px;
+    font-size: 82%;
+    margin-bottom: 5px;
+}
+
+.comment-username {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.comment-date {
+    color: #777;
+    font-size: 85%;
+}
+
+.comment-controls {
+    margin-top: 5px;
+    margin-left: 10px;
+    color: #777;
+    font-size: 80%;
+}
+
+.comment {
+    margin-top: 12px;
+}
+
+.comment-rating {
+    text-align: right;
+    margin-left: 20px;
+}
+
+#blunder-rating-container, #blunder-success-rate-container, #game-info-container, #spent-time-container {
+    margin-bottom: 7px;
+}
+
+#comments {        
+    transition: visibility 0s linear 0.2s, opacity 0.2s ease-in-out;
+}
+
+#comments.visible {
+    transition-delay: 0s;visibility: visible;opacity: 1;
+}
+
+#comments.hidden {
+    opacity: 0; visibility:hidden;
+}
+
+.submit-comment-button {
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+.submit-comment-cancel {
+}
+
+@media screen and (max-width: 1024px) {
+	section {
+		left: 0;
+		width: 100%;
+	}
+
+	#info-block {
+		width: auto;
+	}
+}
+
+@media screen and (max-width: 1720px) {section {left: -200px;}}
+@media screen and (max-width: 1520px) {section {left: -100px;}}
+@media screen and (max-width: 1320px) {section {left: 0px;}}
+
+.comment-avatar > img {
+    width: 30px;
+    vertical-align: middle;
+
+    margin-right: 10px;
+}
