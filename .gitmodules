@@ -7,3 +7,6 @@
 [submodule "app/static/third-party/simplePagination"]
 	path = app/static/third-party/simplePagination
 	url = https://github.com/flaviusmatis/simplePagination.js.git
+[submodule "app/static/third-party/notifyjs"]
+	path = app/static/third-party/notifyjs
+	url = https://github.com/jpillora/notifyjs.git
