@@ -29,3 +29,12 @@ def download():
 @app.route('/api')
 def api():
     return render_template('api.html', title = 'API', session = session)
+
+@app.errorhandler(404)
+def notFound(error):
+    return render_template('404.html', title = '404', session = session)
+
+@app.errorhandler(500)
+@app.errorhandler(503)
+def internalError(error):
+    return render_template('50x.html', title = 'Something went wrong', session = session)
