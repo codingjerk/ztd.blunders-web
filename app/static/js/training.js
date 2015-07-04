@@ -567,7 +567,7 @@
 	}
 
 	function pieceTheme(piece) {
-		return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
+		return '/static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
 	}
 
 	board = new ChessBoard('board', {
