@@ -68,6 +68,8 @@
 	};
 
 	var sendResult = function(callback) {
+		grid.updateSpoiler('help-block', false);
+
 		$.ajax({
 			type: 'POST',
 			url: "/validateBlunder",
@@ -699,6 +701,16 @@
 (function setupRightPanel() {
 	var model = [
         {
+            id: 'help-block',
+            caption: 'Help',
+            rows: [
+                {
+                    type: 'wide',
+                    id: 'help'
+                }
+            ]
+        },
+        {
             id: 'game-block',
             caption: 'Game',
             cells: 2,
@@ -787,7 +799,14 @@
     var content = grid.generate(model);
     $('#info-block').html(content);
 
+    grid.setupSpoiler('help-block', true);
     grid.setupSpoiler('comments-block', false);
     grid.setupSpoiler('blunder-block', true);
     grid.setupSpoiler('game-block', true);
+
+    grid.update({'help': 
+    	'The player has just made a fatal mistake.\n' +
+		'Play the best moves to obtain advantage.\n' +
+		"There's only one winning variation wins at least 2 pawns."
+	});
 })();
