@@ -137,6 +137,17 @@
 		}
 	};
 
+	var getMoveByIndex = function(pv, moveIndex) {
+		var game = new Chess(blunder.fenBefore);
+
+		var result = null;
+		for (var i = 0; i < moveIndex; ++i) {
+			result = game.move(pv[i]);
+		}
+
+		return result;
+	};
+
 	var onDrop = function(source, target) {
 		// see if the move is legal
 		var move = makeMove(board, {
@@ -157,11 +168,7 @@
 			setStatus('failed');
 			updatePv(getPv('original'));
 
-			var goodGame = new Chess(blunder.fenBefore);
-			for (var i = 0; i < gameLength; ++i) {
-				var bestMoveAsObject = goodGame.move(getPv('original')[i]);
-			}
-
+			var bestMoveAsObject = getMoveByIndex(getPv('original'), gameLength);
 			highlightAtFailure(bestMoveAsObject, move);
 
 			return;
