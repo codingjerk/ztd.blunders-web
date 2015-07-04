@@ -249,7 +249,6 @@ a.move:active {
 #comments {
     margin-left: -20px;
     margin-top: -2px;
-
 }
 
 .comment-header {
@@ -323,3 +322,9 @@ a.move:active {
 @media screen and (max-width: 1520px) {section {left: -100px;}}
 @media screen and (max-width: 1320px) {section {left: 0px;}}
 
+.comment-avatar > img {
+    width: 30px;
+    vertical-align: middle;
+
+    margin-right: 10px;
+}

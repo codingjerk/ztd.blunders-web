@@ -424,7 +424,7 @@
 	}
 
 	function commentBuilder(data, comments) {
-		var header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
+		var header = '<div class="comment-header"><span class="comment-avatar"><img src="/static/img/default-avatar.png" /></span><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		var body = '<div class="comment-body">{2}</div>';
 		var controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
 		var subcomments = '<ul class="comment-responses">{5}</ul>';
@@ -491,7 +491,7 @@
 		var rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
 		var rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
 
-		var htmlData = rootControls + buildCommentReplies(data.comments, 0);
+		var htmlData = rootControls + "<ul>{0}</ul>".format(buildCommentReplies(data.comments, 0));
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
 
