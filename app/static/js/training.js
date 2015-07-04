@@ -155,6 +155,13 @@
 			setStatus('failed');
 			updatePv(getPv('original'));
 
+			var goodGame = new Chess(blunder.fenBefore);
+			for (var i = 0; i < gameLength; ++i) {
+				var bestMoveAsObject = goodGame.move(getPv('original')[i]);
+			}
+
+			highlightAtFailure(bestMoveAsObject, move);
+
 			return;
 		}
 
@@ -200,7 +207,7 @@
 			lastMove = game.move(move);
 		}
 
-		hightlightMove(lastMove);
+		highlightMove(lastMove);
 		
 		lockAnimation();
 		board.position(game.fen());
@@ -233,12 +240,19 @@
 			}
 
 			var NAG = '';
-			if (i === 0) NAG = '?';
-			else if (i === 1) NAG = '!';
+			if (i === 0) {
+				NAG = '?';
+			} else if (i === 1) {
+				NAG = '!';
+			}
 
 			if (pv[i] !== getPv('original')[i]) {
 				NAG = "??";
 				style += ' badMove';
+			}
+
+			if (getPv('user').length > i && pv[i] !== getPv('user')[i]) {
+				style += ' goodMove';
 			}
 
 			if (i === 0 && firstMoveTurn === 'b') {
@@ -261,11 +275,25 @@
 		}
 	}
 
-	function hightlightMove(move) {
+	function highlightMove(move) {
 		$('.highlight').removeClass('highlight');
+		$('.good-highlight').removeClass('good-highlight');
+		$('.bad-highlight').removeClass('bad-highlight');
 
 		$('#board').find('.square-' + move.from).addClass('highlight');
 		$('#board').find('.square-' + move.to).addClass('highlight');
+	}
+
+	function highlightAtFailure(goodMove, badMove) {
+		$('.highlight').removeClass('highlight');
+		$('.good-highlight').removeClass('good-highlight');
+		$('.bad-highlight').removeClass('bad-highlight');
+
+		$('#board').find('.square-' + goodMove.from).addClass('good-highlight');
+		$('#board').find('.square-' + goodMove.to).addClass('good-highlight');
+
+		$('#board').find('.square-' + badMove.from).addClass('bad-highlight');
+		$('#board').find('.square-' + badMove.to).addClass('bad-highlight');
 	}
 
 	function makeMove(board, move, aiMove) {
@@ -273,7 +301,7 @@
 		if (pmove !== null) {
 			++visitedMoveCounter;
 
-			hightlightMove(pmove);
+			highlightMove(pmove);
 			
 			if (aiMove) {
 				lockAnimation();
