@@ -70,16 +70,18 @@
     $('#details').html(html);
 })();
 
-(function updateUsersStatistic() {
-    function updateUsersOnlineList(id, users) {
-        var usersLinks = users.map(function(user) {
-            return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
-        }).join('');
+(function updateUsersCount() {
+    $.ajax({
+        type: 'POST',
+        url: "/api/global/users-count",
+        contentType: 'application/json'
+    }).done(function(response) {
+        grid.update(response.data);
+    });
+})();
 
-        $('#' + id).html(usersLinks);
-    }
-
-    function updateUsersTopList(id, users) {
+(function updateUsersTop() {
+    function drawUsersTopList(id, users) {
         var usersList = users.map(function(user) {
             var username = user.username;
             var elo = user.elo;
@@ -90,21 +92,41 @@
         $('#' + id).html(content);
     }
 
-    function onUpdateUsersRequest(response) {
+    $.ajax({
+        type: 'POST',
+        url: "/api/global/users-top",
+        contentType: 'application/json'
+    }).done(function(response) {
         if (response.status !== 'ok') {
             notify.error(response.message);
             return;
         }
 
-        grid.update(response.data, {  "users-online-list" : updateUsersOnlineList,
-                                      "users-top-list":     updateUsersTopList    });
+        grid.update(response.data, {"users-top-list": drawUsersTopList});
+    });
+})();
+
+(function updateUsersOnline() {
+    function drawUsersOnlineList(id, users) {
+        var usersLinks = users.map(function(user) {
+            return '<a href="/profile?user={0}">{1}</a> '.format(user,user);
+        }).join('');
+
+        $('#' + id).html(usersLinks);
     }
 
     $.ajax({
         type: 'POST',
-        url: "/api/statistic/users",
+        url: "/api/global/users-online",
         contentType: 'application/json'
-    }).done(onUpdateUsersRequest);
+    }).done(function(response) {
+        if (response.status !== 'ok') {
+            notify.error(response.message);
+            return;
+        }
+
+        grid.update(response.data, {"users-online-list": drawUsersOnlineList});
+    });
 })();
 
 (function updateUsersRatingChart() {
@@ -231,7 +253,7 @@
 })();
 
 
-(function updateBlunders() {
+(function updateBlundersCount() {
     function onUpdateBlundersRequest(response) {
         grid.update(response.data);
     }
@@ -249,4 +271,3 @@
     grid.setupSpoiler('blunders-block');
     grid.setupSpoiler('online-block');
 })();
-

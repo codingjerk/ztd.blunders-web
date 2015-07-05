@@ -904,7 +904,7 @@ def lastUserActivity(username, format):
 
         return last_activity
 
-def lastActiveUsers(interval):
+def getActiveUsers(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.username,
@@ -939,7 +939,7 @@ def getUsersTop(number):
 
     return top
 
-def getUsersStatistic():
+def getUsersCount():
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
                 SELECT COUNT(id)
@@ -947,17 +947,14 @@ def getUsersStatistic():
             )
         (users_registered_value, ) = connection.cursor.fetchone()
 
-    users_day = lastActiveUsers('1 HOUR')
-    users_week = lastActiveUsers('1 WEEK')
-    users_top = getUsersTop(10)
+    users_day = getActiveUsers('1 HOUR')
+    users_week = getActiveUsers('1 WEEK')
 
     return {
         'status': 'ok',
         'data': {
             "users-registered-value": users_registered_value,
             "users-online-value": len(users_day),
-            "users-online-list" : users_day,
-            "users-top-list": users_top,
             "users-active-value": len(users_week)
         }
     }
