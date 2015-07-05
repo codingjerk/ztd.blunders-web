@@ -34,18 +34,12 @@ def changeRating(user_id, blunder_id, success):
 
     return newUserElo, (newUserElo - user_elo)
 
-@app.route('/validateBlunder', methods = ['POST'])
-def validateBlunder():
-    try:
-        blunder_id = request.json['id']
-        userLine = request.json['line']
-        spentTime = request.json['spentTime']
-    except Exception:
-        return jsonify({
-            'status': 'error',
-            'message': 'Blunder id, user line and spent time required'
-        })
+def validateExploreBlunder(blunder_id, userLine, spentTime): #pylint: disable=unused-argument
+    postgre.closeBlunderTask(session.userID(), blunder_id, tasks.EXPLORE)
 
+    return jsonify({'status': 'ok'})
+
+def validateRatedBlunder(blunder_id, userLine, spentTime):
     if session.isAnonymous():
         return jsonify({'status': 'ok'})
 
@@ -78,3 +72,26 @@ def validateBlunder():
         'elo': newElo,
         'delta': delta
     })
+
+@app.route('/api/validate-blunder', methods = ['POST'])
+def validateBlunder():
+    try:
+        blunder_id = request.json['id']
+        userLine = request.json['line']
+        spentTime = request.json['spentTime']
+        type = request.json['type']
+    except Exception:
+        return jsonify({
+            'status': 'error',
+            'message': 'Blunder id, user line, spent time and type required'
+        })
+
+    if type == tasks.RATED:
+        return validateRatedBlunder(blunder_id, userLine, spentTime)
+    elif type == tasks.EXPLORE:
+        return validateExploreBlunder(blunder_id, userLine, spentTime)
+    else:
+        return jsonify({
+            'status': 'error',
+            'message': 'Blunder type must be rated or explore'
+        })

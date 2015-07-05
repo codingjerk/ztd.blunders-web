@@ -46,24 +46,12 @@
 
     var onResultAprooved = function(data) {
         if (data.status !== 'ok') {
-            updateRating();
             notify.error(data.message);
             return;
         }
-
-        var deltaClass = '';
-        if (data.delta > 0) {
-            deltaClass = 'green';
-            data.delta = '+{0}'.format(data.delta);
-        } else if (data.delta < 0) {
-            deltaClass = 'red';
-        }
-
-        $('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
         
         if (finished) {
             getBlunderInfo(blunder.id);
-            showComments();
         }
     };
 
@@ -72,11 +60,12 @@
 
         sync.ajax({
             id: 'loading-spin',
-            url: '/validateBlunder',
+            url: '/api/validate-blunder',
             data: {
                 id: blunder.id,
                 line: getPv('user'),
-                spentTime: counter.total()
+                spentTime: counter.total(),
+                type: 'explore'
             },
             onDone: function(data) {
                 onResultAprooved(data);
@@ -92,15 +81,12 @@
     var setStatus = function(status) {
         if (status === 'playing') {
             finished = false;
-            $("#nextBlunder").html('<i class="fa fa-exclamation-circle"></i> Give up');
             $("#rightMoves").html('');
         } else if (status === 'failed') {
             finished = true;
-            $("#nextBlunder").html('<i class="fa fa-lg fa-caret-right"></i> Next blunder');
             $("#status").html('<span id="failedStatus"><i class="fa fa-times-circle"></i> Failed!</span>');
         } else if (status === 'finished') {
             finished = true;
-            $("#nextBlunder").html('<i class="fa fa-lg fa-caret-right"></i> Next blunder');
             $("#status").html('<span id="successStatus"><i class="fa fa-check-circle"></i> Success!</span>');
         }
     };
@@ -335,8 +321,10 @@
         }
 
         blunder = response.data;
+        if ($.url('path') !== '/explore/' + blunder.id) {
+            history.pushState({}, null, '/explore/' + blunder.id);
+        }
 
-        hideComments();
         getBlunderInfo(blunder.id);
             
         setStatus('playing');
@@ -632,23 +620,15 @@
         gotoMove(getPv('active'), game.history().length, getPv('active').length);
     }
 
-    function showComments() {
-        grid.updateSpoiler('comments-block', true);
-    }
-
-    function hideComments() {
-        grid.updateSpoiler('comments-block', false);
-    }
-
     $('#nextBlunder').on('click', function() {
         if (!blunder) {
             return;
         }
 
         if (finished) {
-            getRatedBlunder();
+            getExploreBlunder();
         } else {
-            sendResult(getRatedBlunder);
+            sendResult(getExploreBlunder);
         }
 
         // Clearing blunder to know about unloaded state
@@ -832,7 +812,7 @@
     $('#info-block').html(content);
 
     grid.setupSpoiler('help-block', true);
-    grid.setupSpoiler('comments-block', false);
+    grid.setupSpoiler('comments-block', true);
     grid.setupSpoiler('blunder-block', true);
     grid.setupSpoiler('game-block', true);
 

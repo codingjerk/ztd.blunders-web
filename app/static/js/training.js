@@ -73,11 +73,12 @@
 
 		sync.ajax({
             id: 'loading-spin',
-            url: '/validateBlunder',
+            url: '/api/validate-blunder',
             data: {
 				id: blunder.id,
 				line: getPv('user'),
-				spentTime: counter.total()
+				spentTime: counter.total(),
+				type: 'rated'
 			},
             onDone: function(data) {
 				onResultAprooved(data);
