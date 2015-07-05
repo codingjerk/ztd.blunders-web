@@ -1,12 +1,12 @@
 # Readme
 
 ## Try it online
-Ztd.Blunders available in [blunders.ztd.io](http://blunders.ztd.io) and this is main server site. 
+Ztd.Blunders available on[blunders.ztd.io](http://blunders.ztd.io) and this is our main server. 
 
 ## Introducing
-Ztd.Blunders is the software for deployment a Web server for solving chess problems. This is OpenSource project written with use of Flask, PostgreSQL, MongoDB and several other tools and libs. To use it you will need special prepared databases, you will not find them in this repository.
+Ztd.Blunders is the software for deployment a Web server for solving chess problems. This is Open Source project written with use of Flask, PostgreSQL, MongoDB and several other tools and libraries. To use it you will need special prepared databases, you will not find them in this repository.
 
-Those databases are result of several month of research and analizing for over 6000000+ officially registered chess games.  From all this data, we derived 1700000+ positions, where one of the side make brute mistake and it's opponent can win in ellegant way. More, sophisticated algorithm was developed to assign each position a rating score.
+Those databases are result of several months of research and analyzing for over 6000000+ officially registered chess games.  From all this data, we derived 1700000+ positions, where one of the players makes brute mistake and it's opponent can win in an elegant way. More, sophisticated algorithm was developed to assign each position a rating score, showing relative difficulty for finding best move.
 
 ## Installing
 In this article we will cover deployment of Ztd.Blunders server. We are focusing on CentOS 7 x64 distribution, however this is not step by step manual. Variations are possible and different software versions can cause some problems.
