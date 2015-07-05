@@ -8,7 +8,7 @@ from app.api.getBlunderInfo import getBlunderInfoById
 
 MAX_MESSAGE_SIZE = 500
 
-@app.route('/commentBlunder', methods = ['POST'])
+@app.route('/api/comment/send', methods = ['POST'])
 def commentBlunder():
     if session.isAnonymous():
         return jsonify({

@@ -12,6 +12,8 @@ def getBlundersStatistic():
         pass
 
     if username is None:
+        # TODO: /api/global/blunders-count
         return jsonify(db.getBlundersStatistic())              # server statistic
     else:
+        # TODO: /api/user/blunders-by-date
         return jsonify(postgre.getBlundersStatistic(username)) # user statistic

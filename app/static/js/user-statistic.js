@@ -60,7 +60,7 @@
 (function updateRatingChart() {
     $.ajax({
         type: 'POST',
-        url: "/statistic/getRatingByDate",
+        url: "/api/user/rating-by-date",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -111,7 +111,7 @@
 (function updateBlunderChart() {
     $.ajax({
         type: 'POST',
-        url: "/statistic/getBlundersByDate",
+        url: "/api/user/blunders-by-date",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')

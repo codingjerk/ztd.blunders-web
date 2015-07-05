@@ -60,7 +60,7 @@
 
         sync.ajax({
             id: 'loading-spin',
-            url: '/api/validate-blunder',
+            url: '/api/blunder/validate',
             data: {
                 id: blunder.id,
                 line: getPv('user'),
@@ -362,7 +362,7 @@
     function voteBlunderComment(blunder_id, comment_id, vote) {
         $.ajax({
             type: 'POST',
-            url: "/voteBlunderComment",
+            url: "/api/comment/vote",
             contentType: 'application/json',
             data: JSON.stringify({
                 blunder_id: blunder_id,
@@ -501,7 +501,7 @@
     function getExploreBlunderById(id) {
         sync.ajax({
             id: 'loading-spin',
-            url: '/api/get-blunder',
+            url: '/api/blunder/get',
             data: {
                 type: 'explore', 
                 id: id
@@ -513,7 +513,7 @@
     function getExploreBlunder() {
         sync.ajax({
             id: 'loading-spin',
-            url: '/api/get-blunder',
+            url: '/api/blunder/get',
             data: {
                 type: 'explore'
             },
@@ -524,7 +524,7 @@
     function getBlunderInfo(blunder_id) {
         $.ajax({
             type: 'POST',
-            url: "/getBlunderInfo",
+            url: "/api/blunder/info",
             contentType: 'application/json',
             data: JSON.stringify({
                 blunder_id: blunder_id
@@ -535,7 +535,7 @@
     function voteBlunder(blunder_id, vote) {
         sync.ajax({
             id: 'loading-spin',
-            url: '/voteBlunder',
+            url: '/api/blunder/vote',
             data: {
                 blunder_id: blunder_id,
                 vote: vote
@@ -547,7 +547,7 @@
     function favoriteBlunder(blunder_id) {
         sync.ajax({
             id: 'loading-spin',
-            url: "/favoriteBlunder",
+            url: "/api/blunder/favorite",
             data: {
                 blunder_id: blunder_id
             },
@@ -558,7 +558,7 @@
     function sendComment(blunder_id, comment_id, text) {
         $.ajax({
             type: 'POST',
-            url: "/commentBlunder",
+            url: "/api/comment/send",
             contentType: 'application/json',
             data: JSON.stringify({
                 blunder_id: blunder_id,
@@ -597,7 +597,7 @@
     function updateRating() {
         $.ajax({
             type: 'GET',
-            url: "/getRating"
+            url: "/api/session/rating"
         }).done(function(data) {
             if (data.status !== 'ok') {
                 notify.error(data.message);

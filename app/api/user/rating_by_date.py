@@ -3,8 +3,8 @@ from flask import jsonify, request
 from app import app
 from app.db import postgre
 
-@app.route('/getUserProfile', methods=['POST'])
-def getUserProfile():
+@app.route('/api/user/rating-by-date', methods=['POST'])
+def getRatingByDate():
     try:
         username = request.json['username']
     except Exception:
@@ -13,4 +13,4 @@ def getUserProfile():
             'message': 'Username required'
         })
 
-    return jsonify(postgre.getUserProfile(username))
+    return jsonify(postgre.getRatingByDate(username))

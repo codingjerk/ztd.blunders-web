@@ -45,7 +45,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/getUserProfile",
+        url: "/api/user/profile",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -97,7 +97,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistic/getBlundersHistory",
+            url: "/api/user/passed-blunders",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -150,7 +150,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistic/getBlundersFavorites",
+            url: "/api/user/favorite-blunders",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -200,7 +200,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistic/getCommentsByUser",
+            url: "/api/user/comments",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),

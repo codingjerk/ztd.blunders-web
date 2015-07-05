@@ -3,7 +3,7 @@ from flask import jsonify, request
 from app import app
 from app.db import postgre
 
-@app.route('/statistic/getBlundersByDate', methods=['POST'])
+@app.route('/api/user/blunders-by-date', methods=['POST'])
 def getBlundersByDate():
     try:
         username = request.json['username']

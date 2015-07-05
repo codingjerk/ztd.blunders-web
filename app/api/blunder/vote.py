@@ -6,8 +6,8 @@ from app.utils import session
 
 from app.api.getBlunderInfo import getBlunderInfoById
 
-@app.route('/voteBlunderComment', methods = ['POST'])
-def voteBlunderComment():
+@app.route('/api/blunder/vote', methods = ['POST'])
+def voteBlunder():
     if session.isAnonymous():
         return jsonify({
             'status': 'error',
@@ -16,24 +16,17 @@ def voteBlunderComment():
 
     try:
         blunder_id = request.json['blunder_id']
-        comment_id = request.json['comment_id']
         vote = request.json['vote']
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Blunder id, comment id and vote required'
+            'message': 'Blunder id and vote required'
         })
 
-    if postgre.blunderCommentAuthor(comment_id) == session.userID():
+    if not postgre.voteBlunder(session.userID(), blunder_id, vote):
         return jsonify({
             'status': 'error',
-            'message': "Can't vote for own comments"
-        })
-
-    if not postgre.voteBlunderComment(session.userID(), comment_id, vote):
-        return jsonify({
-            'status': 'error',
-            'message': "Can't vote comment"
+            'message': "Can't vote blunder"
         })
 
     return getBlunderInfoById(blunder_id)

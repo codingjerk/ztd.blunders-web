@@ -73,7 +73,7 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
         'delta': delta
     })
 
-@app.route('/api/validate-blunder', methods = ['POST'])
+@app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
     try:
         blunder_id = request.json['id']

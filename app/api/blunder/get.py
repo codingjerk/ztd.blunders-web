@@ -36,7 +36,7 @@ def getExploreBlunder():
     data = utils.jsonifyBlunder(blunder)
     return jsonify(data)
 
-@app.route('/api/get-blunder', methods = ['POST'])
+@app.route('/api/blunder/get', methods = ['POST'])
 def getBlunder():
     try:
         type = request.json['type']

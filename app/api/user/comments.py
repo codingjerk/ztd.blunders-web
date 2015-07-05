@@ -2,7 +2,7 @@ from flask import jsonify, request
 
 from app import app, db
 
-@app.route('/statistic/getCommentsByUser', methods = ['POST'])
+@app.route('/api/user/comments', methods = ['POST'])
 def getCommentsByUser():
     try:
         username = request.json['username']

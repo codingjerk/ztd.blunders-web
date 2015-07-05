@@ -15,7 +15,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: "/api/send-feedback",
+                url: "/api/feedback/send",
                 contentType: 'application/json',
                 data: JSON.stringify({
                     message: message

@@ -101,8 +101,8 @@
     }
 
     $.ajax({
-        type: 'GET',
-        url: "/statistic/getUsersStatistic",
+        type: 'POST',
+        url: "/api/statistic/users",
         contentType: 'application/json'
     }).done(onUpdateUsersRequest);
 })();
@@ -160,8 +160,8 @@
     }
 
     $.ajax({
-        type: 'GET',
-        url: "/statistic/getUsersByRating",
+        type: 'POST',
+        url: "/api/global/users-by-rating",
         contentType: 'application/json'
     }).done(onUpdateUsersRatingRequest);
 })();
@@ -224,8 +224,8 @@
     }
 
     $.ajax({
-        type: 'GET',
-        url: "/statistic/getBlundersByRating",
+        type: 'POST',
+        url: "/api/global/blunders-by-rating",
         contentType: 'application/json'
     }).done(onUpdateBlundersRatingRequest);
 })();

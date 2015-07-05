@@ -2,8 +2,8 @@ from flask import jsonify, request
 
 from app import app, db
 
-@app.route('/statistic/getBlundersHistory', methods = ['POST'])
-def getBlundersHistory():
+@app.route('/api/user/favorite-blunders', methods = ['POST'])
+def getBlundersFavorites():
     try:
         username = request.json['username']
         offset = request.json['offset']
@@ -14,4 +14,4 @@ def getBlundersHistory():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(db.getBlundersHistory(username, offset, limit))
+    return jsonify(db.getBlundersFavorites(username, offset, limit))

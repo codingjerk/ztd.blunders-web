@@ -65,7 +65,7 @@ def getBlunderInfoById(blunder_id):
         }
     })
 
-@app.route('/getBlunderInfo', methods=['POST'])
+@app.route('/api/blunder/info', methods=['POST'])
 def getBlunderInfo():
     try:
         blunder_id = request.json['blunder_id']
