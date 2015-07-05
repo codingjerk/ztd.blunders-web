@@ -4,7 +4,7 @@ from app import app
 from app.db import postgre
 from app.utils import session
 
-from app.api.getBlunderInfo import getBlunderInfoById
+from app.api.blunder.info import getBlunderInfoById
 
 MAX_MESSAGE_SIZE = 500
 

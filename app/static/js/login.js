@@ -10,7 +10,7 @@
     function login() {
         sync.ajax({
             id: 'login-button',
-            url: '/login',
+            url: '/api/session/login',
             data: {
                 username: $('#username').val(),
                 password: $('#password').val()

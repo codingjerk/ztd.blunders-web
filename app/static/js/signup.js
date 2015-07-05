@@ -10,7 +10,7 @@
     function signup() {
         sync.ajax({
             id: 'submit',
-            url: '/signup',
+            url: '/api/session/signup',
             data: {
                 username: $('#username').val(),
                 password: $('#password').val(),
