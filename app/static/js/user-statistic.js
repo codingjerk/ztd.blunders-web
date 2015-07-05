@@ -49,7 +49,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/statistic/getBlundersStatistic",
+        url: "/api/user/blunders-count",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')

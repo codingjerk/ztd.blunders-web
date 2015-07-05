@@ -238,7 +238,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/statistic/getBlundersStatistic",
+        url: "/api/global/blunders-count",
         contentType: 'application/json'
     }).done(onUpdateBlundersRequest);
 })();
