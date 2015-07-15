@@ -79,6 +79,7 @@
     "type":"rated"
 }</code></pre>
 
+    If user is logged in and user's rating affected, we return user's rating change and new Elo.<br>
     Response example:
     <pre><code class="json">{
     "data": {
@@ -88,6 +89,65 @@
     "status": "ok"}
 }</code></pre>
 
+
+<h3>/api/blunder/vote</h3>
+    Vote for a blunder. Valid only for authorized user. <b>vote</b> argument can be +1 for positive vote and -1 for negative.<br>
+    Request example:
+    <pre><code class="json">{
+    "blunder_id":"5580f5afe13823b83b0095e1",
+    "vote":1
+}</code></pre>
+
+    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
+    Response example:
+    <pre><code class="json">{
+    "data": {
+        "comments": [],
+        "dislikes": 0,
+        "elo": 1420,
+        "favorites": 0,
+        "game-info": {
+            "Black": "Unknown",
+            "BlackElo": "?",
+            "White": "Unknown",
+            "WhiteElo": "?"
+            },
+        "likes": 1,
+        "myFavorite": false,
+        "successTries": 0,
+        "totalTries": 1
+        },
+    "status": "ok"
+}</code></pre>
+
+<h3>/api/blunder/favorite</h3>
+    Set blander user's favorite. Valid only for authorized user. If blunder already a favorite, removes it from favorite list.<br>
+    Request example:
+    <pre><code class="json">{
+    "blunder_id":"5580f5afe13823b83b0095e1"
+}</code></pre>
+
+    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
+    Response example:
+    <pre><code class="json">{
+    "data": {
+        "comments": [],
+        "dislikes": 0,
+        "elo": 1420,
+        "favorites": 0,
+        "game-info": {
+            "Black": "Unknown",
+            "BlackElo": "?",
+            "White": "Unknown",
+            "WhiteElo": "?"
+            },
+        "likes": 1,
+        "myFavorite": false,
+        "successTries": 0,
+        "totalTries": 1
+        },
+    "status": "ok"
+}</code></pre>
 
 {% endblock %}
 
