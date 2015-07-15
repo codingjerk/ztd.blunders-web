@@ -12,12 +12,12 @@ Those databases are result of several months of research and analyzing for over 
 In this article we will cover deployment of Ztd.Blunders server. We are focusing on CentOS 7 x64 distribution, however this is not step by step manual. Variations are possible and different software versions can cause some problems.
 
 1. Install repository and update submodules  
-    ```bash
+    ```
     $ yum install git  
     $ git clone git@bitbucket.org:ziltoidteam/chessdb-web.git```
 
     Enter to Git repository's directory and update modules  
-    ```bash
+    ```
     $ git submodule init  
     $ git submodule update
     ```
@@ -25,9 +25,9 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
 2. Installing python.  
     Currently, default repository includes only 2.7 version, but we need 3.4. We will find it in IUS repository.  
     Source: https://iuscommunity.org/pages/Repos.html  
-    ```bash$ yum install https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm```  
+    ```$ yum install https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm```  
     NOTE: IUS repository installs EPEL repository as dependence  
-    ```bash$ yum install python34u.x86_64 python34u-pip.noarch```
+    ```$ yum install python34u.x86_64 python34u-pip.noarch```
 
 3. Installing PostgreSQL server.
     We can use special repository from PostgreSQL maintainers. Current available version is 9.4.  
