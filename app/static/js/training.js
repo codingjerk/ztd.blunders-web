@@ -44,12 +44,14 @@
 		return result;
 	}
 
-	var onResultAprooved = function(data) {
-		if (data.status !== 'ok') {
+	var onResultAprooved = function(response) {
+		if (response.status !== 'ok') {
 			updateRating();
-			notify.error(data.message);
+			notify.error(response.message);
 			return;
 		}
+
+		var data = response.data;
 
 		var deltaClass = '';
 		if (data.delta > 0) {
@@ -80,10 +82,10 @@
 				spentTime: counter.total(),
 				type: 'rated'
 			},
-            onDone: function(data) {
-				onResultAprooved(data);
+            onDone: function(response) {
+				onResultAprooved(response);
 				if (callback !== undefined) {
-					callback(data);
+					callback(response);
 				}
 			}
         });

@@ -68,9 +68,11 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
     newElo, delta = changeRating(session.userID(), blunder_id, success)
 
     return jsonify({
-        'status': 'ok',
-        'elo': newElo,
-        'delta': delta
+        'data':{
+            'elo': newElo,
+            'delta': delta
+            },
+        'status': 'ok'
     })
 
 @app.route('/api/blunder/validate', methods = ['POST'])

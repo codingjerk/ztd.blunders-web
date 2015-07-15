@@ -44,9 +44,9 @@
         return result;
     }
 
-    var onResultAprooved = function(data) {
-        if (data.status !== 'ok') {
-            notify.error(data.message);
+    var onResultAprooved = function(response) {
+        if (response.status !== 'ok') {
+            notify.error(response.message);
             return;
         }
         
@@ -67,10 +67,10 @@
                 spentTime: counter.total(),
                 type: 'explore'
             },
-            onDone: function(data) {
-                onResultAprooved(data);
+            onDone: function(response) {
+                onResultAprooved(response);
                 if (callback !== undefined) {
-                    callback(data);
+                    callback(response);
                 }
             }
         });
