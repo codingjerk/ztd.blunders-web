@@ -32,19 +32,19 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
 3. Installing PostgreSQL server.
     We can use special repository from PostgreSQL maintainers. Current available version is 9.4.  
     Source: http://www.postgresql.org/download/linux/redhat/#  
-    ```bash
+    ```
     $ yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-1.noarch.rpm
     ```  
-    ```bash
+    ```
     $ sudo yum install postgresql94.x86_64postgresql94-server.x86_64postgresql94-devel.x86_64  
     ```  
-    ```bash
+    ```
     $ /usr/pgsql-9.4/bin/postgresql94-setup initdb  
     ```  
-    ```bash
+    ```
     $ systemctl enable postgresql-9.4.service Edit config file to allow local login.
     ```  
-    ```bash  
+    ```  
     $ vi /var/lib/pgsql/9.4/data/pg_hba.conf
     ```
 
@@ -54,11 +54,11 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     host all all 127.0.0.1/32 trust```
 
     Start the service:
-    ```bash$ systemctl start postgresql-9.4.service```  
+    ```$ systemctl start postgresql-9.4.service```  
     By default, database user postgres is activated. We will use it. At first, create empty database chessdb
-    ```bash$ createdb -U postgres chessdb```  
+    ```$ createdb -U postgres chessdb```  
     Second, we will load scheme to use in our project. It is just a dump stored in our repository.
-    ```bash$ psql -U postgres chessdb < misc/postgresql_scheme.sql```  
+    ```$ psql -U postgres chessdb < misc/postgresql_scheme.sql```  
 
 4. Installing MongoDB server.   
     Once more, we will use custom repository with more recent version of software. At standard repository there is version 2.6.9, but we will install version 3.0.4  
@@ -72,7 +72,7 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     enabled=1```
 
     Now install it:
-    ```bash
+    ```
     $ sudo yum install mongodb-org.x86_64
     $ sudo systemctl start mongod
     $ sudo chkconfig mongod on```
@@ -80,35 +80,35 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
 5. Create secret key to enable sessions  
     Source: http://flask.pocoo.org/docs/0.10/quickstart/  
     We created special script to generate this key. Go to repository root directory and run
-        ```bash$ misc/generateSecretKey.py```  
+    ```$ misc/generateSecretKey.py```  
     You should see secret.key file created in the repository. Don't replace this key during server work as it can corrupt your user's sessions.
 
 6. Installing dependencies for flask project.  
-    ```bash$ sudo pip install Flask```  
+    ```$ sudo pip install Flask```  
 
 7. Install Python driver for MongoDB  
-    ```bash$ sudo pip install pymongo```  
+    ```$ sudo pip install pymongo```  
 
 8. We need to install Python driver for PostgreSQL.  
-    ```bash$ sudo yum install gcc python34u-devel libpqxx libpqxx-devel```  
+    ```$ sudo yum install gcc python34u-devel libpqxx libpqxx-devel```  
     Do following as root: 
-    ```bash$ export PATH=$PATH:/usr/pgsql-9.4/bin```  
-    ```bash$ pip3.4 install psycopg2```  
+    ```$ export PATH=$PATH:/usr/pgsql-9.4/bin```  
+    ```$ pip3.4 install psycopg2```  
 
 9. Install Python BCrypt library  
-    ```bash$ sudo yum install libffi-devel $ sudo pip3.4 install bcrypt```  
+    ```$ sudo yum install libffi-devel $ sudo pip3.4 install bcrypt```  
 
 10. Install python-chess library  
-    ```bash$ sudo pip3.4 install python-chess```  
+    ```$ sudo pip3.4 install python-chess```  
 
 11. Load games and blunders collections  
     We assume you have two specially prepared collections on MongoDB. We are not include them into this repository now, but will probably do this in the future.
-    ```bash$ mongoimport --drop -d chessdb -c games ./games-ready.mongo```  
-    ```bash$ mongoimport --drop -d chessdb -c filtered_blunders ./filtered_blunders-ready.mongo```  
+    ```$ mongoimport --drop -d chessdb -c games ./games-ready.mongo```  
+    ```$ mongoimport --drop -d chessdb -c filtered_blunders ./filtered_blunders-ready.mongo```  
     Now you have all the data to run the service.
 
 12. You can run server from repository's root directory  
-    ```bash$ sudo python3.4 ./run.py```  
+    ```$ sudo python3.4 ./run.py```  
     If you want systemd script, we prepared one for you
-    ```bash$ sudo cp misc/blunders.service /usr/lib/systemd/system/```  
+    ```$ sudo cp misc/blunders.service /usr/lib/systemd/system/```  
     Your repository location can be in different location than ours so you can edit this file to set it up.
