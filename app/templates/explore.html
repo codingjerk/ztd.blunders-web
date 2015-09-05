@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block section %}
+	<span id='main-block'>
+		<div id="blunderControls">
+			<table>
+				<tr>
+					<td id='blunderControls'>
+						<a id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Random blunder</a>
+					</td>
+					<td id="loading-spin">
+					</td>
+					<td id='ratingControls'>
+						<a id="dislikeButton"><i class="fa fa-thumbs-down"></i> <span id="dislikes">0</span></a>
+						<a id="likeButton"><i class="fa fa-thumbs-up"></i> <span id="likes">0</span></a>
+						<a id="favoriteButton"><i id="favorite-icon" class="fa fa-star-o"></i> <span id="favorites">0</span></a>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="board" style="width: 400px"></div>
+
+		<div id="boardControls">
+			<table>
+				<tr>
+					<td id="status">
+					</td>
+					<td id="controlButtons">
+						<a id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
+						<a id="previousMove" class="control"><i class="fa fa-backward"></i></a>
+						<a id="nextMove" class="control"><i class="fa fa-forward"></i></a>
+						<a id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
+						<span class="spacer"></span>
+						<a id="flip" class="control"><i class="fa fa-retweet"></i></a>
+						<a id="getFen" class="control"><i class="fa fa-file-text"></i></a>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div id="moves">
+		</div>
+
+		<div id="rightMoves">
+		</div>
+	</span>
+	<span id='info-block'>
+	</span>
+{% endblock %}
+
+{% block script %}
+	<script src="/static/third-party/chessboardjs/js/chessboard.js"></script>
+	<script src="/static/third-party/chessboardjs/js/chess.js"></script>
+    <script src="/static/js/grid.js"></script>
+
+    <script src="/static/third-party/js-url/url.min.js"></script>
+    
+	<script src='/static/js/explore.js'></script>
+{% endblock %}
+
+{% block style %}
+	<link rel="stylesheet" href="/static/third-party/chessboardjs/css/chessboard.css">
+    <link rel="stylesheet" href="/static/css/grid.css">
+	<link rel="stylesheet" href="/static/css/explore.css">
+{% endblock %}

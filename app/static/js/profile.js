@@ -45,7 +45,7 @@
 
     $.ajax({
         type: 'POST',
-        url: "/getUserProfile",
+        url: "/api/user/profile",
         contentType: 'application/json',
         data: JSON.stringify({
             username: $.url('?user')
@@ -84,7 +84,7 @@ function sortByDate(data, options) {
 }
 
 function pieceTheme(piece) {
-    return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
+    return '/static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
 }
 
 (function setupBlunderHistoryPager() {
@@ -97,7 +97,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getBlundersHistory",
+            url: "/api/user/passed-blunders",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -120,7 +120,7 @@ function pieceTheme(piece) {
             var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = (item.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
                 var title = 'Date: {0}, Spent time: {1}'.format(item.date_start, utils.timePrettyFormat(item.spent_time));
-                return '<div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div>'.format(style, item.blunder_id, title);
+                return '<a href="/explore/{1}"><div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div></a>'.format(style, item.blunder_id, title);
             });
 
             if (response.data.total === 0) {
@@ -150,7 +150,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getBlundersFavorites",
+            url: "/api/user/favorite-blunders",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -172,7 +172,7 @@ function pieceTheme(piece) {
 
             var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = 'blunder-favorites-board';
-                return '<div class="{0}" id="board-favorite-{1}" style="width: 180px"></div>'.format(style, item.blunder_id);
+                return '<a href="/explore/{1}"><div class="{0}" id="board-favorite-{1}" style="width: 180px"></div></a>'.format(style, item.blunder_id);
             });
 
             if (response.data.total === 0) {
@@ -200,7 +200,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/statistics/getCommentsByUser",
+            url: "/api/user/comments",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),
@@ -223,7 +223,7 @@ function pieceTheme(piece) {
                     var blunder = response.data.blunders[blunder_id];
 
                     var style = 'comments-board';
-                    var boardContent = '<div class="{0}" id="board-comment-{1}" style="width: 180px"></div>'.format(style, blunder_id);
+                    var boardContent = '<a href="/explore/{1}"><div class="{0}" id="board-comment-{1}" style="width: 180px"></div></a>'.format(style, blunder_id);
                     
                     var commentContent = blunder.comments.map(commentMaker).join('');
 

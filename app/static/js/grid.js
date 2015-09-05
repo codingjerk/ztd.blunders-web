@@ -131,7 +131,7 @@ var grid = {};
     module.setupSpoiler = function(id, state) {
         var head = $('#{0}>tbody>tr:first-child>td'.format(id));
         var newContent = '<i id="{0}-spoiler-icon" class="fa fa-angle-up"></i> {1}'.format(id, head.html());
-        var link = '<a href="#" id="{0}-spoiler-link">{1}</a>'.format(id, newContent);
+        var link = '<a id="{0}-spoiler-link">{1}</a>'.format(id, newContent);
         head.html(link);
 
         module.updateSpoiler(id, state);

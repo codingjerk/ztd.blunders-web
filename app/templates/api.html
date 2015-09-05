@@ -2,7 +2,153 @@
 
 {% block section %}
     <h1>Ztd.Blunders Api Reference</h1>
-    This section is not ready yet.
+    <h2>Blunders</h2>
+
+    <h3>/api/blunder/get</h3>
+    Get random blunder from server database.
+    If user is not logged in, new random blunder is always returned.<br>
+    If user is logged in, return already assigned blunder for user of given type. If none assigned, assign and return new blunder.<br>
+    Two modes are possible according to "type" argument:
+    <ul>
+        <li><b>type:rated</b><br>
+            When user will solve the blunder, it will affect it's rating and be recorded into statistics and history.
+        </li>
+        <li><b>type:explore</b><br>
+            Optional argument <b>id</b> to get blunder with specific identification number.
+            Blunder will not effect user's rating and statistics.
+        </li>
+    </ul>
+
+    Request example:
+    <pre><code class="json">{
+    "type": "rated"           
+}</code></pre>
+
+    Response example:
+    <pre><code class="json">{
+    "data": {
+            "blunderMove": "Bxb6",
+            "elo": 2296,
+            "fenBefore": "2k1r3/pp4pp/1n5b/B1p2P2/2P1p3/PP1r1BP1/4K2P/1R5R w - - 2 22",
+            "forcedLine": ["Re3+", "Kf2", "Rxf3+", "Kg2", "axb6"],
+            "id": "557ae090e13823b818db76b6",
+            "move_index": 42, "pgn_id": "554dcb33e1382385749b7e9e",
+            "pv": ["Re3+", "Kf2", "Rxf3+", "Kg2", "axb6", "Rhf1", "Rc3", "a4", "Bg5", "Rf2", "Kc7", "Re2", "Re5", "g4", "Re8", "Kg1", "Rd3", "Kg2", "Kc6", "Rbb2", "e3", "Kf3", "Rd1", "Ra2", "Rf1+", "Kg2", "Rb1", "Kg3", "Re4", "h4", "Bf6"]
+            }, 
+    "status": "ok"
+}</code></pre>
+
+    <h3>/api/blunder/info</h3>
+    Get information on given blunder.
+    Use <b>blunder_id</b> argument to specify blunder.<br>
+
+    Request example:
+    <pre><code class="json">{
+    "blunder_id":"557ae090e13823b818db76b6"}       
+}</code></pre>
+
+    Response example:
+    <pre><code class="json">{
+    "data": 
+        {
+        "comments": [],
+        "dislikes": 0,
+        "elo": 2296,
+        "favorites": 0,
+        "game-info":{
+            "Black": "Unknown",
+            "BlackElo": "?",
+            "White": "Unknown",
+            "WhiteElo": "?"
+            },
+        "likes": 0,
+        "myFavorite": false,
+        "successTries": 0,
+        "totalTries": 0
+        },
+    "status": "ok"
+}</code></pre>
+
+<h3>/api/blunder/validate</h3>
+    Send user's solution to server. User's rating and statistics can be changed as a result of user's moves.<br>
+    Request example:
+    <pre><code class="json">{
+    "id":"557ae090e13823b818db76b6",
+    "line":["Bxb6","Rd4"],
+    "spentTime":1293,
+    "type":"rated"
+}</code></pre>
+
+    If user is logged in and user's rating affected, we return user's rating change and new Elo.<br>
+    Response example:
+    <pre><code class="json">{
+    "data": {
+        "delta": -15,
+        "elo": 1270
+        },
+    "status": "ok"}
+}</code></pre>
+
+
+<h3>/api/blunder/vote</h3>
+    Vote for a blunder. Valid only for authorized user. <b>vote</b> argument can be +1 for positive vote and -1 for negative.<br>
+    Request example:
+    <pre><code class="json">{
+    "blunder_id":"5580f5afe13823b83b0095e1",
+    "vote":1
+}</code></pre>
+
+    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
+    Response example:
+    <pre><code class="json">{
+    "data": {
+        "comments": [],
+        "dislikes": 0,
+        "elo": 1420,
+        "favorites": 0,
+        "game-info": {
+            "Black": "Unknown",
+            "BlackElo": "?",
+            "White": "Unknown",
+            "WhiteElo": "?"
+            },
+        "likes": 1,
+        "myFavorite": false,
+        "successTries": 0,
+        "totalTries": 1
+        },
+    "status": "ok"
+}</code></pre>
+
+<h3>/api/blunder/favorite</h3>
+    Set blander user's favorite. Valid only for authorized user. If blunder already a favorite, removes it from favorite list.<br>
+    Request example:
+    <pre><code class="json">{
+    "blunder_id":"5580f5afe13823b83b0095e1"
+}</code></pre>
+
+    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
+    Response example:
+    <pre><code class="json">{
+    "data": {
+        "comments": [],
+        "dislikes": 0,
+        "elo": 1420,
+        "favorites": 0,
+        "game-info": {
+            "Black": "Unknown",
+            "BlackElo": "?",
+            "White": "Unknown",
+            "WhiteElo": "?"
+            },
+        "likes": 1,
+        "myFavorite": false,
+        "successTries": 0,
+        "totalTries": 1
+        },
+    "status": "ok"
+}</code></pre>
+
 {% endblock %}
 
 {% block style %}

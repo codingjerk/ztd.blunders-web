@@ -44,12 +44,14 @@
 		return result;
 	}
 
-	var onResultAprooved = function(data) {
-		if (data.status !== 'ok') {
+	var onResultAprooved = function(response) {
+		if (response.status !== 'ok') {
 			updateRating();
-			notify.error(data.message);
+			notify.error(response.message);
 			return;
 		}
+
+		var data = response.data;
 
 		var deltaClass = '';
 		if (data.delta > 0) {
@@ -68,21 +70,25 @@
 	};
 
 	var sendResult = function(callback) {
-		$.ajax({
-			type: 'POST',
-			url: "/validateBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+		history.replaceState({}, null, '/explore/' + blunder.id);
+		grid.updateSpoiler('help-block', false);
+
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/api/blunder/validate',
+            data: {
 				id: blunder.id,
 				line: getPv('user'),
-				spentTime: counter.total()
-			})
-		}).done(function(data) {
-			onResultAprooved(data);
-			if (callback !== undefined) {
-				callback(data);
+				spentTime: counter.total(),
+				type: 'rated'
+			},
+            onDone: function(response) {
+				onResultAprooved(response);
+				if (callback !== undefined) {
+					callback(response);
+				}
 			}
-		});
+        });
 
 		counter.stop();
 	};
@@ -135,6 +141,17 @@
 		}
 	};
 
+	var getMoveByIndex = function(pv, moveIndex) {
+		var game = new Chess(blunder.fenBefore);
+
+		var result = null;
+		for (var i = 0; i < moveIndex; ++i) {
+			result = game.move(pv[i]);
+		}
+
+		return result;
+	};
+
 	var onDrop = function(source, target) {
 		// see if the move is legal
 		var move = makeMove(board, {
@@ -150,18 +167,21 @@
 		var bestMove = getPv(0)[gameLength - 1];
 
 		if (move.san !== bestMove) {
+			setStatus('failed');
 			sendResult();
 
-			setStatus('failed');
 			updatePv(getPv('original'));
+
+			var bestMoveAsObject = getMoveByIndex(getPv('original'), gameLength);
+			highlightAtFailure(bestMoveAsObject, move);
 
 			return;
 		}
 
 		if (gameLength === getPv(0).length) {
+			setStatus('finished');
 			sendResult();
 
-			setStatus('finished');
 			return;
 		}
 
@@ -200,7 +220,7 @@
 			lastMove = game.move(move);
 		}
 
-		hightlightMove(lastMove);
+		highlightMove(lastMove);
 		
 		lockAnimation();
 		board.position(game.fen());
@@ -233,19 +253,26 @@
 			}
 
 			var NAG = '';
-			if (i === 0) NAG = '?';
-			else if (i === 1) NAG = '!';
+			if (i === 0) {
+				NAG = '?';
+			} else if (i === 1) {
+				NAG = '!';
+			}
 
 			if (pv[i] !== getPv('original')[i]) {
 				NAG = "??";
 				style += ' badMove';
 			}
 
+			if (getPv('user').length > i && pv[i] !== getPv('user')[i]) {
+				style += ' goodMove';
+			}
+
 			if (i === 0 && firstMoveTurn === 'b') {
 				text += '...';
 			}
 
-			text += '<a class="{0}" id="{1}" href="#">{2}{3}</a>'.format(style, pv.tag + "_child_" + i, move, NAG);
+			text += '<a class="{0}" id="{1}">{2}{3}</a>'.format(style, pv.tag + "_child_" + i, move, NAG);
 		}
 
 		$('#' + pv.tag).html(text);
@@ -261,11 +288,25 @@
 		}
 	}
 
-	function hightlightMove(move) {
+	function highlightMove(move) {
 		$('.highlight').removeClass('highlight');
+		$('.good-highlight').removeClass('good-highlight');
+		$('.bad-highlight').removeClass('bad-highlight');
 
 		$('#board').find('.square-' + move.from).addClass('highlight');
 		$('#board').find('.square-' + move.to).addClass('highlight');
+	}
+
+	function highlightAtFailure(goodMove, badMove) {
+		$('.highlight').removeClass('highlight');
+		$('.good-highlight').removeClass('good-highlight');
+		$('.bad-highlight').removeClass('bad-highlight');
+
+		$('#board').find('.square-' + goodMove.from).addClass('good-highlight');
+		$('#board').find('.square-' + goodMove.to).addClass('good-highlight');
+
+		$('#board').find('.square-' + badMove.from).addClass('bad-highlight');
+		$('#board').find('.square-' + badMove.to).addClass('bad-highlight');
 	}
 
 	function makeMove(board, move, aiMove) {
@@ -273,7 +314,7 @@
 		if (pmove !== null) {
 			++visitedMoveCounter;
 
-			hightlightMove(pmove);
+			highlightMove(pmove);
 			
 			if (aiMove) {
 				lockAnimation();
@@ -337,7 +378,7 @@
 	function voteBlunderComment(blunder_id, comment_id, vote) {
 		$.ajax({
 			type: 'POST',
-			url: "/voteBlunderComment",
+			url: "/api/comment/vote",
 			contentType: 'application/json',
 			data: JSON.stringify({
 				blunder_id: blunder_id,
@@ -349,8 +390,8 @@
 
 	function commentOnReply(comment_id) {
 		return function() {
-			var buttons = '<a href="#" class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>' + 
-				'<a href="#" class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>';
+			var buttons = '<a class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>' + 
+				'<a class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>';
 
 			var editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
 
@@ -387,13 +428,13 @@
 	}
 
 	function commentBuilder(data, comments) {
-		var header = '<div class="comment-header"><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
+		var header = '<div class="comment-header"><span class="comment-avatar"><img src="/static/img/default-avatar.png" /></span><span class="comment-username">{0}</span> <span class="comment-date">{1}</span></div>';
 		var body = '<div class="comment-body">{2}</div>';
 		var controls = '<div id="comment-controls-' + data.id + '" class="comment-controls">{3} {4}</div><div id="comment-user-input-' + data.id + '"></div>';
 		var subcomments = '<ul class="comment-responses">{5}</ul>';
 
-		var likeButton = '<a href="#" class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
-		var dislikeButton = '<a href="#" class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
+		var likeButton = '<a class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
+		var dislikeButton = '<a class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
 		
 		var votesCount = data.likes - data.dislikes;
 
@@ -410,7 +451,7 @@
 
 		var comment = '<li class="comment">' + header + body + controls + subcomments + '</li>';
 
-		var replyButton = '<a id="comment-reply-button-{0}" href="#"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
+		var replyButton = '<a id="comment-reply-button-{0}"><i class="fa fa-reply fa-rotate-90"></i> Reply</a>'.format(data.id);
 
 		var subcommentsData = buildCommentReplies(comments, data.id);
 
@@ -451,10 +492,10 @@
 			'success-rate': successRate.toFixed(1)
 		});
 
-		var rootComment = '<a id="comment-reply-button-0" href="#"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
+		var rootComment = '<a id="comment-reply-button-0"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
 		var rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
 
-		var htmlData = rootControls + buildCommentReplies(data.comments, 0);
+		var htmlData = rootControls + "<ul>{0}</ul>".format(buildCommentReplies(data.comments, 0));
 		$('#comments').html(htmlData);
 		$('#comments-counter').html(data.comments.length);
 
@@ -473,17 +514,27 @@
 		});
 	}
 
+	window.onpopstate = function(event) {
+		location.reload();
+    };
+
 	function getRatedBlunder() {
-		$.ajax({
-			type: 'POST',
-			url: "/getRatedBlunder"
-		}).done(onBlunderRequest);
+		if ($.url('path') !== '/training') {
+			history.pushState({}, null, '/training');
+		}
+
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/api/blunder/get',
+            data: {type: 'rated'},
+            onDone: onBlunderRequest
+        });
 	}
 
 	function getBlunderInfo(blunder_id) {
 		$.ajax({
 			type: 'POST',
-			url: "/getBlunderInfo",
+			url: "/api/blunder/info",
 			contentType: 'application/json',
 			data: JSON.stringify({
 				blunder_id: blunder_id
@@ -492,32 +543,32 @@
 	}
 
 	function voteBlunder(blunder_id, vote) {
-		$.ajax({
-			type: 'POST',
-			url: "/voteBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+		sync.ajax({
+            id: 'loading-spin',
+            url: '/api/blunder/vote',
+            data: {
 				blunder_id: blunder_id,
 				vote: vote
-			})
-		}).done(onInfoRequest);
+			},
+            onDone: onInfoRequest
+        });
 	}
 
 	function favoriteBlunder(blunder_id) {
-		$.ajax({
-			type: 'POST',
-			url: "/favoriteBlunder",
-			contentType: 'application/json',
-			data: JSON.stringify({
+		sync.ajax({
+            id: 'loading-spin',
+			url: "/api/blunder/favorite",
+			data: {
 				blunder_id: blunder_id
-			})
-		}).done(onInfoRequest);
+			},
+			onDone: onInfoRequest
+		});
 	}
 
 	function sendComment(blunder_id, comment_id, text) {
 		$.ajax({
 			type: 'POST',
-			url: "/commentBlunder",
+			url: "/api/comment/send",
 			contentType: 'application/json',
 			data: JSON.stringify({
 				blunder_id: blunder_id,
@@ -528,7 +579,7 @@
 	}
 
 	function pieceTheme(piece) {
-		return './static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
+		return '/static/third-party/chessboardjs/img/chesspieces/alpha/' + piece + '.png';
 	}
 
 	board = new ChessBoard('board', {
@@ -547,7 +598,7 @@
 	function updateRating() {
 		$.ajax({
 			type: 'GET',
-			url: "/getRating"
+			url: "/api/session/rating"
 		}).done(function(data) {
 			if (data.status !== 'ok') {
 				notify.error(data.message);
@@ -671,6 +722,16 @@
 (function setupRightPanel() {
 	var model = [
         {
+            id: 'help-block',
+            caption: 'Help',
+            rows: [
+                {
+                    type: 'wide',
+                    id: 'help'
+                }
+            ]
+        },
+        {
             id: 'game-block',
             caption: 'Game',
             cells: 2,
@@ -759,7 +820,14 @@
     var content = grid.generate(model);
     $('#info-block').html(content);
 
+    grid.setupSpoiler('help-block', true);
     grid.setupSpoiler('comments-block', false);
     grid.setupSpoiler('blunder-block', true);
     grid.setupSpoiler('game-block', true);
+
+    grid.update({'help': 
+    	'The player has just made a fatal mistake.\n' +
+		'Play the best moves to obtain advantage.\n' +
+		"There's only one winning variation wins at least 2 pawns."
+	});
 })();

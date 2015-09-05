@@ -15,6 +15,10 @@ a:hover {
     color: #4fabf4;
 }
 
+ul {
+    list-style-type: none;
+}
+
 img {
     margin-bottom: 20px;
 }

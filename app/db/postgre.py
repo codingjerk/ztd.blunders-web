@@ -671,7 +671,7 @@ def getUserProfile(username):
         }
     }
 
-def getBlundersStatistics(username):
+def getBlundersStatistic(username):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.id,
@@ -717,7 +717,7 @@ def getRatingByDate(username):
         'status': 'ok',
         'username': username,
         'data' : {
-            'rating-statistics': rating
+            'rating-statistic': rating
         }
     }
 
@@ -745,7 +745,7 @@ def getBlundersByDate(username):
         'status': 'ok',
         'username': username,
         'data': {
-            'blunder-count-statistics': {
+            'blunder-count-statistic': {
                 'total' : total,
                 'solved': solved,
                 'failed': failed
@@ -904,7 +904,7 @@ def lastUserActivity(username, format):
 
         return last_activity
 
-def lastActiveUsers(interval):
+def getActiveUsers(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.username,
@@ -939,7 +939,7 @@ def getUsersTop(number):
 
     return top
 
-def getUsersStatistics():
+def getUsersCount():
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
                 SELECT COUNT(id)
@@ -947,17 +947,14 @@ def getUsersStatistics():
             )
         (users_registered_value, ) = connection.cursor.fetchone()
 
-    users_day = lastActiveUsers('1 HOUR')
-    users_week = lastActiveUsers('1 WEEK')
-    users_top = getUsersTop(10)
+    users_day = getActiveUsers('1 HOUR')
+    users_week = getActiveUsers('1 WEEK')
 
     return {
         'status': 'ok',
         'data': {
             "users-registered-value": users_registered_value,
             "users-online-value": len(users_day),
-            "users-online-list" : users_day,
-            "users-top-list": users_top,
             "users-active-value": len(users_week)
         }
     }
@@ -974,12 +971,12 @@ def getUsersByRating(interval):
 
         data = connection.cursor.fetchall()
 
-        destribution = [[elo_category, count] for (elo_category, count) in data]
+        distribution = [[elo_category, count] for (elo_category, count) in data]
 
     return {
         'status': 'ok',
         'data': {
-            'users-rating-destribution': destribution
+            'users-rating-distribution': distribution
         }
     }
 
@@ -1026,11 +1023,11 @@ def getBlandersByRating(interval):
 
         data = connection.cursor.fetchall()
 
-        destribution = [[elo_category, count] for (elo_category, count) in data]
+        distribution = [[elo_category, count] for (elo_category, count) in data]
 
     return {
         'status': 'ok',
         'data': {
-            'blunders-rating-destribution' : destribution
+            'blunders-rating-distribution' : distribution
         }
     }

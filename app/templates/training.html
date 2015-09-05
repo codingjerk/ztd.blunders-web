@@ -2,24 +2,18 @@
 
 {% block section %}
 	<span id='main-block'>
-		<div id="help">
-			<p>
-				The player has just made a fatal mistake.
-				Play the best moves to obtain advantage.
-				There's only one winning variation wins at least 2 pawns.
-			</p>
-		</div>
-
 		<div id="blunderControls">
 			<table>
 				<tr>
 					<td id='blunderControls'>
-						<a href="#" id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Give up</a>
+						<a id="nextBlunder" class="blunderControl"><i class="fa fa-exclamation-circle"></i> Give up</a>
+					</td>
+					<td id="loading-spin">
 					</td>
 					<td id='ratingControls'>
-						<a href="#" id="dislikeButton"><i class="fa fa-thumbs-down"></i> <span id="dislikes">0</span></a>
-						<a href="#" id="likeButton"><i class="fa fa-thumbs-up"></i> <span id="likes">0</span></a>
-						<a href="#" id="favoriteButton"><i id="favorite-icon" class="fa fa-star-o"></i> <span id="favorites">0</span></a>
+						<a id="dislikeButton"><i class="fa fa-thumbs-down"></i> <span id="dislikes">0</span></a>
+						<a id="likeButton"><i class="fa fa-thumbs-up"></i> <span id="likes">0</span></a>
+						<a id="favoriteButton"><i id="favorite-icon" class="fa fa-star-o"></i> <span id="favorites">0</span></a>
 					</td>
 				</tr>
 			</table>
@@ -33,13 +27,13 @@
 					<td id="status">
 					</td>
 					<td id="controlButtons">
-						<a href="#" id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
-						<a href="#" id="previousMove" class="control"><i class="fa fa-backward"></i></a>
-						<a href="#" id="nextMove" class="control"><i class="fa fa-forward"></i></a>
-						<a href="#" id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
+						<a id="firstMove" class="control"><i class="fa fa-fast-backward"></i></a>
+						<a id="previousMove" class="control"><i class="fa fa-backward"></i></a>
+						<a id="nextMove" class="control"><i class="fa fa-forward"></i></a>
+						<a id="lastMove" class="control"><i class="fa fa-fast-forward"></i></a>
 						<span class="spacer"></span>
-						<a href="#" id="flip" class="control"><i class="fa fa-retweet"></i></a>
-						<a href="#" id="getFen" class="control"><i class="fa fa-file-text"></i></a>
+						<a id="flip" class="control"><i class="fa fa-retweet"></i></a>
+						<a id="getFen" class="control"><i class="fa fa-file-text"></i></a>
 					</td>
 				</tr>
 			</table>
@@ -52,24 +46,21 @@
 		</div>
 	</span>
 	<span id='info-block'>
-		<div id="game-info-container"><span class="bold">Game:</span> <span id='source-game-info'></span></div>
-		<div id="blunder-rating-container"><span class="bold">Rating:</span> <span id='blunder-rating'>0</span></div>
-		<div id="blunder-success-rate-container"><span class="bold">Success rate:</span> <span id='success-played'>0</span>/<span id='total-played'>0</span> (<span id='success-rate'>0</span>%)</div>
-		<div id="spent-time-container"><span class="bold">Spent time:</span> <span id='spent-time-value'>0:00</span></div>
-		<a id='comments-spoiler' href="#" class='bold'><span id='comments-label'>Comments (<span id='comments-counter'>0</span>)</span> <i id='comments-icon' class="fa fa-angle-down"></i></a><br/>
-		<ul id="comments"></ul>
 	</span>
 {% endblock %}
 
 {% block script %}
-	<script src="static/third-party/chessboardjs/js/chessboard.js"></script>
-	<script src="static/third-party/chessboardjs/js/chess.js"></script>
-    <script src="static/js/grid.js"></script>
-	<script src='static/js/training.js'></script>
+	<script src="/static/third-party/chessboardjs/js/chessboard.js"></script>
+	<script src="/static/third-party/chessboardjs/js/chess.js"></script>
+    <script src="/static/js/grid.js"></script>
+
+    <script src="/static/third-party/js-url/url.min.js"></script>
+    
+	<script src='/static/js/training.js'></script>
 {% endblock %}
 
 {% block style %}
-	<link rel="stylesheet" href="static/third-party/chessboardjs/css/chessboard.css">
-    <link rel="stylesheet" href="static/css/grid.css">
-	<link rel="stylesheet" href="static/css/training.css">
+	<link rel="stylesheet" href="/static/third-party/chessboardjs/css/chessboard.css">
+    <link rel="stylesheet" href="/static/css/grid.css">
+	<link rel="stylesheet" href="/static/css/training.css">
 {% endblock %}

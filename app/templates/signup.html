@@ -3,23 +3,23 @@
 {% block section %}
 	<div id="form">
 	
-		<div id="avatar-wrapper"><img id="avatar" src="static/img/default-avatar.png"/></div>
+		<div id="avatar-wrapper"><img id="avatar" src="/static/img/default-avatar.png"/></div>
 
 	    <form action="#" method="POST">
 		    <input type="text" placeholder="Pick a username" id="username" name="username">
 		    <input type="password" placeholder="Create a password" id="password" name="password">
 		    <input type="text" placeholder="Enter your email (optional)" id="email" name="email">
 
-			<a id="submit" href="#">Sign Up!</a>
+			<a id="submit">Sign Up!</a>
 	    </form>
     </div>
 {% endblock %}
 
 {% block script %}
-    <script src='static/js/signup.js'></script>
+    <script src='/static/js/signup.js'></script>
 {% endblock %}
 
 {% block style %}
-	<link rel="stylesheet" href="static/css/signup.css">
+	<link rel="stylesheet" href="/static/css/signup.css">
 {% endblock %}
 

@@ -1,3 +1,12 @@
 [submodule "app/static/third-party/chessboardjs"]
 	path = app/static/third-party/chessboardjs
 	url = https://github.com/oakmac/chessboardjs.git
+[submodule "app/static/third-party/js-url"]
+	path = app/static/third-party/js-url
+	url = https://github.com/websanova/js-url.git
+[submodule "app/static/third-party/simplePagination"]
+	path = app/static/third-party/simplePagination
+	url = https://github.com/flaviusmatis/simplePagination.js.git
+[submodule "app/static/third-party/notifyjs"]
+	path = app/static/third-party/notifyjs
+	url = https://github.com/jpillora/notifyjs.git
