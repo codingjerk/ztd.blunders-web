@@ -2,7 +2,7 @@ from flask import jsonify, request
 
 from app import app
 from app.db import mongo, postgre
-from app.utils import session
+from app.utils import session, crossdomain
 
 def gameShortInfo(data):
     whitePlayer = 'Unknown'
@@ -65,7 +65,8 @@ def getBlunderInfoById(blunder_id):
         }
     })
 
-@app.route('/api/blunder/info', methods=['POST'])
+@app.route('/api/blunder/info', methods=['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
 def getBlunderInfo():
     try:
         blunder_id = request.json['blunder_id']
