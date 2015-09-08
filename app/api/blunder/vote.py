@@ -2,11 +2,12 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session
+from app.utils import session, crossdomain
 
 from app.api.blunder.info import getBlunderInfoById
 
 @app.route('/api/blunder/vote', methods = ['POST'])
+@crossdomain.crossdomain()
 def voteBlunder():
     if session.isAnonymous():
         return jsonify({

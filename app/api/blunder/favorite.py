@@ -2,11 +2,12 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session
+from app.utils import session, crossdomain
 
 from app.api.blunder.info import getBlunderInfoById
 
-@app.route('/api/blunder/favorite', methods = ['POST'])
+@app.route('/api/blunder/favorite', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
 def favoriteBlunder():
     if session.isAnonymous():
         return jsonify({
@@ -29,3 +30,4 @@ def favoriteBlunder():
         })
 
     return getBlunderInfoById(blunder_id)
+

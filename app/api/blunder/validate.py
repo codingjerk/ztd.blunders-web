@@ -4,7 +4,7 @@ from app import app
 from app.db import postgre
 from app.utils import session, tasks
 
-from app.utils import elo
+from app.utils import elo, crossdomain
 
 def compareLines(blunder_id, userLine):
     data = postgre.getBlunderById(blunder_id)
@@ -76,6 +76,7 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
     })
 
 @app.route('/api/blunder/validate', methods = ['POST'])
+@crossdomain.crossdomain()
 def validateBlunder():
     try:
         blunder_id = request.json['id']
