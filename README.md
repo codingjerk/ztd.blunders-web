@@ -1,5 +1,8 @@
 # Readme
 
+## Build status (with [Codeship](httpы://codeship.com))
+[ ![Codeship Status for ziltoidteam/Ztd.Blunders Web](https://codeship.com/projects/b49b6390-f8e9-0132-c0a7-1e4cf25a7aa5/status?branch=master)](https://codeship.com/projects/86737)
+
 ## Try it online
 Ztd.Blunders available on [blunders.ztd.io](http://blunders.ztd.io) and this is our main server. 
 
