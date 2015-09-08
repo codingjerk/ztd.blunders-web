@@ -51,18 +51,21 @@
 			return;
 		}
 
-		var data = response.data;
+		if (response.data) { // Not anonymous
+			var data = response.data;
 
-		var deltaClass = '';
-		if (data.delta > 0) {
-			deltaClass = 'green';
-			data.delta = '+{0}'.format(data.delta);
-		} else if (data.delta < 0) {
-			deltaClass = 'red';
+			var deltaClass = '';
+			if (data.delta > 0) {
+				deltaClass = 'green';
+				data.delta = '+{0}'.format(data.delta);
+			} else if (data.delta < 0) {
+				deltaClass = 'red';
+			}
+
+			$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
 		}
 
-		$('#rating').html('({0}&nbsp<span class={1}>{2}</span>)'.format(data.elo, deltaClass, data.delta));
-		
+
 		if (finished) {
 			getBlunderInfo(blunder.id);
 			showComments();
