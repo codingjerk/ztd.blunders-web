@@ -3,7 +3,7 @@ from flask import jsonify
 from app import app
 from app.utils import session, crossdomain
 
-@app.route('/api/session/logout', methods = ['POST'])
+@app.route('/api/session/logout', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def logout():
     session.deauthorize()

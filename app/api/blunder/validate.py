@@ -75,7 +75,7 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
         'status': 'ok'
     })
 
-@app.route('/api/blunder/validate', methods = ['POST'])
+@app.route('/api/blunder/validate', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def validateBlunder():
     try:

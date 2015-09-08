@@ -6,7 +6,7 @@ from app.utils import session, crossdomain
 
 from app.api.blunder.info import getBlunderInfoById
 
-@app.route('/api/blunder/vote', methods = ['POST'])
+@app.route('/api/blunder/vote', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def voteBlunder():
     if session.isAnonymous():
