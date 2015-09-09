@@ -4,6 +4,7 @@ from datetime import timedelta
 from flask import make_response, current_app
 from functools import update_wrapper
 
+#pylint: disable=too-many-arguments
 def crossdomainex(origin=None, methods=None, headers=None,
                 max_age=21600, attach_to_all=True,
                 automatic_options=True):
@@ -14,7 +15,7 @@ def crossdomainex(origin=None, methods=None, headers=None,
     if not isinstance(origin, str):
         origin = ', '.join(origin)
     if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
+        max_age = max_age.total_seconds() #pylint: disable=no-member
 
     def get_methods():
         if methods is not None:
@@ -46,5 +47,5 @@ def crossdomainex(origin=None, methods=None, headers=None,
     return decorator
 
 def crossdomain():
-    return crossdomainex(origin='*', headers=['origin', 'content-type', 'accept'])
+    return crossdomainex(origin='*', headers=['origin', 'content-type', 'accept', 'cookie', 'set-cookie'])
 

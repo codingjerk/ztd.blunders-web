@@ -9,3 +9,4 @@ def login_post():
     result = session.authorize(request.json['username'], request.json['password'])
 
     return jsonify(result)
+
