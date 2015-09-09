@@ -47,5 +47,8 @@ def crossdomainex(origin=None, methods=None, headers=None,
     return decorator
 
 def crossdomain():
-    return crossdomainex(origin='*', headers=['origin', 'content-type', 'accept', 'cookie', 'set-cookie'])
+    return crossdomainex(
+        origin='*',
+        headers=['origin', 'content-type', 'accept', 'cookie', 'set-cookie']
+    )
 

@@ -1,6 +1,6 @@
 from flask import jsonify, request
 
-from app import app, db
+from app import app
 from app.db import postgre
 
 @app.route('/api/user/blunders-count', methods=['POST'])
