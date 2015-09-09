@@ -1,9 +1,5 @@
 from flask import request, jsonify
 
-from datetime import timedelta
-from flask import make_response, current_app
-from functools import update_wrapper
-
 from app import app
 from app.db import postgre
 from app import utils

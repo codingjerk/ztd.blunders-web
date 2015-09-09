@@ -10,7 +10,8 @@ def userBlundersCount():
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Username required'    
+            'message': 'Username required'
         })
 
     return jsonify(postgre.getBlundersStatistic(username))
+
