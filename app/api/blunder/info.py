@@ -65,7 +65,7 @@ def getBlunderInfoById(blunder_id):
         }
     })
 
-@app.route('/api/blunder/info', methods=['POST', 'OPTIONS'])
+@app.route('/api/blunder/info', methods=['POST'])
 @crossdomain.crossdomain()
 def getBlunderInfo():
     try:
@@ -77,3 +77,9 @@ def getBlunderInfo():
         })
 
     return getBlunderInfoById(blunder_id)
+
+@app.route('/api/mobile/blunder/info', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getBlunderInfoMobile():
+    return getBlunderInfo()

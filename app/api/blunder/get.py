@@ -36,8 +36,7 @@ def getExploreBlunder():
     data = utils.jsonifyBlunder(blunder)
     return jsonify(data)
 
-@app.route('/api/blunder/get', methods = ['POST', 'OPTIONS'])
-@crossdomain.crossdomain()
+@app.route('/api/blunder/get', methods = ['POST'])
 def getBlunder():
     try:
         type = request.json['type']
@@ -57,3 +56,8 @@ def getBlunder():
             'message': 'Blunder type must be rated or explore'
         })
 
+@app.route('/api/mobile/blunder/get', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getBlunderMobile():
+    return getBlunder()

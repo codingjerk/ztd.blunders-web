@@ -6,8 +6,7 @@ from app.utils import session, crossdomain
 
 from app.api.blunder.info import getBlunderInfoById
 
-@app.route('/api/blunder/vote', methods = ['POST', 'OPTIONS'])
-@crossdomain.crossdomain()
+@app.route('/api/blunder/vote', methods = ['POST'])
 def voteBlunder():
     if session.isAnonymous():
         return jsonify({
@@ -31,3 +30,9 @@ def voteBlunder():
         })
 
     return getBlunderInfoById(blunder_id)
+
+@app.route('/api/mobile/blunder/vote', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def voteBlunderMobile():
+    return voteBlunder()

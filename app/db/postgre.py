@@ -1,5 +1,7 @@
 import psycopg2
 
+from uuid import uuid4
+
 from app.utils import roles
 from app.utils import cache
 from datetime import timedelta
@@ -53,6 +55,48 @@ def autentithicateUser(username, hash):
 
     return success
 
+def getUserIdByToken(token):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT user_id from api_tokens WHERE token = %s;'
+            , (token,)
+        )
+
+        return connection.cursor.fetchone()[0]
+
+def getTokenForUser(username):
+    user_id = getUserId(username)
+    if user_id is None:
+        raise Exception('Getting token for anonymous')
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            'SELECT token from api_tokens WHERE user_id = %s;'
+            , (user_id,)
+        )
+
+        token = connection.cursor.fetchone()[0]
+
+    if token: return token
+
+    token = uuid4().hex
+
+    with PostgreConnection('w') as connection:
+        connection.cursor.execute("""
+            INSERT INTO api_tokens (user_id, token)
+            VALUES (
+                %s,
+                %s
+            );
+            """, (user_id, token)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to save token')
+
+    return token
+
+
 def getUserField(user_id, field):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
@@ -104,7 +148,7 @@ def getUsernameById(user_id):
         return result[0]
 
 def getRandomBlunder():
-    with PostgreConnection('w') as connection:
+    with PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT * FROM GET_RANDOM_BLUNDER();
             """

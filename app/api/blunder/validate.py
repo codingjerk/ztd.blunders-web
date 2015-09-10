@@ -75,8 +75,7 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
         'status': 'ok'
     })
 
-@app.route('/api/blunder/validate', methods = ['POST', 'OPTIONS'])
-@crossdomain.crossdomain()
+@app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
     try:
         blunder_id = request.json['id']
@@ -98,3 +97,9 @@ def validateBlunder():
             'status': 'error',
             'message': 'Blunder type must be rated or explore'
         })
+
+@app.route('/api/mobile/blunder/validate', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def validateBlunderMobile():
+    return validateBlunder()
