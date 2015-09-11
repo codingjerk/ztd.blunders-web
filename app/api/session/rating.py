@@ -2,7 +2,7 @@ import flask
 
 from app import app
 from app.db import postgre
-from app.utils import session
+from app.utils import session, crossdomain
 
 @app.route('/api/session/rating')
 def getRating():
@@ -10,3 +10,9 @@ def getRating():
         'status': 'ok',
         'rating': postgre.getRating(session.userID())
     })
+
+@app.route('/api/mobile/session/rating', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getRatingMobile():
+    return getRating()
