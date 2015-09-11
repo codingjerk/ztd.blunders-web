@@ -419,6 +419,23 @@ def isFavorite(user_id, blunder_id):
             return True
         return False
 
+def getUserVote(user_id, blunder_id):
+    if user_id is None:
+        return False
+
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """SELECT vote from blunder_votes
+               WHERE blunder_id = %s
+                 AND user_id = %s;"""
+            , (blunder_id, user_id)
+        )
+
+        if connection.cursor.rowcount == 1:
+            return connection.cursor.fetchone()[0]
+
+    return 0
+
 def getBlunderPopularity(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute(
