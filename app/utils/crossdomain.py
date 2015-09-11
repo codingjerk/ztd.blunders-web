@@ -49,6 +49,6 @@ def crossdomainex(origin=None, methods=None, headers=None,
 def crossdomain():
     return crossdomainex(
         origin='*',
-        headers=['origin', 'content-type', 'accept', 'cookie', 'set-cookie']
+        headers=['origin', 'content-type', 'accept', 'cookie', 'set-cookie', 'x-requested-with']
     )
 
