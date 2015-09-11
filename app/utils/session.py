@@ -5,12 +5,16 @@ from app.utils import hash
 
 from functools import update_wrapper
 
+#pylint: disable=too-few-public-methods
 class State:
     token = None
     username = None
     userID = None
 
-    def authorize(token):
+    def __init__(self):
+        raise Exception("State is static class, can't call State.__init__")
+
+    def authorize(token): #pylint: disable=no-self-argument
         State.token = token
         State.userID = postgre.getUserIdByToken(token)
         State.username = postgre.getUsernameById(State.userID)
@@ -40,6 +44,7 @@ def tokenize():
 
     return decorator
 
+#pylint: disable=redefined-outer-name
 def authorizeWithToken(username, password):
     try:
         if postgre.autentithicateUser(username, hash.get(username, password)):
@@ -63,7 +68,8 @@ def authorizeWithToken(username, password):
     }
 
 def isAnonymous():
-    if State.token: return False
+    if State.token:
+        return False
 
     return 'user_id' not in session
 
@@ -71,7 +77,8 @@ def isAuthorized():
     return not isAnonymous()
 
 def username():
-    if State.token: return State.username
+    if State.token:
+        return State.username
 
     if isAnonymous():
         return None
@@ -79,7 +86,8 @@ def username():
     return session['username']
 
 def userID():
-    if State.token: return State.userID
+    if State.token:
+        return State.userID
 
     if isAnonymous():
         return None
