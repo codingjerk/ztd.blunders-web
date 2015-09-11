@@ -6,7 +6,7 @@ from app.utils import session, crossdomain
 @app.route('/api/session/login', methods=['POST'])
 def login_post():
     try:
-        username = request.json['username'] 
+        username = request.json['username']
         password = request.json['password']
     except Exception:
         return jsonify({
@@ -22,7 +22,7 @@ def login_post():
 @crossdomain.crossdomain()
 def login_post_mobile():
     try:
-        username = request.json['username'] 
+        username = request.json['username']
         password = request.json['password']
     except Exception:
         return jsonify({
@@ -33,3 +33,4 @@ def login_post_mobile():
     result = session.authorizeWithToken(username, password)
 
     return jsonify(result)
+

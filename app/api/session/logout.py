@@ -1,7 +1,7 @@
 from flask import jsonify
 
 from app import app
-from app.utils import session, crossdomain
+from app.utils import session
 
 @app.route('/api/session/logout', methods = ['POST'])
 def logout():
@@ -9,3 +9,4 @@ def logout():
     return jsonify({
         'status': 'ok'
     })
+

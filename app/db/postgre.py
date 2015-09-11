@@ -77,7 +77,8 @@ def getTokenForUser(username):
 
         token = connection.cursor.fetchone()
 
-    if token: return token[0]
+    if token:
+        return token[0]
 
     token = uuid4().hex
 
