@@ -24,7 +24,13 @@ def signup_post():
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def signup_post_mobile():
-    username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
+    try:
+        username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
+    except:
+        return jsonify({
+            'status': 'error',
+            'message': 'Username, password and email is required'
+        })
 
     validateResult = utils.validateUser(username, password, email)
     if validateResult is not None:
