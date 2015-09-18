@@ -26,7 +26,7 @@ def signup_post():
 def signup_post_mobile():
     try:
         username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
-    except:
+    except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Username, password and email is required'
