@@ -19,6 +19,11 @@ class State:
         State.userID = postgre.getUserIdByToken(token)
         State.username = postgre.getUsernameById(State.userID)
 
+    def clean():
+        State.token = None
+        State.userID = None
+        State.username = None
+
 def tokenize():
     def decorator(f):
         def wrapped():
@@ -38,7 +43,11 @@ def tokenize():
                     'message': 'Invalid API token'
                 })
 
-            return f()
+            result = f()
+
+            State.clean()
+
+            return result
 
         return update_wrapper(wrapped, f)
 
