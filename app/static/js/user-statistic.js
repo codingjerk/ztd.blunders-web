@@ -182,8 +182,7 @@
             },
             axes: {
                 xaxis: {
-                    renderer: $.jqplot.DateAxisRenderer,
-                    tickInterval: 'day'
+                    renderer: $.jqplot.DateAxisRenderer
                 },
                 yaxis: {
                     padMin: 0,
