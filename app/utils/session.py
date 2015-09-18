@@ -19,6 +19,7 @@ class State:
         State.userID = postgre.getUserIdByToken(token)
         State.username = postgre.getUsernameById(State.userID)
 
+    #pylint: disable=no-method-argument
     def clean():
         State.token = None
         State.userID = None
