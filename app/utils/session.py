@@ -37,13 +37,13 @@ def tokenize():
 
             try:
                 State.authorize(token)
+
+                result = f()
             except Exception:
                 return jsonify({
                     'status': 'error',
                     'message': 'Invalid API token'
                 })
-
-            result = f()
 
             State.clean()
 
