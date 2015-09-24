@@ -22,6 +22,14 @@ def termsOfUse():
         session = session
     )
 
+@app.route('/privacy')
+def privacy():
+    return render_template(
+        'privacy.html',
+        title = 'Privacy Policy',
+        session = session
+    )
+
 @app.route('/download')
 def download():
     return render_template('download.html', title = 'Download', session = session)
