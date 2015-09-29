@@ -5,6 +5,11 @@ html, body, div {
     font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
+#android-button {
+    text-align: center;
+    margin-top: 30px;
+}
+
 a {
     text-decoration: none;
     color: #0f6bb4;
