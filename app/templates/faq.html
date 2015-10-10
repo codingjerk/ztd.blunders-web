@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block section %}
+          <h2>Frequently Asked Questions</h2> 
+          <h3>Where did you get a huge database of 1.7M+ chess problems?</h3>
+          All positions were calculated from the scratch by special algorithms we developed.
+          Those algorithms written at most on Python and use chess games available freely on the net to find
+          positions we think are interested enough for man to solve.
+
+          <h3>Can I get this database?</h3>
+          By now, not. We will update you about that. All our service uses centralized server to get blunders from
+          and we are working on unified API to communicate with server. We will publish this API when it will be stable.
+          
+          <h3>Can you describe this algorithm in words?</h3>
+          When player makes a mistake in the even game which costs him at least 2 pawns or equivalent material,
+          we move this position to special database. After that, another algorithm checks if this position is beautiful
+          enough to solve. We don't rely on some static rules like mate in N or sacrifices, but instead of this use 
+          <a href="https://stockfishchess.org">Stockfish</a> score as only criteria. We calculate principal variation a player must find, when all his moves 
+          are completely forced. When forced moves ends, we cut the variation.
+
+          <h3>Sometimes I dissagree with given solution. Can you explain this?</h3>
+          If you feel like that, check your solution with modern engine. At most cases you will understand your mistake.
+          In a very rare cases, algorithm indeed gives not optimal solution. The reason for that is the time limit, algorithm 
+          have for each positions to analyze. This time is long enough for most cases, but for some positions
+          it is not true. Those positions are usually with rating 2000 or above. You can read about 
+          <a href="https://chessprogramming.wikispaces.com/Horizon+Effect">Horizon effect</a> to understand this phenomenon.<br> 
+          In the future, as service will grow, we will recalculate those postions to get more accurate lines.
+         
+          <h3>What are the rating?</h3>
+          When new player signs up, he receives an Elo rating of 1500. Chess problems also have a rating calculated by
+          special algorithm. Easy positions are rated 1200, extremelly hard are about 3000. That all give us a scale.
+          When user solves a position right, his rating gets up, if he fail, his rating gets down. The greater the 
+          difference between the ratings of the player and the position, the greater the change in the ratings in the case 
+          of success or failure.<br>
+          Please read aboute <a href="https://en.wikipedia.org/wiki/Elo_rating_system">Elo rating</a> to understand the math behind.
+
+          <h3>Sometimes I get positions far away from my rating. Why you give me so hard positions to solve?</h3>
+          Indeed, player should receive positions not too difficult and not to easy. This functionality is
+          ready to be implemented on the server and probably will be introduced in the near future.
+
+          <h3>I want more features.</h3>
+          We have a lot of ideas to where we can extend this service, you should'nt tell us about. Contact us
+          if you really want to participate in Open Source project.
+{% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="/static/css/faq.css">
+{% endblock %}
+
+{% block script %}
+    <script src='/static/js/faq.js'></script>
+{% endblock %}

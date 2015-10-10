@@ -38,6 +38,10 @@ def download():
 def api():
     return render_template('api.html', title = 'API', session = session)
 
+@app.route('/faq')
+def faq():
+    return render_template('faq.html', title = 'FAQ', session = session)
+
 @app.errorhandler(404)
 def notFound(error): #pylint: disable=unused-argument
     return render_template('404.html', title = '404', session = session)
