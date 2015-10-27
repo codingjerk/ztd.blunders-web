@@ -164,7 +164,6 @@
                 },
                 yaxis: {
                     padMin: 0,
-                    tickInterval: 1,
                     min: 0
                 }
             }
