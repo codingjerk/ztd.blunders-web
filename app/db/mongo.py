@@ -10,7 +10,7 @@ db = None
 def main():
     global db #pylint: disable=global-statement
 
-    mongo = pymongo.MongoClient('localhost', 27017)
+    mongo = pymongo.MongoClient('localhost', 27017, connect = False)
     db = mongo['chessdb']
 
 
