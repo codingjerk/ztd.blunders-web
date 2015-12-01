@@ -1072,7 +1072,7 @@ def saveFeedback(message):
         'status': 'ok'
     }
 
-@cache.cached(timedelta(days = 1))
+@cache.cached('blundersByRating','day')
 def getBlandersByRating(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""

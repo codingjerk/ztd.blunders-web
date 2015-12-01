@@ -1,18 +1,17 @@
 from datetime import datetime
 
-def cached(expireDelta):
+from app.db import mongo
+
+def cached(type, expireTime):
     def decorator(func):
-        memo = {}
-        expires = {}
-
         def result(*args):
-            if args in memo and datetime.now() <= expires[args]:
-                pass # Do nothing, all cached
-            else:
-                memo[args] = func(*args)
-                expires[args] = datetime.now() + expireDelta
+            cachedData = mongo.getFromCache(type);
+            if cachedData is None:
+                calculatedData = func(*args);
+                mongo.setInCache(type, calculatedData, expireTime)
+                return calculatedData
 
-            return memo[args]
+            return cachedData
 
         return result
 

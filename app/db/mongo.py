@@ -1,4 +1,5 @@
 import pymongo
+from datetime import datetime
 
 from bson.objectid import ObjectId
 
@@ -21,3 +22,14 @@ def getGameById(game_id):
         return None
 
     return requestResult[0]
+
+def getFromCache(type):
+    requestResult = db['cache'].find({'type':type})
+
+    if requestResult.count() == 0:
+        return None
+
+    return requestResult[0]['content']
+
+def setInCache(type, data, expireTime):
+    db['cache'].insert({'type':type, expireTime: datetime.utcnow(), 'content':data})
