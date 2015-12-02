@@ -1021,6 +1021,7 @@ def getUsersCount():
         }
     }
 
+@cache.cached('usersByRating','hour')
 def getUsersByRating(interval):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
