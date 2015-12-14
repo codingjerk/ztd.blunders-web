@@ -1,0 +1,14 @@
+[Unit]
+Description=Ztd Blunders
+Requires=postgresql-9.4.service mongod.service
+After=nginx.service
+Wants=
+
+[Service]
+User=blunders
+WorkingDirectory=/home/blunders/ztd.blunders-web/
+ExecStart=/bin/uwsgi /home/blunders/uwsgi.ini
+ExecStop=/bin/kill -SIGINT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
