@@ -166,7 +166,7 @@ def getRandomBlunder():
             fen_before,
             blunder_move,
             move_index,
-            pgn_id
+            game_id
         ) = connection.cursor.fetchone()
 
     return {
@@ -177,7 +177,7 @@ def getRandomBlunder():
         'fen_before': fen_before,
         'blunder_move': blunder_move,
         'move_index': move_index,
-        'pgn_id': pgn_id
+        'game_id': game_id
     }
 
 
@@ -272,7 +272,7 @@ def setRatingBlunder(blunder_id, newBlunderElo):
 def getBlunderById(blunder_id):
     with PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT b.id, b.forced_line, b.pv, b.elo, b.fen_before, b.blunder_move, b.move_index, b.pgn_id
+            SELECT b.id, b.forced_line, b.pv, b.elo, b.fen_before, b.blunder_move, b.move_index, b.game_id
             FROM blunders AS b
             WHERE b.id = %s
             """, (blunder_id,)
@@ -289,7 +289,7 @@ def getBlunderById(blunder_id):
             fen_before,
             blunder_move,
             move_index,
-            pgn_id
+            game_id
         ) = connection.cursor.fetchone()
 
         return {
@@ -300,7 +300,7 @@ def getBlunderById(blunder_id):
             'fen_before': fen_before,
             'blunder_move': blunder_move,
             'move_index': move_index,
-            'pgn_id': pgn_id
+            'game_id': game_id
         }
 
 def getAssignedBlunder(user_id, type):
@@ -1094,3 +1094,41 @@ def getBlandersByRating(interval):
             'blunders-rating-distribution' : distribution
         }
     }
+
+def getGameById(game_id):
+    with PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+                    SELECT g.id,
+                           g.white,
+                           g.white_elo,
+                           g.black,
+
+                           g.black_elo,
+                           g.result,
+                           g.moves
+                    FROM games as g
+                    WHERE g.id = %s;"""
+                    , (game_id,)
+                )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to find associated game')
+
+        (
+            id,
+            white,
+            white_elo,
+            black,
+            black_elo,
+            result,
+            moves
+        ) = connection.cursor.fetchone()
+
+        return {
+            'white': white,
+            'white_elo': white_elo,
+            'black': black,
+            'black_elo': black_elo,
+            'result': result,
+            'moves': moves
+        }

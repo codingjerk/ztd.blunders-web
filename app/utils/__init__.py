@@ -11,7 +11,7 @@ def jsonifyBlunder(data):
         'status': 'ok',
         'data': {
             'id': str(data['id']),
-            'pgn_id': str(data['pgn_id']),
+            'game_id': str(data['game_id']),
             'move_index': data['move_index'],
 
             'forcedLine': data['forced_line'],

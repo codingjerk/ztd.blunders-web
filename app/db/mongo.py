@@ -14,15 +14,6 @@ def main():
     mongo = pymongo.MongoClient('localhost', 27017, connect = False)
     db = mongo['chessdb']
 
-
-def getGameById(game_id):
-    requestResult = db['games'].find({'_id': ObjectId(game_id)})
-
-    if requestResult.count() != 1:
-        return None
-
-    return requestResult[0]
-
 def getFromCache(type):
     requestResult = db['cache'].find({'type':type})
 

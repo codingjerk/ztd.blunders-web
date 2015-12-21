@@ -11,17 +11,17 @@ def gameShortInfo(data):
     blackElo = '?'
 
     if data is not None:
-        if 'White'    in data:
-            whitePlayer = data['White']
+        if 'white' in data and data['white'] is not None:
+            whitePlayer = data['white']
 
-        if 'WhiteElo' in data:
-            whiteElo    = data['WhiteElo']
+        if 'white_elo' in data and data['white_elo'] is not None:
+            whiteElo    = data['white_elo']
 
-        if 'Black'    in data:
-            blackPlayer = data['Black']
+        if 'black' in data and data['black'] is not None:
+            blackPlayer = data['black']
 
-        if 'BlackElo' in data:
-            blackElo    = data['BlackElo']
+        if 'black_elo' in data and data['black_elo'] is not None:
+            blackElo    = data['black_elo']
 
     return {
         'White': whitePlayer,
@@ -49,7 +49,7 @@ def getBlunderInfoById(blunder_id):
     favorites = postgre.getBlunderPopularity(blunder_id)
     likes, dislikes = postgre.getBlunderVotes(blunder_id)
 
-    gameInfo = gameShortInfo(mongo.getGameById(blunder['pgn_id']))
+    gameInfo = gameShortInfo(postgre.getGameById(blunder['game_id']))
 
     return jsonify({
         'status': 'ok',
