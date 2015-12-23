@@ -16,8 +16,8 @@ class State:
 
     def authorize(token): #pylint: disable=no-self-argument
         State.token = token
-        State.userID = postgre.getUserIdByToken(token)
-        State.username = postgre.getUsernameById(State.userID)
+        State.userID = postgre.user.getUserIdByToken(token)
+        State.username = postgre.user.getUsernameById(State.userID)
 
     #pylint: disable=no-method-argument
     def clean():
@@ -106,9 +106,9 @@ def userID():
 
 def authorize(username, password): #pylint: disable=redefined-outer-name
     try:
-        if postgre.autentithicateUser(username, hash.get(username, password)):
+        if postgre.user.authorize(username, hash.get(username, password)):
             session['username'] = username
-            session['user_id'] = postgre.getUserId(username)
+            session['user_id'] = postgre.user.getUserId(username)
 
             return {
                 'status': 'ok'

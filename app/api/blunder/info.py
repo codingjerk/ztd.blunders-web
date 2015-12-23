@@ -31,7 +31,7 @@ def gameShortInfo(data):
     }
 
 def getBlunderInfoById(blunder_id):
-    blunder = postgre.getBlunderById(blunder_id)
+    blunder = postgre.blunder.getBlunderById(blunder_id)
 
     if blunder is None:
         return jsonify({
@@ -41,15 +41,15 @@ def getBlunderInfoById(blunder_id):
 
     elo = blunder['elo']
 
-    successTries, totalTries = postgre.getTries(blunder_id)
+    successTries, totalTries = postgre.blunder.getTries(blunder_id)
 
-    comments = postgre.getBlunderComments(blunder_id)
-    myFavorite = postgre.isFavorite(session.userID(), blunder_id)
-    myVote = postgre.getUserVote(session.userID(), blunder_id)
-    favorites = postgre.getBlunderPopularity(blunder_id)
-    likes, dislikes = postgre.getBlunderVotes(blunder_id)
+    comments = postgre.blunder.getBlunderComments(blunder_id)
+    myFavorite = postgre.blunder.isFavorite(session.userID(), blunder_id)
+    myVote = postgre.blunder.getUserVote(session.userID(), blunder_id)
+    favorites = postgre.blunder.getBlunderPopularity(blunder_id)
+    likes, dislikes = postgre.blunder.getBlunderVotes(blunder_id)
 
-    gameInfo = gameShortInfo(postgre.getGameById(blunder['game_id']))
+    gameInfo = gameShortInfo(postgre.game.getGameById(blunder['game_id']))
 
     return jsonify({
         'status': 'ok',

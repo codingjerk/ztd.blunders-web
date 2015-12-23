@@ -7,7 +7,7 @@ from app.utils import session, tasks
 from app.utils import elo, crossdomain
 
 def compareLines(blunder_id, userLine):
-    data = postgre.getBlunderById(blunder_id)
+    data = postgre.blunder.getBlunderById(blunder_id)
     if data == None:
         return
 
@@ -20,22 +20,22 @@ def changeRating(user_id, blunder_id, success):
     if user_id is None:
         return None, None
 
-    blunder = postgre.getBlunderById(blunder_id)
+    blunder = postgre.blunder.getBlunderById(blunder_id)
     if blunder is None:
         return None, None
 
     blunder_elo = blunder['elo']
-    user_elo = postgre.getRating(user_id)
+    user_elo = postgre.user.getRating(user_id)
 
     newUserElo, newBlunderElo = elo.calculate(user_elo, blunder_elo, success)
 
-    postgre.setRatingUser(user_id, newUserElo)
-    postgre.setRatingBlunder(blunder_id, newBlunderElo)
+    postgre.user.setRatingUser(user_id, newUserElo)
+    postgre.blunder.setRatingBlunder(blunder_id, newBlunderElo)
 
     return newUserElo, (newUserElo - user_elo)
 
 def validateExploreBlunder(blunder_id, userLine, spentTime): #pylint: disable=unused-argument
-    postgre.closeBlunderTask(session.userID(), blunder_id, tasks.EXPLORE)
+    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, tasks.EXPLORE)
 
     return jsonify({'status': 'ok'})
 
@@ -43,9 +43,9 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
     if session.isAnonymous():
         return jsonify({'status': 'ok'})
 
-    date_start = postgre.getTaskStartDate(session.userID(), blunder_id, tasks.RATED)
+    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, tasks.RATED)
 
-    if not postgre.closeBlunderTask(session.userID(), blunder_id, tasks.RATED):
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, tasks.RATED):
         return jsonify({
             'status': 'error',
             'message': "Validation failed"
@@ -53,9 +53,9 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
 
     success = compareLines(blunder_id, userLine)
 
-    blunder = postgre.getBlunderById(blunder_id)
+    blunder = postgre.blunder.getBlunderById(blunder_id)
 
-    postgre.saveBlunderHistory(
+    postgre.blunder.saveBlunderHistory(
         session.userID(),
         blunder_id,
         blunder['elo'],

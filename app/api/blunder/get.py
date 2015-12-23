@@ -6,14 +6,14 @@ from app import utils
 from app.utils import session, tasks, crossdomain
 
 def assignNewBlunder(taskType):
-    blunder = postgre.getRandomBlunder()
+    blunder = postgre.blunder.getRandomBlunder()
 
-    postgre.assignBlunderTask(session.userID(), str(blunder['id']), taskType)
+    postgre.blunder.assignBlunderTask(session.userID(), str(blunder['id']), taskType)
 
     return blunder
 
 def getRatedBlunder():
-    blunder = postgre.getAssignedBlunder(session.userID(), tasks.RATED)
+    blunder = postgre.blunder.getAssignedBlunder(session.userID(), tasks.RATED)
 
     if blunder is None:
         blunder = assignNewBlunder(tasks.RATED)
@@ -22,13 +22,13 @@ def getRatedBlunder():
     return jsonify(data)
 
 def getExploreBlunder():
-    blunder = postgre.getAssignedBlunder(session.userID(), tasks.EXPLORE)
+    blunder = postgre.blunder.getAssignedBlunder(session.userID(), tasks.EXPLORE)
 
     if 'id' in request.json:
         if blunder is not None:
-            postgre.closeBlunderTask(session.userID(), request.json['id'], tasks.EXPLORE)
+            postgre.blunder.closeBlunderTask(session.userID(), request.json['id'], tasks.EXPLORE)
 
-        blunder = postgre.getBlunderById(request.json['id'])
+        blunder = postgre.blunder.getBlunderById(request.json['id'])
     else:
         if blunder is None:
             blunder = assignNewBlunder(tasks.EXPLORE)

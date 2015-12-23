@@ -5,4 +5,4 @@ from app.db import postgre
 
 @app.route('/api/global/blunders-by-rating', methods = ['POST'])
 def getBlundersByRating():
-    return jsonify(postgre.getBlandersByRating(50))
+    return jsonify(postgre.statistic.getBlundersByRating(50))

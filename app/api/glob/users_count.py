@@ -5,4 +5,4 @@ from app.db import postgre
 
 @app.route('/api/global/users-count', methods=['POST'])
 def getUsersCount():
-    return jsonify(postgre.getUsersCount())
+    return jsonify(postgre.statistic.getUsersCount())

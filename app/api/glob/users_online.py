@@ -8,6 +8,6 @@ def getUsersOnline():
     return jsonify({
         'status': 'ok',
         'data': {
-            "users-online-list" : postgre.getActiveUsers('1 HOUR')
+            "users-online-list" : postgre.statistic.getActiveUsers('1 HOUR')
         }
     })

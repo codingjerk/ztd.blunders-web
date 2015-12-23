@@ -22,7 +22,7 @@ def favoriteBlunder():
             'message': 'Blunder id required'
         })
 
-    if not postgre.favoriteBlunder(session.userID(), blunder_id):
+    if not postgre.blunder.favoriteBlunder(session.userID(), blunder_id):
         return jsonify({
             'status': 'error',
             'message': "Can't favorite blunder"
