@@ -13,5 +13,5 @@ def userBlundersCount():
             'message': 'Username required'
         })
 
-    return jsonify(postgre.statistic.getBlundersStatistic(username))
+    return jsonify(postgre.user.getBlundersStatistic(username))
 

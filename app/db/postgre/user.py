@@ -266,6 +266,56 @@ def getCommentsByUser(user_id, offset, limit):
 
     return comments
 
+def asdasd():
+    print("here")
+
+def getBlunderHistoryCount(user_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_history AS h
+            WHERE h.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting blunders for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getBlundersHistory(user_id, offset, limit):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT h.blunder_id,
+                   h.result,
+                   h.date_start,
+                   h.spent_time
+            FROM blunder_history AS h
+            WHERE h.user_id = %s
+            ORDER BY h.date_start DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "result": True if result == 1 else False,
+                "date_start": date_start,
+                "spent_time": spent_time
+            }
+            for (blunder_id, result, date_start, spent_time) in data
+        ]
+
+    return blunders
+
 def getUserProfile(username):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -338,5 +388,32 @@ def getUserProfile(username):
             'username-value':        username,
             'user-join-value':       userJoinDate,
             'user-last-activity-value': userLastActivity
+        }
+    }
+
+def getBlundersStatistic(username):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.id,
+                   COUNT(b.id) as total,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+            FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
+            GROUP BY u.id, u.elo HAVING u.username = %s;"""
+            , (username,)
+        )
+
+        if connection.cursor.rowcount != 1: # New user, no records in blunder_history
+            total, solved, failed = 0, 0, 0
+        else:
+            (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
+
+    return {
+        'status': 'ok',
+        'data': {
+            'username': username,
+            'failed-blunders-value': failed,
+            'total-blunders-value':  total,
+            'solved-blunders-value': solved
         }
     }

@@ -2,35 +2,8 @@
 from app.utils import cache,chess
 from app.db.postgre import core,user,blunder
 
-def getBlundersStatistic(username):
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT u.id,
-                   COUNT(b.id) as total,
-                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
-                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
-            FROM users AS u INNER JOIN blunder_history AS b ON u.id = b.user_id
-            GROUP BY u.id, u.elo HAVING u.username = %s;"""
-            , (username,)
-        )
-
-        if connection.cursor.rowcount != 1: # New user, no records in blunder_history
-            total, solved, failed = 0, 0, 0
-        else:
-            (_1, total, solved, failed) = connection.cursor.fetchone() #pylint: disable=unused-variable
-
-    return {
-        'status': 'ok',
-        'data': {
-            'username': username,
-            'failed-blunders-value': failed,
-            'total-blunders-value':  total,
-            'solved-blunders-value': solved
-        }
-    }
-
 def getRatingByDate(username):
-    user_id = getUserId(username)
+    user_id = user.getUserId(username)
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -53,7 +26,7 @@ def getRatingByDate(username):
     }
 
 def getBlundersByDate(username):
-    user_id = getUserId(username)
+    user_id = user.getUserId(username)
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -243,8 +216,6 @@ def getBlundersHistory(username, offset, limit):
             'message': 'Trying to get not exist user with name %s' % username
         }
 
-    print("ghjghjghjghjghjghjghjjjjjjjjjjjjjjjjjjjjjjjjjj")
-    print(user.getUserId(username))
     total = user.getBlunderHistoryCount(user_id)
     blunders = user.getBlundersHistory(user_id, offset, limit)
 
