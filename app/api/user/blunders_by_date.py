@@ -13,4 +13,4 @@ def getBlundersByDate():
             'message': 'Username required'
         })
 
-    return jsonify(postgre.statistic.getBlundersByDate(username))
+    return jsonify(postgre.user.getBlundersByDate(username))

@@ -13,4 +13,4 @@ def getRatingByDate():
             'message': 'Username required'
         })
 
-    return jsonify(postgre.statistic.getRatingByDate(username))
+    return jsonify(postgre.user.getRatingByDate(username))

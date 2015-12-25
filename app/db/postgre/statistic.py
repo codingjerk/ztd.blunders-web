@@ -2,61 +2,6 @@
 from app.utils import cache,chess
 from app.db.postgre import core,user,blunder
 
-def getRatingByDate(username):
-    user_id = user.getUserId(username)
-
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date,
-                   AVG(b.user_elo)
-            FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
-            , (user_id,)
-        )
-
-        data = connection.cursor.fetchall()
-        rating = [[date, int(elo)] for (date, elo) in data]
-
-    return {
-        'status': 'ok',
-        'username': username,
-        'data' : {
-            'rating-statistic': rating
-        }
-    }
-
-def getBlundersByDate(username):
-    user_id = user.getUserId(username)
-
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date,
-                   COUNT(b.id) as total,
-                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
-                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
-            FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s"""
-            , (user_id,)
-        )
-
-        data = connection.cursor.fetchall()
-
-        total = [[date, total] for (date, total, _1, _2) in data]     #pylint: disable=unused-variable
-        solved = [[date, solved] for (date, _1, solved, _2) in data]  #pylint: disable=unused-variable
-        failed = [[date, failed] for (date, _1, _2, failed) in data]  #pylint: disable=unused-variable
-
-    return {
-        'status': 'ok',
-        'username': username,
-        'data': {
-            'blunder-count-statistic': {
-                'total' : total,
-                'solved': solved,
-                'failed': failed
-            }
-        }
-    }
-
 def getActiveUsers(interval):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -207,6 +152,10 @@ def getBlundersStatistic():
         }
     }
 
+
+# TODO: functions getBlundersHistory and getBlundersFavorites have duplicates in postgre.user
+# We can unite those 2 functions into one with 1 SQL query. This will also solve another issue,
+# when those functions can not be moved into users because of getBlunderById.(circular import)
 def getBlundersHistory(username, offset, limit):
     try:
         user_id = user.getUserId(username)

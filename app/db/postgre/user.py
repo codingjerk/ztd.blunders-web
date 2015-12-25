@@ -266,9 +266,6 @@ def getCommentsByUser(user_id, offset, limit):
 
     return comments
 
-def asdasd():
-    print("here")
-
 def getBlunderHistoryCount(user_id):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -415,5 +412,60 @@ def getBlundersStatistic(username):
             'failed-blunders-value': failed,
             'total-blunders-value':  total,
             'solved-blunders-value': solved
+        }
+    }
+
+def getRatingByDate(username):
+    user_id = getUserId(username)
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date,
+                   AVG(b.user_elo)
+            FROM blunder_history AS b
+            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
+            , (user_id,)
+        )
+
+        data = connection.cursor.fetchall()
+        rating = [[date, int(elo)] for (date, elo) in data]
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data' : {
+            'rating-statistic': rating
+        }
+    }
+
+def getBlundersByDate(username):
+    user_id = getUserId(username)
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date,
+                   COUNT(b.id) as total,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+            FROM blunder_history AS b
+            GROUP BY date, b.user_id HAVING b.user_id = %s"""
+            , (user_id,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        total = [[date, total] for (date, total, _1, _2) in data]     #pylint: disable=unused-variable
+        solved = [[date, solved] for (date, _1, solved, _2) in data]  #pylint: disable=unused-variable
+        failed = [[date, failed] for (date, _1, _2, failed) in data]  #pylint: disable=unused-variable
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            'blunder-count-statistic': {
+                'total' : total,
+                'solved': solved,
+                'failed': failed
+            }
         }
     }
