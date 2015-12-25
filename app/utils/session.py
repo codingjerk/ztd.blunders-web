@@ -57,8 +57,8 @@ def tokenize():
 #pylint: disable=redefined-outer-name
 def authorizeWithToken(username, password):
     try:
-        if postgre.autentithicateUser(username, hash.get(username, password)):
-            token = postgre.getTokenForUser(username)
+        if postgre.user.authorize(username, hash.get(username, password)):
+            token = postgre.user.getTokenForUser(username)
 
             return {
                 'status': 'ok',

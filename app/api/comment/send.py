@@ -37,7 +37,7 @@ def commentBlunder():
             'message': 'Input length can\'t be greater than %d' % MAX_MESSAGE_SIZE
         })
 
-    if not postgre.commentBlunder(session.userID(), blunder_id, comment_id, user_input):
+    if not postgre.blunder.commentBlunder(session.userID(), blunder_id, comment_id, user_input):
         return jsonify({
             'status': 'error',
             'message': "Can't comment blunder"

@@ -162,6 +162,110 @@ def signupUser(username, salt, hash, email):
 
     return {'status': 'ok'}
 
+def getBlunderFavoritesCount(user_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting favorites for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getBlundersFavorites(user_id, offset, limit):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT f.blunder_id,
+                   f.assign_date
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s
+            ORDER BY f.assign_date DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "assign_date": assign_date
+            }
+            for (blunder_id, assign_date) in data
+        ]
+
+    return blunders
+
+def lastUserActivity(username, format):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.username,
+                   TO_CHAR(act.last_activity, %s)
+            FROM vw_activities AS act
+            INNER JOIN users as u
+                ON act.user_id = u.id
+            WHERE u.username = %s;"""
+            , (format, username)
+        )
+
+        (_, last_activity) = connection.cursor.fetchone()
+
+        return last_activity
+
+def getCommentsByUserCount(user_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(id)
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s"""
+            , (user_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return {
+                'status': 'error',
+                'message': 'Error when counting comments for user'
+            }
+
+        (total,) = connection.cursor.fetchone()
+
+    return total
+
+def getCommentsByUser(user_id, offset, limit):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT c.blunder_id,
+                   c.date,
+                   c.comment
+            FROM blunder_comments AS c
+            WHERE c.user_id = %s
+            ORDER BY c.date DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset,)
+        )
+
+        data = connection.cursor.fetchall()
+
+        comments = [
+            {
+                "blunder_id": blunder_id,
+                "date": date,
+                "text": text
+            }
+            for (blunder_id, date, text) in data
+        ]
+
+    return comments
+
 def getUserProfile(username):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""

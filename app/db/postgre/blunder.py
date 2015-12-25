@@ -223,7 +223,7 @@ def getBlunderComments(blunder_id):
 
         for comment in comments:
             comment_id, date, parent_id, user_id, text = comment
-            username = getUsernameById(user_id)
+            username = user.getUsernameById(user_id)
             likes, dislikes = getBlunderCommentVotes(comment_id)
 
             pythonComment = {

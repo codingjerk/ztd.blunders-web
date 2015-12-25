@@ -23,7 +23,7 @@ def voteBlunder():
             'message': 'Blunder id and vote required'
         })
 
-    if not postgre.voteBlunder(session.userID(), blunder_id, vote):
+    if not postgre.blunder.voteBlunder(session.userID(), blunder_id, vote):
         return jsonify({
             'status': 'error',
             'message': "Can't vote blunder"

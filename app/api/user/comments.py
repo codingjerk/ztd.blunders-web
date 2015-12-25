@@ -1,6 +1,7 @@
 from flask import jsonify, request
 
-from app import app, db
+from app import app
+from app.db import postgre
 
 @app.route('/api/user/comments', methods = ['POST'])
 def getCommentsByUser():
@@ -14,4 +15,4 @@ def getCommentsByUser():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(db.getCommentsByUser(username, offset, limit))
+    return jsonify(postgre.statistic.getCommentsByUser(username, offset, limit))

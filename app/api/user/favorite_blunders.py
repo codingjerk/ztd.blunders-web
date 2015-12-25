@@ -1,6 +1,7 @@
 from flask import jsonify, request
 
-from app import app, db
+from app import app
+from app.db import postgre
 
 @app.route('/api/user/favorite-blunders', methods = ['POST'])
 def getBlundersFavorites():
@@ -14,4 +15,4 @@ def getBlundersFavorites():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(db.getBlundersFavorites(username, offset, limit))
+    return jsonify(postgre.statistic.getBlundersFavorites(username, offset, limit))
