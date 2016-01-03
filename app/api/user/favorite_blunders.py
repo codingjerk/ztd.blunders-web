@@ -15,4 +15,4 @@ def getBlundersFavorites():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(postgre.statistic.getBlundersFavorites(username, offset, limit))
+    return jsonify(postgre.user.getBlundersFavorites(username, offset, limit))

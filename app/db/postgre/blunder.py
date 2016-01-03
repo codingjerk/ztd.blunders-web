@@ -1,5 +1,6 @@
 
-from app.db.postgre import core,user
+from app.db.postgre import core
+import app.db.postgre.user
 
 def getRandomBlunder():
     with core.PostgreConnection('r') as connection:

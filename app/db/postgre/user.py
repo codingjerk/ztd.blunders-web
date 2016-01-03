@@ -1,6 +1,9 @@
 
 
+from app.utils import chess
 from app.db.postgre import core
+#import app.db.postgre.core
+import .blunder
 
 def authorize(username, hash):
     if username is None:
@@ -181,7 +184,7 @@ def getBlunderFavoritesCount(user_id):
 
     return total
 
-def getBlundersFavorites(user_id, offset, limit):
+def getBlundersFavoritesIds(user_id, offset, limit):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT f.blunder_id,
@@ -285,7 +288,7 @@ def getBlunderHistoryCount(user_id):
 
     return total
 
-def getBlundersHistory(user_id, offset, limit):
+def getBlundersHistoryIds(user_id, offset, limit):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT h.blunder_id,
@@ -467,5 +470,74 @@ def getBlundersByDate(username):
                 'solved': solved,
                 'failed': failed
             }
+        }
+    }
+
+    # TODO: functions getBlundersHistory and getBlundersFavorites have duplicates in postgre.user
+# We can unite those 2 functions into one with 1 SQL query. This will also solve another issue,
+# when those functions can not be moved into users because of getBlunderById.(circular import)
+def getBlundersHistory(username, offset, limit):
+    #try:
+    user_id = getUserId(username)
+    #except Exception:
+    #    return {
+    #        'status': 'error',
+    #        'message': 'Trying to get not exist user with name %s' % username
+    #    }
+
+    total = getBlunderHistoryCount(user_id)
+    blunders = getBlundersHistoryIds(user_id, offset, limit)
+
+    result = []
+    for theblunder in blunders:
+        blunder_info = app.db.postgre.blunder.getBlunderById(theblunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
+
+        result.append({
+            "blunder_id": theblunder['blunder_id'],
+            "fen": fen,
+            "result": theblunder['result'],
+            "date_start": theblunder['date_start'],
+            "spent_time": theblunder['spent_time']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }
+
+def getBlundersFavorites(username, offset, limit):
+    #try:
+    user_id = getUserId(username)
+    #except Exception:
+    #    return {
+    #        'status': 'error',
+    #        'message': 'Trying to get not exist user with name %s' % username
+    #    }
+
+    total = getBlunderFavoritesCount(user_id)
+    blunders = getBlundersFavoritesIds(user_id, offset, limit)
+
+    result = []
+    for theblunder in blunders:
+        blunder_info = app.db.postgre.blunder.getBlunderById(theblunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
+
+        result.append({
+            "blunder_id": theblunder['blunder_id'],
+            "fen": fen,
+            "assign_date": theblunder['assign_date']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
         }
     }
