@@ -15,4 +15,4 @@ def getBlundersHistory():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(postgre.user.getBlundersHistory(username, offset, limit))
+    return jsonify(postgre.statistic.getBlundersHistory(username, offset, limit))

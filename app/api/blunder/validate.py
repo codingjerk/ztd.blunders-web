@@ -54,9 +54,12 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
     success = compareLines(blunder_id, userLine)
 
     blunder = postgre.blunder.getBlunderById(blunder_id)
+    user_id = session.userID()
+    user_elo = postgre.user.getRating(user_id)
 
     postgre.blunder.saveBlunderHistory(
-        session.userID(),
+        user_id,
+        user_elo,
         blunder_id,
         blunder['elo'],
         success,

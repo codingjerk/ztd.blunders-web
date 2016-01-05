@@ -151,3 +151,121 @@ def getBlundersStatistic():
             'total-blunders-value' : blunder.countBlunders()
         }
     }
+
+def getBlundersHistoryIds(user_id, offset, limit):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT h.blunder_id,
+                   h.result,
+                   h.date_start,
+                   h.spent_time
+            FROM blunder_history AS h
+            WHERE h.user_id = %s
+            ORDER BY h.date_start DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "result": True if result == 1 else False,
+                "date_start": date_start,
+                "spent_time": spent_time
+            }
+            for (blunder_id, result, date_start, spent_time) in data
+        ]
+
+    return blunders
+
+def getBlundersHistory(username, offset, limit):
+    try:
+        user_id = user.getUserId(username)
+    except Exception:
+        return {
+            'status': 'error',
+            'message': 'Trying to get not exist user with name %s' % username
+        }
+
+    total = user.getBlunderHistoryCount(user_id)
+    blunders = getBlundersHistoryIds(user_id, offset, limit)
+
+    result = []
+    for theblunder in blunders:
+        blunder_info = blunder.getBlunderById(theblunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
+
+        result.append({
+            "blunder_id": theblunder['blunder_id'],
+            "fen": fen,
+            "result": theblunder['result'],
+            "date_start": theblunder['date_start'],
+            "spent_time": theblunder['spent_time']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }
+
+def getBlundersFavoritesIds(user_id, offset, limit):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT f.blunder_id,
+                   f.assign_date
+            FROM blunder_favorites AS f
+            WHERE f.user_id = %s
+            ORDER BY f.assign_date DESC
+            LIMIT %s OFFSET %s"""
+            , (user_id, limit, offset, )
+        )
+
+        data = connection.cursor.fetchall()
+
+        blunders = [
+            {
+                "blunder_id": blunder_id,
+                "assign_date": assign_date
+            }
+            for (blunder_id, assign_date) in data
+        ]
+
+    return blunders
+
+def getBlundersFavorites(username, offset, limit):
+    try:
+        user_id = user.getUserId(username)
+    except Exception:
+        return {
+            'status': 'error',
+            'message': 'Trying to get not exist user with name %s' % username
+        }
+
+    total = user.getBlunderFavoritesCount(user_id)
+    blunders = getBlundersFavoritesIds(user_id, offset, limit)
+
+    result = []
+    for theblunder in blunders:
+        blunder_info = blunder.getBlunderById(theblunder['blunder_id'])
+        fen = chess.blunderStartPosition(blunder_info['fen_before'], blunder_info['blunder_move'])
+
+        result.append({
+            "blunder_id": theblunder['blunder_id'],
+            "fen": fen,
+            "assign_date": theblunder['assign_date']
+        })
+
+    return {
+        'status': 'ok',
+        'username': username,
+        'data': {
+            "total": total,
+            "blunders": result
+        }
+    }

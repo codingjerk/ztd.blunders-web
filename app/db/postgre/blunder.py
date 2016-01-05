@@ -1,7 +1,8 @@
 
 from app.db.postgre import core
-import app.db.postgre.user
+from app.db.postgre import user
 
+# Get random blunder from database
 def getRandomBlunder():
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -35,6 +36,7 @@ def getRandomBlunder():
     }
 
 
+# Assign blunder to user
 def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None:
         return
@@ -53,6 +55,7 @@ def assignBlunderTask(user_id, blunder_id, type):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
+# Get time, when blunder was assigned to user
 def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None:
         return
@@ -77,15 +80,13 @@ def getTaskStartDate(user_id, blunder_id, type):
         return assign_date
 
 #pylint: disable=too-many-arguments
-def saveBlunderHistory(user_id, blunder_id, blunder_elo, success, userLine, date_start, spent_time):
+def saveBlunderHistory(user_id, user_elo, blunder_id, blunder_elo, success, userLine, date_start, spent_time):
     if user_id is None:
         raise Exception('postre.saveBlunderHistory for anonim')
     if date_start is None:
         raise Exception('postre.saveBlunderHistory date start is not defined')
 
-    user_elo = user.getRating(user_id)
     result = 1 if success else 0
-
     if success:
         userLine = ''
 
@@ -472,26 +473,3 @@ def countBlunders():
         (count,) = connection.cursor.fetchone()
 
         return count
-
-def getTaskStartDate(user_id, blunder_id, type):
-    if user_id is None:
-        return
-
-    with core.PostgreConnection('w') as connection:
-        connection.cursor.execute(
-            """SELECT assign_date
-               FROM blunder_tasks AS bt
-               INNER JOIN blunder_task_type AS btt
-                   ON bt.type_id = btt.id
-               WHERE bt.user_id = %s
-                 AND bt.blunder_id = %s
-                 AND btt.name = %s;"""
-            , (user_id, blunder_id, type)
-        )
-
-        if connection.cursor.rowcount != 1:
-            return None
-
-        (assign_date,) = connection.cursor.fetchone()
-
-        return assign_date
