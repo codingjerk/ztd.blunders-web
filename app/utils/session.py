@@ -40,7 +40,8 @@ def tokenize():
                 State.authorize(token)
 
                 result = f()
-            except Exception:
+            except Exception as e:
+                print(e) # Useful debug printing
                 return jsonify({
                     'status': 'error',
                     'message': 'Invalid API token'
@@ -132,4 +133,3 @@ def deauthorize():
 
     del session['username']
     del session['user_id']
-
