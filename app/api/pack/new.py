@@ -4,10 +4,7 @@ from flask import request, jsonify
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import session, tasks, crossdomain
-
-OPENING = "Opening"
-RANDOM = "Random"
+from app.utils import session, const, crossdomain
 
 #TODO: What if duplicates in blunder tasks?
 
@@ -17,7 +14,7 @@ def newRandomPack():
         for index in range(25)
     ]
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, RANDOM)
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.RANDOM)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return {
@@ -35,7 +32,7 @@ def packSelector(pack_type_name):
             'message': 'Pack type name is not exist or locked for user: %s' % pack_type_name
         }
 
-    if(pack_type_name == RANDOM):
+    if(pack_type_name == const.pack_type.RANDOM):
         return newRandomPack()
     else:
         return {

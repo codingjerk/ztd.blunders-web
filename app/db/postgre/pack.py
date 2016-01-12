@@ -1,5 +1,5 @@
 from app.db.postgre import core, blunder
-from app.utils import tasks
+from app.utils import const
 
 def getAssignedPacks(user_id):
     with core.PostgreConnection('r') as connection:
@@ -53,7 +53,7 @@ def getPackTypeId(pack_type_name):
         return pack_type_id
 
 # created_by is the user id, who phisically created the pack. This user
-# may not have this pack assigned to him and, in face, will not after calling
+# may not have this pack assigned to him and, in fact, will not after calling
 # this function
 def createPack(created_by, blunder_ids, pack_type_name):
     pack_type_id = getPackTypeId(pack_type_name)
@@ -91,11 +91,11 @@ def assignPack(user_id, pack_id):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign pack to user')
 
-    #TODO: getUserPackById - get blunders and write them into blunder_tasks
+    # Get blunders and write them into blunder_tasks
     # writing tasks into blunder tasks
     blunder_ids = getPackBlundersById(pack_id)
     for blunder_id in blunder_ids:
-        blunder.assignBlunderTask(user_id, blunder_id, tasks.PACK)
+        blunder.assignBlunderTask(user_id, blunder_id, const.tasks.PACK)
 
 def getPackBlundersById(pack_id):
     with core.PostgreConnection('r') as connection:

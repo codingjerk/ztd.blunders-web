@@ -2,7 +2,7 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session, tasks
+from app.utils import session, const
 
 from app.utils import elo, crossdomain
 
@@ -35,7 +35,7 @@ def changeRating(user_id, blunder_id, success):
     return newUserElo, (newUserElo - user_elo)
 
 def validateExploreBlunder(blunder_id, userLine, spentTime): #pylint: disable=unused-argument
-    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, tasks.EXPLORE)
+    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
 
     return jsonify({'status': 'ok'})
 
@@ -43,9 +43,9 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
     if session.isAnonymous():
         return jsonify({'status': 'ok'})
 
-    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, tasks.RATED)
+    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, const.tasks.RATED)
 
-    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, tasks.RATED):
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.RATED):
         return jsonify({
             'status': 'error',
             'message': "Validation failed"
@@ -91,9 +91,9 @@ def validateBlunder():
             'message': 'Blunder id, user line, spent time and type required'
         })
 
-    if type == tasks.RATED:
+    if type == const.tasks.RATED:
         return validateRatedBlunder(blunder_id, userLine, spentTime)
-    elif type == tasks.EXPLORE:
+    elif type == const.tasks.EXPLORE:
         return validateExploreBlunder(blunder_id, userLine, spentTime)
     else:
         return jsonify({

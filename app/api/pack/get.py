@@ -3,7 +3,7 @@ from flask import request, jsonify
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import session, tasks, crossdomain
+from app.utils import session, crossdomain
 
 @app.route('/api/pack/get', methods = ['POST'])
 def getPack():

@@ -65,7 +65,8 @@ def authorizeWithToken(username, password):
                 'status': 'ok',
                 'token': token
             }
-    except (Exception, KeyError):
+    except (Exception, KeyError) as e:
+        print(e)
         return {
             'status': 'error',
             'field': 'username',

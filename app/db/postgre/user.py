@@ -1,7 +1,9 @@
+from uuid import uuid4
 
-
-from app.utils import chess
+from app.utils import chess, const
 from app.db.postgre import core
+
+from psycopg2 import IntegrityError
 
 def authorize(username, hash):
     if username is None:
@@ -144,9 +146,9 @@ def signupUser(username, salt, hash, email):
             connection.cursor.execute("""
                 INSERT INTO users (username, salt, password, role, email, registration, last_login)
                 VALUES (%s, %s, %s, %s, %s, NOW(), NOW());
-                """, (username, salt, hash, roles.USER, email)
+                """, (username, salt, hash, const.roles.USER, email)
             )
-        except psycopg2.IntegrityError:
+        except IntegrityError:
             return {
                 'status': 'error',
                 'field': 'username',
