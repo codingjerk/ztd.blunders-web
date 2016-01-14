@@ -98,17 +98,42 @@ def assignPack(user_id, pack_id):
 
     # Get blunders and write them into blunder_tasks
     # writing tasks into blunder tasks
-    blunder_ids = getPackBlundersById(pack_id)
+    blunder_ids = getPackBlundersByIdAll(pack_id)
     for blunder_id in blunder_ids:
         blunder.assignBlunderTask(user_id, blunder_id, const.tasks.PACK)
 
-def getPackBlundersById(pack_id):
+# gets all blunders in pack
+def getPackBlundersByIdAll(pack_id):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT blunder_id
             FROM pack_blunders as pb
             WHERE pb.pack_id = %s
             """, (pack_id,)
+        )
+
+        pack_blunders = [
+                blunder_id
+                for (blunder_id,) in connection.cursor.fetchall()
+            ]
+        return pack_blunders
+
+def getPackBlundersByIdAssignedOnly(user_id, pack_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT pb.blunder_id
+            FROM pack_blunders AS pb
+            INNER JOIN blunder_tasks AS bt
+                USING(blunder_id)
+            WHERE pb.pack_id = %s AND
+                  bt.user_id = %s AND
+                  bt.type_id =
+                    (
+                        SELECT bty.id
+                        FROM blunder_task_type AS bty
+                        WHERE bty.name = %s
+                    ) ;
+            """, (pack_id, user_id, const.tasks.PACK)
         )
 
         pack_blunders = [
@@ -124,6 +149,6 @@ def getAssignedBlunders(user_id, pack_id):
     if not pack_id in pack_ids:
         return None
 
-    blunders = getPackBlundersById(pack_id)
+    blunders = getPackBlundersByIdAssignedOnly(user_id, pack_id)
 
     return blunders
