@@ -98,6 +98,10 @@ def assignPack(user_id, pack_id):
 
     # Get blunders and write them into blunder_tasks
     # writing tasks into blunder tasks
+    #TODO: WHen working in blunder mode, this is ok to have same blunders in different packs
+    # and user can assign them both. We need to check not assign already existed blunder
+    # This will fail and not right to do. Duplicated blunder will be added only once.
+    # On second validation need special check. For now, will get validation error
     blunder_ids = getPackBlundersByIdAll(pack_id)
     for blunder_id in blunder_ids:
         blunder.assignBlunderTask(user_id, blunder_id, const.tasks.PACK)
