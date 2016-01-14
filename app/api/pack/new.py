@@ -45,7 +45,7 @@ def packSelector(pack_type_name):
 @app.route('/api/pack/new', methods = ['POST'])
 def getNewPack():
     try:
-        pack_type_name = request.json['type_name']
+        pack_type_name = request.json['type']
     except Exception:
         return jsonify({
             'status': 'error',
@@ -61,7 +61,6 @@ def getNewPack():
         })
 
     return jsonify(packSelector(pack_type_name))
-
 
 @app.route('/api/mobile/pack/new', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()

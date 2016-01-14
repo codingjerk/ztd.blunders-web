@@ -12,7 +12,7 @@ def getPackInfo():
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Error in pack info'
+            'message': 'Unknown'
         })
 
     if(session.isAnonymous()):
@@ -31,7 +31,6 @@ def getPackInfo():
             'unlocked': unlocked
         }
     })
-
 
 @app.route('/api/mobile/pack/info', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()

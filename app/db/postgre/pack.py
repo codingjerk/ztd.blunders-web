@@ -49,12 +49,17 @@ def getPackTypeId(pack_type_name):
             """, (pack_type_name,)
         )
 
+        if connection.cursor.rowcount != 1:
+            raise Exception('Wrong pack type name')
+
         pack_type_id = connection.cursor.fetchone()
+
         return pack_type_id
 
 # created_by is the user id, who phisically created the pack. This user
 # may not have this pack assigned to him and, in fact, will not after calling
 # this function
+#TODO: filter blunder_ids to remove already exist
 def createPack(created_by, blunder_ids, pack_type_name):
     pack_type_id = getPackTypeId(pack_type_name)
 

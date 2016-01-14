@@ -78,6 +78,22 @@ def validateRatedBlunder(blunder_id, userLine, spentTime):
         'status': 'ok'
     })
 
+def validatePackBlunder(blunder_id, userLine, spentTime):
+    if session.isAnonymous():
+        return jsonify({
+            'status': 'error',
+            'message': 'Working with packs in anonymous mode is not supported'
+        })
+
+    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, const.tasks.PACK)
+
+    # TODO: is this an error?
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.RATED):
+        return jsonify({
+            'status': 'error',
+            'message': "Validation failed"
+        })
+
 @app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
     try:
@@ -95,6 +111,8 @@ def validateBlunder():
         return validateRatedBlunder(blunder_id, userLine, spentTime)
     elif type == const.tasks.EXPLORE:
         return validateExploreBlunder(blunder_id, userLine, spentTime)
+    elif type == const.tasks.PACK:
+        return validatePackBlunder(blunder_id, userLine, spentTime)
     else:
         return jsonify({
             'status': 'error',

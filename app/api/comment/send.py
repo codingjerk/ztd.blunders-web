@@ -4,8 +4,6 @@ from app import app
 from app.db import postgre
 from app.utils import session
 
-from app.api.blunder.info import getBlunderInfoById
-
 MAX_MESSAGE_SIZE = 500
 
 @app.route('/api/comment/send', methods = ['POST'])
@@ -43,4 +41,4 @@ def commentBlunder():
             'message': "Can't comment blunder"
         })
 
-    return getBlunderInfoById(blunder_id)
+    return jsonify(postgre.blunder.getBlunderInfoById(session.userID(), blunder_id))

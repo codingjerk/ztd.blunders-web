@@ -12,7 +12,7 @@ def getPack():
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Error in pack get'
+            'message': 'Pack id required'
         })
 
     if(session.isAnonymous()):
@@ -29,7 +29,10 @@ def getPack():
         })
 
     blunders = [
-        postgre.blunder.getBlunderById(blunder_id)
+        {
+            'get': postgre.blunder.getBlunderById(blunder_id),
+            'info': postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
+        }
         for blunder_id in blunder_ids
     ]
 

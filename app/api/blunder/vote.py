@@ -4,8 +4,6 @@ from app import app
 from app.db import postgre
 from app.utils import session, crossdomain
 
-from app.api.blunder.info import getBlunderInfoById
-
 @app.route('/api/blunder/vote', methods = ['POST'])
 def voteBlunder():
     if session.isAnonymous():
@@ -29,7 +27,7 @@ def voteBlunder():
             'message': "Can't vote blunder"
         })
 
-    return getBlunderInfoById(blunder_id)
+    return jsonify(postgre.blunder.getBlunderInfoById(session.userID(), blunder_id))
 
 @app.route('/api/mobile/blunder/vote', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()

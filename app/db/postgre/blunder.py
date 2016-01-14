@@ -1,6 +1,6 @@
 
-from app.db.postgre import core
-from app.db.postgre import user
+from app.db.postgre import core,user,game
+
 
 # Get random blunder from database
 def getRandomBlunder():
@@ -166,6 +166,69 @@ def getBlunderById(blunder_id):
             'move_index': move_index,
             'game_id': game_id
         }
+
+def gameShortInfo(data):
+    whitePlayer = 'Unknown'
+    whiteElo = '?'
+    blackPlayer = 'Unknown'
+    blackElo = '?'
+
+    if data is not None:
+        if 'white' in data and data['white'] is not None:
+            whitePlayer = data['white']
+
+        if 'white_elo' in data and data['white_elo'] is not None:
+            whiteElo    = data['white_elo']
+
+        if 'black' in data and data['black'] is not None:
+            blackPlayer = data['black']
+
+        if 'black_elo' in data and data['black_elo'] is not None:
+            blackElo    = data['black_elo']
+
+    return {
+        'White': whitePlayer,
+        'WhiteElo': whiteElo,
+        'Black': blackPlayer,
+        'BlackElo': blackElo,
+    }
+
+def getBlunderInfoById(user_id, blunder_id):
+    blunder = getBlunderById(blunder_id)
+
+    if blunder is None:
+        return {
+            'status': 'error',
+            'message': 'Invalid blunder id',
+        }
+
+    elo = blunder['elo']
+
+    successTries, totalTries = getTries(blunder_id)
+
+    comments = getBlunderComments(blunder_id)
+    myFavorite = isFavorite(user_id, blunder_id)
+    myVote = getUserVote(user_id, blunder_id)
+    favorites = getBlunderPopularity(blunder_id)
+    likes, dislikes = getBlunderVotes(blunder_id)
+
+    gameInfo = gameShortInfo(game.getGameById(blunder['game_id']))
+
+    return {
+        'status': 'ok',
+        'data': {
+            'elo': elo,
+            'totalTries': totalTries,
+            'successTries': successTries,
+            'comments': comments,
+            'myFavorite': myFavorite,
+            'myVote': myVote,
+            'likes': likes,
+            'dislikes': dislikes,
+            'favorites': favorites,
+            'game-info': gameInfo
+        }
+    }
 
 def getAssignedBlunder(user_id, type):
     if user_id is None:
