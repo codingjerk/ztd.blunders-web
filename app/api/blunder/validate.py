@@ -34,7 +34,14 @@ def changeRating(user_id, blunder_id, success):
 
     return newUserElo, (newUserElo - user_elo)
 
-def confirmSolution(blunder_id, user_line, spent_time, date_start):
+def validate(blunder_id, user_line, spent_time, task_type):
+    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
+
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
+        return jsonify({
+            'status': 'error',
+            'message': "Validation failed"
+        })
     success = compareLines(blunder_id, user_line)
 
     blunder = postgre.blunder.getBlunderById(blunder_id)
@@ -68,35 +75,21 @@ def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=
     return jsonify({'status': 'ok'})
 
 def validateRatedBlunder(blunder_id, user_line, spent_time):
+    # In rated mode, anonymous users have nothing to validate, this is correct situation
     if session.isAnonymous():
         return jsonify({'status': 'ok'})
 
-    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, const.tasks.RATED)
-
-    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.RATED):
-        return jsonify({
-            'status': 'error',
-            'message': "Validation failed"
-        })
-
-    return jsonify(confirmSolution(blunder_id, user_line, spent_time, date_start))
+    return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.RATED))
 
 def validatePackBlunder(blunder_id, user_line, spent_time):
+    # In pack mode, anonimous user can't validate, this is error
     if session.isAnonymous():
         return jsonify({
             'status': 'error',
             'message': "Working with packs in anonymous mode is not supported"
         })
 
-    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, const.tasks.PACK)
-
-    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.PACK):
-        return jsonify({
-            'status': 'error',
-            'message': "Validation failed"
-        })
-
-    return jsonify(confirmSolution(blunder_id, user_line, spent_time, date_start))
+    return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.PACK))
 
 @app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
