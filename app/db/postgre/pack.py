@@ -96,14 +96,16 @@ def assignPack(user_id, pack_id):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign pack to user')
 
-    # Get blunders and write them into blunder_tasks
-    # writing tasks into blunder tasks
-    #TODO: WHen working in blunder mode, this is ok to have same blunders in different packs
-    # and user can assign them both. We need to check not assign already existed blunder
+    # When working in pack mode, this is ok to have same blunders in different packs
+    # and user can assign them both. We need to check if blunder already assigned
     # This will fail and not right to do. Duplicated blunder will be added only once.
-    # On second validation need special check. For now, will get validation error
+    # When user will try to solve second duplication blunder, it will get validation error
+    # This is ok because it is very rare situation
+    #TODO: In PostgreSQL 9.5 INSERT ... ON CONFLICT DO NOTHING added, rewrite after update?
     blunder_ids = getPackBlundersByIdAll(pack_id)
     for blunder_id in blunder_ids:
+        if blunder.isBlunderTaskExist(user_id, blunder_id, const.tasks.PACK):
+            continue
         blunder.assignBlunderTask(user_id, blunder_id, const.tasks.PACK)
 
 # gets all blunders in pack

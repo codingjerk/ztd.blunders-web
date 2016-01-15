@@ -70,6 +70,7 @@ def validate(blunder_id, user_line, spent_time, task_type):
     }
 
 def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
+    # In explore mode, just remove blunder from task list
     postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
 
     return jsonify({'status': 'ok'})
@@ -82,7 +83,7 @@ def validateRatedBlunder(blunder_id, user_line, spent_time):
     return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.RATED))
 
 def validatePackBlunder(blunder_id, user_line, spent_time):
-    # In pack mode, anonimous user can't validate, this is error
+    # In pack mode, anonymous user can't validate, this is error
     if session.isAnonymous():
         return jsonify({
             'status': 'error',

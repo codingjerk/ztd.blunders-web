@@ -55,6 +55,27 @@ def assignBlunderTask(user_id, blunder_id, type):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to assign new blunder')
 
+def isBlunderTaskExist(user_id, blunder_id, type):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT bt.id
+            FROM blunder_tasks as bt
+            WHERE bt.user_id = %s AND
+                  bt.blunder_id = %s AND
+                  bt.type_id =
+                      (
+                       SELECT btt.id
+                       FROM blunder_task_type AS btt
+                       WHERE btt.name = %s
+                      )
+            """, (user_id, blunder_id, type)
+        )
+
+        if connection.cursor.rowcount != 0:
+            return True
+
+        return False
+
 # Get time, when blunder was assigned to user
 def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None:
