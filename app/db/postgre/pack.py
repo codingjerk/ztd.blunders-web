@@ -1,5 +1,6 @@
 from app.db.postgre import core, blunder
 from app.utils import const
+from json import dumps
 
 def getAssignedPacks(user_id):
     with core.PostgreConnection('r') as connection:
@@ -19,6 +20,24 @@ def getAssignedPacks(user_id):
 
         return result
 
+def getUnlockedRandom(name, description):
+    return [{
+        'type_name': name,
+        'description': description
+    }]
+
+def getUnlockedMateInN(name, description):
+    result = [{
+        'type_name': name,
+        'description': description % (N,),
+        'args' : {
+            'N' : N
+        }
+    }
+    for N in [1,2,3,4,5,6,7,8,9,10]]
+
+    return result
+
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy
 # Total limit, dependencies etc
@@ -32,11 +51,14 @@ def getUnlockedPacks(user_id):
 
         pack_types = connection.cursor.fetchall()
 
-        result = [{
-            'type_name': name,
-            'description': description
-        }
-        for (id, name,description) in pack_types]
+        result = []
+        for (id, name, description) in pack_types:
+            if name == const.pack_type.RANDOM:
+                result.extend(getUnlockedRandom(name, description))
+            elif name == const.pack_type.MATEINN:
+                result.extend(getUnlockedMateInN(name, description))
+            #else:
+            #    raise Exception('')
 
         return result
 
@@ -60,15 +82,15 @@ def getPackTypeId(pack_type_name):
 # may not have this pack assigned to him and, in fact, will not after calling
 # this function
 #TODO: filter blunder_ids to remove already exist
-def createPack(created_by, blunder_ids, pack_type_name):
+def createPack(created_by, blunder_ids, pack_type_name, pack_type_args, pack_description):
     pack_type_id = getPackTypeId(pack_type_name)
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
             INSERT INTO packs(description,created_by,type_id,type_args)
-            VALUES ('', %s, %s, '{}')
+            VALUES (%s, %s, %s, %s)
             RETURNING id
-            """, (created_by, pack_type_id)
+            """, (pack_description, created_by, pack_type_id, dumps(pack_type_args))
         )
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to create pack')
@@ -150,7 +172,6 @@ def getPackBlundersByIdAssignedOnly(user_id, pack_id):
 
 # Returns assigned blunders of some pack, not yet solved by user
 def getAssignedBlunders(user_id, pack_id):
-    #TODO: not include blunders, already solved by user
     pack_ids = getAssignedPacks(user_id)
     if not pack_id in pack_ids:
         return None
@@ -158,3 +179,21 @@ def getAssignedBlunders(user_id, pack_id):
     blunders = getPackBlundersByIdAssignedOnly(user_id, pack_id)
 
     return blunders
+
+def getPackInfo(pack_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT p.description
+            FROM packs as p
+            WHERE p.id = %s
+            """, (pack_id,)
+        )
+
+        if connection.cursor.rowcount != 1:
+            return None
+
+        description, = connection.cursor.fetchone()
+        result = {
+            'description': description
+        }
+        return result

@@ -11,3 +11,4 @@ class roles(object):
 class pack_type(object):
     OPENING = "Opening"
     RANDOM = "Random"
+    MATEINN = "Mate in N"

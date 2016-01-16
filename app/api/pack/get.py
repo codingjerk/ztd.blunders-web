@@ -21,11 +21,19 @@ def getPack():
             'message': 'Working with packs in anonymous mode is not supported'
         })
 
+    pack_info = postgre.pack.getPackInfo(pack_id)
+    if pack_info is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'This pack not exist'
+        })
+    description = pack_info['description']
+
     blunder_ids = postgre.pack.getAssignedBlunders(session.userID(), pack_id)
     if blunder_ids is None:
         return jsonify({
             'status': 'error',
-            'message': 'This pack not exists or not assigned to user'
+            'message': 'This pack not assigned to user'
         })
 
     blunders = [
@@ -39,6 +47,7 @@ def getPack():
     return jsonify({
         'status':'ok',
         'data': {
+            'description': description,
             'pack_id': pack_id,
             'blunders': blunders
         }
