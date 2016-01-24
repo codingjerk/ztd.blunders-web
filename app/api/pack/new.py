@@ -90,7 +90,7 @@ def packSelector(pack_type_name, pack_type_args):
 @app.route('/api/pack/new', methods = ['POST'])
 def getNewPack():
     try:
-        pack_type_name = request.json['type']
+        pack_type_name = request.json['type_name']
         pack_type_args = request.json['args'] if 'args' in request.json else {}
     except Exception:
         return jsonify({

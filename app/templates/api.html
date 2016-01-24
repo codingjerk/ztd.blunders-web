@@ -1,31 +1,64 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block section %}
+<h1>Ztd.Blunders Api Reference</h1>
+<h2>Introduction</h2>
+<p>In next sessions we will cover Blunder service's public API. This API is based on token authorization and extremely easy to use.</p>
+To make things less complicated, we wrote wrapper library to make cross-domain queries easy and intuitive to use. Just add <a href="https://bitbucket.org/ziltoidteam/ztd.blunders-misc/raw/b4e1ddb869cde53ab127d84fac5a7e10b5e104c2/js/sync.js">this</a> to your
+project and use as following
 
-{% block section %}
-    <h1>Ztd.Blunders Api Reference</h1>
-    <h2>Blunders</h2>
+<pre><code class="javascript">
+      sync.ajax({
+          url: 'https://blunders.ztd.io/api/mobile/...',
+          crossDomain : true,
+          data: {
+              token: 'your-token'
+          },
+          onSuccess: function(result) {},
+          onFail: function(result) {}
+      });
+    </code></pre>
 
-    <h3>/api/blunder/get</h3>
-    Get random blunder from server database.
-    If user is not logged in, new random blunder is always returned.<br>
-    If user is logged in, return already assigned blunder for user of given type. If none assigned, assign and return new blunder.<br>
-    Two modes are possible according to "type" argument:
-    <ul>
-        <li><b>type:rated</b><br>
-            When user will solve the blunder, it will affect it's rating and be recorded into statistics and history.
-        </li>
-        <li><b>type:explore</b><br>
-            Optional argument <b>id</b> to get blunder with specific identification number.
-            Blunder will not effect user's rating and statistics.
-        </li>
-    </ul>
+<ul>
+  <li> You will need to specify your request in url field, for example <i>/blunder/get</i> at the end of the path.</li>
+  <li> Data field is the javascript object directly translated to json and passed to server as request description.</li>
+  <li> Field token is necessary data to pass to server with each request, we will assume this by default and not write in following examples.</li>
+</ul>
+</p>
 
-    Request example:
-    <pre><code class="json">{
-    "type": "rated"           
-}</code></pre>
+<p> In next topics, we will only provide json data, translated from <b>data<b> object, explaining previous example it will be look like
+  <pre><code class="json">
+      {
+        'token': 'your-token'
+      }
+      </code></pre>
+</p>
 
-    Response example:
-    <pre><code class="json">{
+<p><b>Note</b>: we also have old API, based on session authorization, but it is deprecated and not supported anymore.
+  Our web site still use this API for historical reasons.
+</p>
+
+<p> You can work with blunders in several different modes.
+
+</p>
+
+  <h2>Blunders</h2>
+
+  <h3>/api/blunder/get</h3> Get random blunder from server database. If user is not logged in, new random blunder is always returned.
+  <br> If user is logged in, return already assigned blunder for user of given type. If none assigned, assign and return new blunder.
+  <br> Two modes are possible according to "type" argument:
+  <ul>
+    <li><b>type:rated</b>
+      <br> When user will solve the blunder, it will affect it's rating and be recorded into statistics and history.
+    </li>
+    <li><b>type:explore</b>
+      <br> Optional argument <b>id</b> to get blunder with specific identification number. Blunder will not effect user's rating and statistics.
+    </li>
+  </ul>
+
+  Request example:
+  <pre><code class="json">{
+    "type": "rated"
+}</code></pre> Response example:
+  <pre><code class="json">{
     "data": {
             "blunderMove": "Bxb6",
             "elo": 2296,
@@ -34,22 +67,17 @@
             "id": "557ae090e13823b818db76b6",
             "move_index": 42, "pgn_id": "554dcb33e1382385749b7e9e",
             "pv": ["Re3+", "Kf2", "Rxf3+", "Kg2", "axb6", "Rhf1", "Rc3", "a4", "Bg5", "Rf2", "Kc7", "Re2", "Re5", "g4", "Re8", "Kg1", "Rd3", "Kg2", "Kc6", "Rbb2", "e3", "Kf3", "Rd1", "Ra2", "Rf1+", "Kg2", "Rb1", "Kg3", "Re4", "h4", "Bf6"]
-            }, 
+            },
     "status": "ok"
 }</code></pre>
 
-    <h3>/api/blunder/info</h3>
-    Get information on given blunder.
-    Use <b>blunder_id</b> argument to specify blunder.<br>
-
-    Request example:
-    <pre><code class="json">{
-    "blunder_id":"557ae090e13823b818db76b6"}       
-}</code></pre>
-
-    Response example:
-    <pre><code class="json">{
-    "data": 
+  <h3>/api/blunder/info</h3> Get information on given blunder. Use <b>blunder_id</b> argument to specify blunder.
+  <br> Request example:
+  <pre><code class="json">{
+    "blunder_id":"557ae090e13823b818db76b6"}
+}</code></pre> Response example:
+  <pre><code class="json">{
+    "data":
         {
         "comments": [],
         "dislikes": 0,
@@ -69,19 +97,16 @@
     "status": "ok"
 }</code></pre>
 
-<h3>/api/blunder/validate</h3>
-    Send user's solution to server. User's rating and statistics can be changed as a result of user's moves.<br>
-    Request example:
-    <pre><code class="json">{
+  <h3>/api/blunder/validate</h3> Send user's solution to server. User's rating and statistics can be changed as a result of user's moves.
+  <br> Request example:
+  <pre><code class="json">{
     "id":"557ae090e13823b818db76b6",
     "line":["Bxb6","Rd4"],
     "spentTime":1293,
     "type":"rated"
-}</code></pre>
-
-    If user is logged in and user's rating affected, we return user's rating change and new Elo.<br>
-    Response example:
-    <pre><code class="json">{
+}</code></pre> If user is logged in and user's rating affected, we return user's rating change and new Elo.
+  <br> Response example:
+  <pre><code class="json">{
     "data": {
         "delta": -15,
         "elo": 1270
@@ -90,17 +115,14 @@
 }</code></pre>
 
 
-<h3>/api/blunder/vote</h3>
-    Vote for a blunder. Valid only for authorized user. <b>vote</b> argument can be +1 for positive vote and -1 for negative.<br>
-    Request example:
-    <pre><code class="json">{
+  <h3>/api/blunder/vote</h3> Vote for a blunder. Valid only for authorized user. <b>vote</b> argument can be +1 for positive vote and -1 for negative.
+  <br> Request example:
+  <pre><code class="json">{
     "blunder_id":"5580f5afe13823b83b0095e1",
     "vote":1
-}</code></pre>
-
-    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
-    Response example:
-    <pre><code class="json">{
+}</code></pre> Response is the blunder information as it is returned by <b>/api/blunder/info </b>.
+  <br> Response example:
+  <pre><code class="json">{
     "data": {
         "comments": [],
         "dislikes": 0,
@@ -120,16 +142,13 @@
     "status": "ok"
 }</code></pre>
 
-<h3>/api/blunder/favorite</h3>
-    Set blander user's favorite. Valid only for authorized user. If blunder already a favorite, removes it from favorite list.<br>
-    Request example:
-    <pre><code class="json">{
+  <h3>/api/blunder/favorite</h3> Set blander user's favorite. Valid only for authorized user. If blunder already a favorite, removes it from favorite list.
+  <br> Request example:
+  <pre><code class="json">{
     "blunder_id":"5580f5afe13823b83b0095e1"
-}</code></pre>
-
-    Response is the blunder information as it is returned by <b>/api/blunder/info </b>.<br>
-    Response example:
-    <pre><code class="json">{
+}</code></pre> Response is the blunder information as it is returned by <b>/api/blunder/info </b>.
+  <br> Response example:
+  <pre><code class="json">{
     "data": {
         "comments": [],
         "dislikes": 0,
@@ -147,17 +166,12 @@
         "totalTries": 1
         },
     "status": "ok"
-}</code></pre>
-
-{% endblock %}
-
-{% block style %}
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
-{% endblock %}
-
-{% block script %}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/languages/json.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-{% endblock %}
+}</code></pre> {% endblock %} {% block style %}
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css"> {% endblock %} {% block script %}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/languages/json.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  {% endblock %}

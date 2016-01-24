@@ -197,3 +197,22 @@ def getPackInfo(pack_id):
             'description': description
         }
         return result
+
+def removePack(user_id, pack_id):
+    ##TODO: optimize?
+    ##delete from blunder_tasks as bt using pack_blunders as pb where bt.blunder_id = pb.blunder_id
+    ##and pb.pack_id = 74 and bt.user_id = 282 and type_id = 3;
+    blunder_ids = getAssignedBlunders(user_id, pack_id)
+    if blunder_ids is None:
+        return
+
+    for blunder_id in blunder_ids:
+        blunder.closeBlunderTask(user_id, blunder_id, const.tasks.PACK)
+
+    with core.PostgreConnection('w') as connection:
+        connection.cursor.execute("""
+            DELETE FROM pack_users as pu
+            WHERE pu.user_id = %s AND
+                  pu.pack_id = %s
+            """, (user_id, pack_id)
+        )
