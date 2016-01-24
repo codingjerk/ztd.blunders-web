@@ -98,8 +98,6 @@ def getNewPack():
             'message': 'Type name required for pack type'
         })
 
-    print (request.json)
-
     if(session.isAnonymous()):
         return jsonify({
             'status': 'error',

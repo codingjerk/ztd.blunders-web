@@ -11,7 +11,6 @@ from app.utils import session, crossdomain
 @app.route('/api/pack/remove', methods = ['POST'])
 def removePack():
     try:
-        print(request.json)
         pack_id = request.json['pack_id']
     except Exception:
         return jsonify({
