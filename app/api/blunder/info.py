@@ -15,7 +15,17 @@ def getBlunderInfo():
             'message': 'Blunder id required'
         })
 
-    return jsonify(postgre.blunder.getBlunderInfoById(session.userID(), blunder_id))
+    result = postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
+    if result is None:
+        return {
+            'status': 'error',
+            'message': 'Invalid blunder id',
+        }
+
+    return jsonify({
+        'status': 'ok',
+        'data': result
+    })
 
 @app.route('/api/mobile/blunder/info', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()

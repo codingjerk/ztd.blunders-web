@@ -218,10 +218,7 @@ def getBlunderInfoById(user_id, blunder_id):
     blunder = getBlunderById(blunder_id)
 
     if blunder is None:
-        return {
-            'status': 'error',
-            'message': 'Invalid blunder id',
-        }
+        return None
 
     elo = blunder['elo']
 
@@ -236,19 +233,16 @@ def getBlunderInfoById(user_id, blunder_id):
     gameInfo = gameShortInfo(game.getGameById(blunder['game_id']))
 
     return {
-        'status': 'ok',
-        'data': {
-            'elo': elo,
-            'totalTries': totalTries,
-            'successTries': successTries,
-            'comments': comments,
-            'myFavorite': myFavorite,
-            'myVote': myVote,
-            'likes': likes,
-            'dislikes': dislikes,
-            'favorites': favorites,
-            'game-info': gameInfo
-        }
+        'elo': elo,
+        'totalTries': totalTries,
+        'successTries': successTries,
+        'comments': comments,
+        'myFavorite': myFavorite,
+        'myVote': myVote,
+        'likes': likes,
+        'dislikes': dislikes,
+        'favorites': favorites,
+        'game-info': gameInfo
     }
 
 def getAssignedBlunder(user_id, type):
