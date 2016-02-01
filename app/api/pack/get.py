@@ -38,7 +38,7 @@ def getPack():
 
     blunders = [
         {
-            'get': postgre.blunder.getBlunderById(blunder_id),
+            'get': utils.jsonifyBlunder(postgre.blunder.getBlunderById(blunder_id)),
             'info': postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
         }
         for blunder_id in blunder_ids

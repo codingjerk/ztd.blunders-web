@@ -18,8 +18,11 @@ def getRatedBlunder():
     if blunder is None:
         blunder = assignNewBlunder(const.tasks.RATED)
 
-    data = utils.jsonifyBlunder(blunder)
-    return jsonify(data)
+    result = {
+        'status': 'ok',
+        'data': utils.jsonifyBlunder(blunder)
+    }
+    return jsonify(result)
 
 def getExploreBlunder():
     blunder = postgre.blunder.getAssignedBlunder(session.userID(), const.tasks.EXPLORE)
@@ -33,8 +36,11 @@ def getExploreBlunder():
         if blunder is None:
             blunder = assignNewBlunder(const.tasks.EXPLORE)
 
-    data = utils.jsonifyBlunder(blunder)
-    return jsonify(data)
+    result = {
+        'status': 'ok',
+        'data': utils.jsonifyBlunder(blunder)
+    }
+    return jsonify(result)
 
 @app.route('/api/blunder/get', methods = ['POST'])
 def getBlunder():
