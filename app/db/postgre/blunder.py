@@ -39,7 +39,7 @@ def getRandomBlunder():
 # Assign blunder to user
 def assignBlunderTask(user_id, blunder_id, type):
     if user_id is None:
-        return
+        return #TODO: value or exception?
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -79,7 +79,7 @@ def isBlunderTaskExist(user_id, blunder_id, type):
 # Get time, when blunder was assigned to user
 def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None:
-        return
+        return #TODO: value or exception?
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute(
@@ -125,7 +125,7 @@ def saveBlunderHistory(user_id, user_elo, blunder_id, blunder_elo, success, user
 
 def closeBlunderTask(user_id, blunder_id, type):
     if user_id is None:
-        return
+        return #TODO: value or exception?
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
