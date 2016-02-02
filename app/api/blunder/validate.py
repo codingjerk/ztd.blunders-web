@@ -38,10 +38,10 @@ def validate(blunder_id, user_line, spent_time, task_type):
     date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
 
     if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
-        return jsonify({
+        return {
             'status': 'error',
             'message': "Validation failed"
-        })
+        }
     success = compareLines(blunder_id, user_line)
 
     blunder = postgre.blunder.getBlunderById(blunder_id)
