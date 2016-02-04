@@ -1,15 +1,15 @@
 (function() {
     var moveSpeed = 500;
-    
+
     var board;
     var game;
-    
+
     var animationLocked = false;
     var blunder;
-    
+
     var firstMoveIndex = null;
     var firstMoveTurn = null;
-    
+
     var visitedMoveCounter = 0;
 
     var multiPv = null;
@@ -18,14 +18,14 @@
 
     var counter = utils.counter(1000, function () {
         var totalSeconds = counter.total();
-        
+
         var formatted = utils.timePrettyFormat(totalSeconds);
 
         $('#spent-time-value').html(formatted);
     });
 
     function getPv(index) {
-        var result; 
+        var result;
 
         if (index === 'user') {
             result = multiPv[1];
@@ -49,7 +49,7 @@
             notify.error(response.message);
             return;
         }
-        
+
         if (finished) {
             getBlunderInfo(blunder.id);
         }
@@ -117,7 +117,7 @@
             finished === true ||
             game.game_over() === true ||
             game.history().length < visitedMoveCounter ||
-            game.turn() !== piece[0]) 
+            game.turn() !== piece[0])
         {
                 return false;
         }
@@ -203,7 +203,7 @@
         }
 
         highlightMove(lastMove);
-        
+
         lockAnimation();
         board.position(game.fen());
 
@@ -228,7 +228,7 @@
             if (i === game.history().length - 1 && multiPv.activeIndex === pv.index) {
                 style += ' currentMove';
             }
-            
+
             if (i % 2 === 0) {
                 var moveNumber = Math.floor(i / 2) + 1 + firstMoveIndex;
                 text += moveNumber + '.&nbsp';
@@ -297,7 +297,7 @@
             ++visitedMoveCounter;
 
             highlightMove(pmove);
-            
+
             if (aiMove) {
                 lockAnimation();
                 board.position(game.fen());
@@ -326,7 +326,7 @@
         }
 
         getBlunderInfo(blunder.id);
-            
+
         setStatus('playing');
 
         multiPv = [];
@@ -374,7 +374,7 @@
 
     function commentOnReply(comment_id) {
         return function() {
-            var buttons = '<a class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>' + 
+            var buttons = '<a class="submit-comment-button"><i class="fa fa-check"></i> Submit</a>' +
                 '<a class="cancel-comment-button"><i class="fa fa-times"></i> Cancel</a>';
 
             var editField = '<div><textarea rows="2" cols="40"></textarea></div>' + buttons;
@@ -404,7 +404,7 @@
             textarea.keyup(function(event) {
                 var keyCode = event.keyCode || event.which;
 
-                if (keyCode === 13 && event.ctrlKey) { // Ctrl+Enter key 
+                if (keyCode === 13 && event.ctrlKey) { // Ctrl+Enter key
                     reply();
                 }
             });
@@ -419,7 +419,7 @@
 
         var likeButton = '<a class="comment-like-button" id="comment-like-button-{0}"><i class="fa fa-thumbs-up"></i></a>'.format(data.id);
         var dislikeButton = '<a class="comment-dislike-button" id="comment-dislike-button-{0}"><i class="fa fa-thumbs-down"></i></a>'.format(data.id);
-        
+
         var votesCount = data.likes - data.dislikes;
 
         var votesClass = "";
@@ -468,7 +468,7 @@
             'black-elo-value':  info.BlackElo
         });
 
-        var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0; 
+        var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0;
         grid.update({
             'blunder-rating': data.elo,
             'success-played': data.successTries,
@@ -489,7 +489,7 @@
             $('#comment-like-button-' + comment.id).on('click', function() {
                 voteBlunderComment(blunder.id, comment.id, 1);
             });
-            
+
             $('#comment-dislike-button-' + comment.id).on('click', function() {
                 voteBlunderComment(blunder.id, comment.id, -1);
             });
@@ -503,7 +503,7 @@
             id: 'loading-spin',
             url: '/api/blunder/get',
             data: {
-                type: 'explore', 
+                type: 'explore',
                 id: id
             },
             onDone: onBlunderRequest
@@ -529,7 +529,7 @@
             data: JSON.stringify({
                 blunder_id: blunder_id
             })
-        }).done(onInfoRequest);     
+        }).done(onInfoRequest);
     }
 
     function voteBlunder(blunder_id, vote) {
@@ -816,7 +816,7 @@
     grid.setupSpoiler('blunder-block', true);
     grid.setupSpoiler('game-block', true);
 
-    grid.update({'help': 
+    grid.update({'help':
         'The player has just made a fatal mistake.\n' +
         'Play the best moves to obtain advantage.\n' +
         "There's only one winning variation wins at least 2 pawns."
