@@ -90,7 +90,11 @@ def validatePackBlunder(blunder_id, user_line, spent_time):
             'message': "Working with packs in anonymous mode is not supported"
         })
 
-    return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.PACK))
+    result = validate(blunder_id, user_line, spent_time, const.tasks.PACK)
+
+    postgre.pack.gcHistoryPacks(session.userID())
+
+    return jsonify(result)
 
 @app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():

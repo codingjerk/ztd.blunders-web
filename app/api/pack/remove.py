@@ -24,7 +24,7 @@ def removePack():
             'message': 'Working with packs in anonymous mode is not supported'
         })
 
-    postgre.pack.removePack(session.userID(), pack_id)
+    postgre.pack.removePack(session.userID(), pack_id, False)
 
     return jsonify({
         'status':'ok'

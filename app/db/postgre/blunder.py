@@ -81,7 +81,7 @@ def getTaskStartDate(user_id, blunder_id, type):
     if user_id is None:
         return #TODO: value or exception?
 
-    with core.PostgreConnection('w') as connection:
+    with core.PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT assign_date
                FROM blunder_tasks AS bt
@@ -121,7 +121,7 @@ def saveBlunderHistory(user_id, user_elo, blunder_id, blunder_elo, success, user
         )
 
         if connection.cursor.rowcount != 1:
-            raise Exception('Failed to assign new blunder')
+            raise Exception('Failed to write into blunder history table')
 
 def closeBlunderTask(user_id, blunder_id, type):
     if user_id is None:

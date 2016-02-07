@@ -198,13 +198,31 @@ def getPackInfo(pack_id):
         }
         return result
 
-def removePack(user_id, pack_id):
+def getPackAssignDate(user_id, pack_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT pu.assign_date FROM pack_users as pu
+            WHERE pu.user_id = %s AND
+                  pu.pack_id = %s
+            """, (user_id, pack_id)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Pack not found, table is not in proper state')
+
+        assign_date, = connection.cursor.fetchone()
+
+        return assign_date
+
+def removePack(user_id, pack_id, success):
     ##TODO: optimize?
     ##delete from blunder_tasks as bt using pack_blunders as pb where bt.blunder_id = pb.blunder_id
     ##and pb.pack_id = 74 and bt.user_id = 282 and type_id = 3;
     blunder_ids = getAssignedBlunders(user_id, pack_id)
     if blunder_ids is None:
         return
+
+    assign_date = getPackAssignDate(user_id, pack_id)
 
     for blunder_id in blunder_ids:
         blunder.closeBlunderTask(user_id, blunder_id, const.tasks.PACK)
@@ -216,3 +234,53 @@ def removePack(user_id, pack_id):
                   pu.pack_id = %s
             """, (user_id, pack_id)
         )
+
+    savePackHistory(user_id, pack_id, assign_date, success)
+
+def savePackHistory(user_id, pack_id, assign_date, success):
+    result = 1 if success else 0
+
+    with core.PostgreConnection('w') as connection:
+        connection.cursor.execute("""
+            INSERT INTO pack_history
+            (user_id, pack_id, date_start, result)
+            VALUES (%s, %s, %s, %s);
+            """,
+            (user_id, pack_id, assign_date, result)
+        )
+
+        if connection.cursor.rowcount != 1:
+            raise Exception('Failed to write into pack history table')
+
+def gcHistoryPacks(user_id):
+    if user_id is None:
+        raise Exception('postre.savePackHistory for anonim')
+
+    # returns packs with 1 or more assigned blunders
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT pack_id,
+                   COUNT(pb.blunder_id)
+            FROM pack_users AS pu
+            INNER JOIN pack_blunders AS pb
+                USING(pack_id)
+            INNER JOIN blunder_tasks AS bt
+                USING(blunder_id)
+            WHERE pu.user_id = %s AND
+                  bt.type_id = (
+                                  SELECT bty.id
+                                  FROM blunder_task_type AS bty
+                                  WHERE bty.name = %s
+                               )
+            GROUP BY pack_id;
+            """,
+            (user_id, const.tasks.PACK)
+        )
+
+        nonEmptyPacks = [pack_id for pack_id,count in connection.cursor.fetchall()]
+        allPacks = getAssignedPacks(user_id)
+
+        emptyPacks = [pack for pack in allPacks if pack not in list(nonEmptyPacks)]
+
+        for pack_id in emptyPacks:
+            removePack(user_id, pack_id, True)
