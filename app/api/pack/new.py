@@ -67,8 +67,9 @@ def packSelector(pack_type_name, pack_type_args):
             'message': 'Pack type name is not exist or locked for user: %s' % pack_type_name
         }
 
+    # Reuse pack mechanism. This keeps database from enlarging too mach and
+    # giving better interactions between users
     pack_id = reusePack(pack_type_name, pack_type_args)
-    print("Found reused id: ", pack_id)
     if(pack_id != None):
         return {
             'status': 'ok',
