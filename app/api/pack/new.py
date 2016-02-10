@@ -32,6 +32,15 @@ def newMateInNPack(pack_type_args, pack_description):
 
     return pack_id
 
+def reusePack(pack_type_name, pack_type_args):
+    pack_id = postgre.pack.reusePack(session.userID(), pack_type_name, pack_type_args)
+    if(pack_id == None):
+        return None
+
+    postgre.pack.assignPack(session.userID(), pack_id)
+
+    return pack_id
+
 def packSelector(pack_type_name, pack_type_args):
     unlocked_packs = postgre.pack.getUnlockedPacks(session.userID())
     unlocked_keys = [(
@@ -56,6 +65,16 @@ def packSelector(pack_type_name, pack_type_args):
         return {
             'status': 'error',
             'message': 'Pack type name is not exist or locked for user: %s' % pack_type_name
+        }
+
+    pack_id = reusePack(pack_type_name, pack_type_args)
+    print("Found reused id: ", pack_id)
+    if(pack_id != None):
+        return {
+            'status': 'ok',
+            'data': {
+                'pack_id': pack_id
+            }
         }
 
     pack = filtered[0]

@@ -160,7 +160,8 @@ def getPackBlundersByIdAssignedOnly(user_id, pack_id):
                         SELECT bty.id
                         FROM blunder_task_type AS bty
                         WHERE bty.name = %s
-                    ) ;
+                    )
+            ORDER BY pb.blunder_id ;
             """, (pack_id, user_id, const.tasks.PACK)
         )
 
@@ -252,6 +253,9 @@ def savePackHistory(user_id, pack_id, assign_date, success):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to write into pack history table')
 
+ #
+ # Scan all user assigned packs and closes them if no blunders left to solve
+ #
 def gcHistoryPacks(user_id):
     if user_id is None:
         raise Exception('postre.savePackHistory for anonim')
@@ -284,3 +288,36 @@ def gcHistoryPacks(user_id):
 
         for pack_id in emptyPacks:
             removePack(user_id, pack_id, True)
+
+ #
+ #
+ #
+def reusePack(user_id, pack_type_name, pack_type_args):
+    pack_type_id = getPackTypeId(pack_type_name)
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT p.id
+            FROM packs AS p
+            LEFT JOIN (
+                        SELECT pu.pack_id AS id
+                        FROM pack_users AS pu
+                        WHERE pu.user_id = %s
+                        UNION
+                        SELECT ph.pack_id AS id
+                        FROM pack_history AS ph
+                        WHERE ph.user_id = %s
+                      ) AS pa
+            USING(id)
+            WHERE pa.id IS NULL AND
+                  p.type_id = %s AND
+                  p.type_args = %s;
+        """, (user_id, user_id, pack_type_id, dumps(pack_type_args))
+        )
+
+        if connection.cursor.rowcount == 0:
+            return None
+
+        pack_id, = connection.cursor.fetchone()
+
+        return pack_id
