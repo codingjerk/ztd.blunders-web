@@ -311,7 +311,8 @@ def reusePack(user_id, pack_type_name, pack_type_args):
             USING(id)
             WHERE pa.id IS NULL AND
                   p.type_id = %s AND
-                  p.type_args = %s;
+                  p.type_args = %s
+            LIMIT 1;
         """, (user_id, user_id, pack_type_id, dumps(pack_type_args))
         )
 
