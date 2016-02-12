@@ -20,7 +20,7 @@ def getAssignedPacks(user_id):
 
         return result
 
-def getUnlockedRandom(name, description):
+def getUnlockedAsIs(name, description):
     return [{
         'type_name': name,
         'description': description
@@ -59,9 +59,17 @@ def getUnlockedPacks(user_id, packs):
         result = []
         for (id, name, description) in pack_types:
             if name == const.pack_type.RANDOM:
-                result.extend(getUnlockedRandom(name, description))
+                result.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.MATEINN:
                 result.extend(getUnlockedMateInN(name, description))
+            elif name == const.pack_type.OPENING:
+                result.extend(getUnlockedAsIs(name, description))
+            elif name == const.pack_type.ENDGAME:
+                result.extend(getUnlockedAsIs(name, description))
+            elif name == const.pack_type.PROMOTION:
+                result.extend(getUnlockedAsIs(name, description))
+            elif name == const.pack_type.CLOSEDGAME:
+                result.extend(getUnlockedAsIs(name, description))
             #else:
             #    raise Exception('')
 

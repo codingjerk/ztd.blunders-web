@@ -19,13 +19,25 @@ def newRandomPack(pack_description):
 
     return pack_id
 
+# Type name and tag name is different beasts, but this function handles
+# the most simple case when they are the same.
+# Request for pack type_name, which consists of blunders tagged by tag name equals to type_name
+def newPackByTagName(pack_type_name, pack_description):
+    blunder_ids = postgre.blunder.getBlunderByTag(pack_type_name, 25)
+
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, pack_type_name, {}, pack_description)
+    postgre.pack.assignPack(session.userID(), pack_id)
+
+    return pack_id
+
 def newMateInNPack(pack_type_args, pack_description):
     try:
         N = pack_type_args['N']
     except Exception:
         return None
 
-    blunder_ids = postgre.blunder.getMateTagBlunder(N, 25)
+    tag_name = "Mate in %s" % (N,)
+    blunder_ids = postgre.blunder.getBlunderByTag(tag_name, 25)
 
     pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.MATEINN, pack_type_args, pack_description)
     postgre.pack.assignPack(session.userID(), pack_id)
@@ -86,6 +98,14 @@ def packSelector(pack_type_name, pack_type_args):
         pack_id = newRandomPack(pack_description)
     elif pack_type_name == const.pack_type.MATEINN:
         pack_id = newMateInNPack(pack_type_args, pack_description)
+    elif pack_type_name == const.pack_type.OPENING:
+        pack_id = newPackByTagName(pack_type_name, pack_description)
+    elif pack_type_name == const.pack_type.ENDGAME:
+        pack_id = newPackByTagName(pack_type_name, pack_description)
+    elif pack_type_name == const.pack_type.PROMOTION:
+        pack_id = newPackByTagName(pack_type_name, pack_description)
+    elif pack_type_name == const.pack_type.CLOSEDGAME:
+        pack_id = newPackByTagName(pack_type_name, pack_description)
     else:
         return {
             'status': 'error',

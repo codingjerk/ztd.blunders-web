@@ -9,6 +9,9 @@ class roles(object):
     USER = 3
 
 class pack_type(object):
-    OPENING = "Opening"
     RANDOM = "Random"
     MATEINN = "Mate in N"
+    OPENING = "Opening"
+    ENDGAME = "Endgame"
+    PROMOTION = "Promotion"
+    CLOSEDGAME = "Closed game"

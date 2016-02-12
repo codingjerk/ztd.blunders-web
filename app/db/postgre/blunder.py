@@ -552,16 +552,16 @@ def countBlunders():
 
         return count
 
-def getMateTagBlunder(N, count):
+def getBlunderByTag(tag_name, count):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT bt.blunder_id
                FROM blunder_tags AS bt
                INNER JOIN blunder_tag_type AS btt
                       ON bt.type_id = btt.id
-               WHERE btt.name = CONCAT('Mate in ',%s)
+               WHERE btt.name = '%s'
                ORDER BY RANDOM()
-               LIMIT %s;""" % (N, count)
+               LIMIT %s;""" % (tag_name, count)
         )
 
         result = connection.cursor.fetchall()
