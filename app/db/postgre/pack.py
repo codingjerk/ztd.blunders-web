@@ -44,6 +44,9 @@ def getUnlockedMateInN(name, description):
 # Total limit, dependencies etc
 # Function receives packs
 def getUnlockedPacks(user_id, packs):
+    if len(packs) >= 4: #Limit packs user can have
+        return []
+
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT id, name, description
