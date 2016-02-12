@@ -27,6 +27,7 @@ def getUnlockedRandom(name, description):
     }]
 
 def getUnlockedMateInN(name, description):
+    # all N 1-10 should work now, however, we artificially limit N to 3
     result = [{
         'type_name': name,
         'description': description % (N,),
@@ -34,14 +35,15 @@ def getUnlockedMateInN(name, description):
             'N' : N
         }
     }
-    for N in [1,2,3,4,5,6,7,8,9,10]]
+    for N in [1,2,3]]
 
     return result
 
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy
 # Total limit, dependencies etc
-def getUnlockedPacks(user_id):
+# Function receives packs
+def getUnlockedPacks(user_id, packs):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT id, name, description
@@ -61,6 +63,13 @@ def getUnlockedPacks(user_id):
             #    raise Exception('')
 
         return result
+
+# Get both assigned and unlocked packs
+def getPacks(user_id):
+    packs = getAssignedPacks(user_id)
+    unlocked = getUnlockedPacks(user_id, packs)
+
+    return packs, unlocked
 
 def getPackTypeId(pack_type_name):
     with core.PostgreConnection('r') as connection:
@@ -312,6 +321,7 @@ def reusePack(user_id, pack_type_name, pack_type_args):
             WHERE pa.id IS NULL AND
                   p.type_id = %s AND
                   p.type_args = %s
+            ORDER BY p.id
             LIMIT 1;
         """, (user_id, user_id, pack_type_id, dumps(pack_type_args))
         )

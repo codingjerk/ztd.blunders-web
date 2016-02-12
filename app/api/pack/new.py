@@ -42,7 +42,7 @@ def reusePack(pack_type_name, pack_type_args):
     return pack_id
 
 def packSelector(pack_type_name, pack_type_args):
-    unlocked_packs = postgre.pack.getUnlockedPacks(session.userID())
+    assigned_packs, unlocked_packs = postgre.pack.getPacks(session.userID())
     unlocked_keys = [(
                         pack['type_name'],
                         pack['args'] if 'args' in pack else {}

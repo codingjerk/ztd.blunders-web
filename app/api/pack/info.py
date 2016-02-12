@@ -21,8 +21,7 @@ def getPackInfo():
             'message': 'Working with packs in anonymous mode is not supported'
         })
 
-    packs = postgre.pack.getAssignedPacks(session.userID())
-    unlocked = postgre.pack.getUnlockedPacks(session.userID())
+    packs, unlocked = postgre.pack.getPacks(session.userID())
 
     return jsonify({
         'status':'ok',
