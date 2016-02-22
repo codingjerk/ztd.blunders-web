@@ -283,14 +283,12 @@ def gcHistoryPacks(user_id):
     # returns packs with 1 or more assigned blunders
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT pack_id,
-                   COUNT(pb.blunder_id)
-            FROM pack_users AS pu
-            INNER JOIN pack_blunders AS pb
-                USING(pack_id)
+            SELECT pb.pack_id,
+                   COUNT(1)
+            FROM pack_blunders as pb
             INNER JOIN blunder_tasks AS bt
                 USING(blunder_id)
-            WHERE pu.user_id = %s AND
+            WHERE bt.user_id = %s AND
                   bt.type_id = (
                                   SELECT bty.id
                                   FROM blunder_task_type AS bty
