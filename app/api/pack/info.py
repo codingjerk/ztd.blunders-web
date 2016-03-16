@@ -22,6 +22,7 @@ def getPackInfo():
         })
 
     packs, unlocked = postgre.pack.getPacks(session.userID())
+    packs = [ postgre.pack.idToHashId(pack_id) for pack_id in packs]
 
     return jsonify({
         'status':'ok',

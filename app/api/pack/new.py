@@ -79,14 +79,14 @@ def packSelector(pack_type_name, pack_type_args):
             'message': 'Pack type name is not exist or locked for user: %s' % pack_type_name
         }
 
-    # Reuse pack mechanism. This keeps database from enlarging too mach and
-    # giving better interactions between users
+    # Reuse pack mechanism. This keeps database from growing too much and
+    # give better interaction experience between users
     pack_id = reusePack(pack_type_name, pack_type_args)
     if(pack_id != None):
         return {
             'status': 'ok',
             'data': {
-                'pack_id': pack_id
+                'pack_id': postgre.pack.idToHashId(pack_id)
             }
         }
 
@@ -121,7 +121,7 @@ def packSelector(pack_type_name, pack_type_args):
     return {
         'status': 'ok',
         'data': {
-            'pack_id': pack_id
+            'pack_id': postgre.pack.idToHashId(pack_id)
         }
     }
 

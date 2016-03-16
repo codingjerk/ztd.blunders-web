@@ -40,11 +40,11 @@ def getUnlockedMateInN(name, description):
     return result
 
 # Returns all pack types user can request in this time
-# This function must limit user from doing crazy
+# This function must limit user from doing crazy things
 # Total limit, dependencies etc
 # Function receives packs
 def getUnlockedPacks(user_id, packs):
-    if len(packs) >= 4: #Limit packs user can have
+    if len(packs) >= 4: # Limit packs user can have
         return []
 
     with core.PostgreConnection('r') as connection:
@@ -273,9 +273,7 @@ def savePackHistory(user_id, pack_id, assign_date, success):
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to write into pack history table')
 
- #
  # Scan all user assigned packs and closes them if no blunders left to solve
- #
 def gcHistoryPacks(user_id):
     if user_id is None:
         raise Exception('postre.savePackHistory for anonim')
@@ -307,9 +305,10 @@ def gcHistoryPacks(user_id):
         for pack_id in emptyPacks:
             removePack(user_id, pack_id, True)
 
- #
- #
- #
+ # Function returns any existed pack with given parameters, not yet seen
+ # by the user. It gives 2 advantages - packs are reused and not growing too much
+ # and new users receive the same packs/blunders as others. Those packs should
+ # accamulate better statistics and feedback.
 def reusePack(user_id, pack_type_name, pack_type_args):
     pack_type_id = getPackTypeId(pack_type_name)
 
@@ -341,3 +340,38 @@ def reusePack(user_id, pack_type_name, pack_type_args):
         pack_id, = connection.cursor.fetchone()
 
         return pack_id
+
+def hashIdToId(hash_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT p.id
+            FROM packs as p
+            WHERE p.hash_id = %s;
+        """, (hash_id,)
+        )
+
+        # Hash id not exist in database is correct behaviour,
+        # as we get those id's from user and user can hack our database.
+        if connection.cursor.rowcount != 1:
+            return None
+
+        pack_id, = connection.cursor.fetchone()
+
+        return pack_id
+
+def idToHashId(pack_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT p.hash_id
+            FROM packs as p
+            WHERE p.id = %s;
+        """, (pack_id,)
+        )
+
+        # This is an error, because pack id must be valid in internal routines
+        if connection.cursor.rowcount != 1:
+            raise Exception('Pack id is invalid, where we assume it is ok')
+
+        hash_id, = connection.cursor.fetchone()
+
+        return hash_id

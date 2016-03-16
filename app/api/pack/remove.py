@@ -11,11 +11,18 @@ from app.utils import session, crossdomain
 @app.route('/api/pack/remove', methods = ['POST'])
 def removePack():
     try:
-        pack_id = request.json['pack_id']
+        hash_id = request.json['pack_id']
     except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Pack id required'
+        })
+
+    pack_id = postgre.pack.hashIdToId(hash_id)
+    if(pack_id is None):
+        return jsonify({
+            'status': 'error',
+            'message': 'Pack with given hash id not found'
         })
 
     if(session.isAnonymous()):
