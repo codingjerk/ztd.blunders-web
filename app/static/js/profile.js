@@ -4,7 +4,7 @@
             caption: 'Blunders history',
             rows: [
                 {
-                    type: 'pager', 
+                    type: 'pager',
                     id: 'blunder-history'
                 }
             ]
@@ -13,7 +13,7 @@
             caption: 'Favorites',
             rows: [
                 {
-                    type: 'pager', 
+                    type: 'pager',
                     id: 'blunder-favorites'
                 }
             ]
@@ -22,7 +22,7 @@
             caption: 'Comments',
             rows: [
                 {
-                    type: 'pager', 
+                    type: 'pager',
                     id: 'user-comments'
                 }
             ]
@@ -91,7 +91,7 @@ function pieceTheme(piece) {
     var columnsRow = 3;
     var rowsNum = 2;
     var itemsOnPage = columnsRow * rowsNum;
-    
+
     var id = 'blunder-history';
 
     grid.setupPager(id, itemsOnPage, function(page) {
@@ -112,14 +112,14 @@ function pieceTheme(piece) {
 
             sortByDate(response.data.blunders, {
                 address: function(blunder) {
-                    return blunder.date_start;
+                    return blunder.date_finish;
                 },
                 reverse: true
             });
 
             var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = (item.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
-                var title = 'Date: {0}, Spent time: {1}'.format(item.date_start, utils.timePrettyFormat(item.spent_time));
+                var title = 'Date: {0}, Spent time: {1}'.format(item.date_finish, utils.timePrettyFormat(item.spent_time));
                 return '<a href="/explore/{1}"><div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div></a>'.format(style, item.blunder_id, title);
             });
 
@@ -144,7 +144,7 @@ function pieceTheme(piece) {
     var columnsRow = 3;
     var rowsNum = 2;
     var itemsOnPage = columnsRow * rowsNum;
-    
+
     var id = 'blunder-favorites';
 
     grid.setupPager(id, itemsOnPage, function(page) {
@@ -194,7 +194,7 @@ function pieceTheme(piece) {
 
 (function setupComments() {
     var itemsOnPage = 5;
-    
+
     var id = 'user-comments';
 
     grid.setupPager(id, itemsOnPage, function(page) {
@@ -224,7 +224,7 @@ function pieceTheme(piece) {
 
                     var style = 'comments-board';
                     var boardContent = '<a href="/explore/{1}"><div class="{0}" id="board-comment-{1}" style="width: 180px"></div></a>'.format(style, blunder_id);
-                    
+
                     var commentContent = blunder.comments.map(commentMaker).join('');
 
                     rows += '<tr><td>{0}</td><td class="blunder-comment-cell">{1}</td></tr>'.format(boardContent, commentContent);

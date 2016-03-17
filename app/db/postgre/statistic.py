@@ -157,11 +157,11 @@ def getBlundersHistoryIds(user_id, offset, limit):
         connection.cursor.execute("""
             SELECT h.blunder_id,
                    h.result,
-                   h.date_start,
+                   h.date_finish,
                    h.spent_time
             FROM blunder_history AS h
             WHERE h.user_id = %s
-            ORDER BY h.date_start DESC
+            ORDER BY h.date_finish DESC
             LIMIT %s OFFSET %s"""
             , (user_id, limit, offset, )
         )
@@ -172,10 +172,10 @@ def getBlundersHistoryIds(user_id, offset, limit):
             {
                 "blunder_id": blunder_id,
                 "result": True if result == 1 else False,
-                "date_start": date_start,
+                "date_finish": date_finish,
                 "spent_time": spent_time
             }
-            for (blunder_id, result, date_start, spent_time) in data
+            for (blunder_id, result, date_finish, spent_time) in data
         ]
 
     return blunders
@@ -201,7 +201,7 @@ def getBlundersHistory(username, offset, limit):
             "blunder_id": theblunder['blunder_id'],
             "fen": fen,
             "result": theblunder['result'],
-            "date_start": theblunder['date_start'],
+            "date_finish": theblunder['date_finish'],
             "spent_time": theblunder['spent_time']
         })
 
