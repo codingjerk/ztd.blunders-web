@@ -14,6 +14,6 @@ def sendFeedback():
         })
 
     return jsonify(
-        postgre.saveFeedback(message)
+        postgre.feedback.saveFeedback(message)
     )
 

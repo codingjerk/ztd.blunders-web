@@ -14,7 +14,7 @@ def signup_post():
         return jsonify(validateResult)
 
     salt, hashPass = hash.new(password)
-    status = postgre.signupUser(username, salt, hashPass, email)
+    status = postgre.user.signupUser(username, salt, hashPass, email)
 
     if status['status'] == 'ok':
         session.authorize(username, password)
@@ -37,7 +37,7 @@ def signup_post_mobile():
         return jsonify(validateResult)
 
     salt, hashPass = hash.new(password)
-    status = postgre.signupUser(username, salt, hashPass, email)
+    status = postgre.user.signupUser(username, salt, hashPass, email)
 
     if status['status'] != 'ok':
         return jsonify(status)

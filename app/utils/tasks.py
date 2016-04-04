@@ -1,2 +1,0 @@
-RATED = 'rated'
-EXPLORE = 'explore'

@@ -8,7 +8,7 @@ from app.utils import session, crossdomain
 def getRating():
     return flask.jsonify({
         'status': 'ok',
-        'rating': postgre.getRating(session.userID())
+        'rating': postgre.user.getRating(session.userID())
     })
 
 @app.route('/api/mobile/session/rating', methods = ['POST', 'OPTIONS'])

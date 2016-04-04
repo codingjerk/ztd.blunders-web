@@ -13,4 +13,4 @@ def getUserProfile():
             'message': 'Username required'
         })
 
-    return jsonify(postgre.getUserProfile(username))
+    return jsonify(postgre.user.getUserProfile(username))

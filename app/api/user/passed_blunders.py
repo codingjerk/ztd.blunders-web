@@ -1,6 +1,7 @@
 from flask import jsonify, request
 
-from app import app, db
+from app import app
+from app.db import postgre
 
 @app.route('/api/user/passed-blunders', methods = ['POST'])
 def getBlundersHistory():
@@ -14,4 +15,4 @@ def getBlundersHistory():
             'message': 'Username, offset and limit required'
         })
 
-    return jsonify(db.getBlundersHistory(username, offset, limit))
+    return jsonify(postgre.statistic.getBlundersHistory(username, offset, limit))

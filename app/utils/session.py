@@ -16,8 +16,8 @@ class State:
 
     def authorize(token): #pylint: disable=no-self-argument
         State.token = token
-        State.userID = postgre.getUserIdByToken(token)
-        State.username = postgre.getUsernameById(State.userID)
+        State.userID = postgre.user.getUserIdByToken(token)
+        State.username = postgre.user.getUsernameById(State.userID)
 
     #pylint: disable=no-method-argument
     def clean():
@@ -40,7 +40,8 @@ def tokenize():
                 State.authorize(token)
 
                 result = f()
-            except Exception:
+            except Exception as e:
+                print(e) # Useful debug printing
                 return jsonify({
                     'status': 'error',
                     'message': 'Invalid API token'
@@ -57,14 +58,15 @@ def tokenize():
 #pylint: disable=redefined-outer-name
 def authorizeWithToken(username, password):
     try:
-        if postgre.autentithicateUser(username, hash.get(username, password)):
-            token = postgre.getTokenForUser(username)
+        if postgre.user.authorize(username, hash.get(username, password)):
+            token = postgre.user.getTokenForUser(username)
 
             return {
                 'status': 'ok',
                 'token': token
             }
-    except (Exception, KeyError):
+    except (Exception, KeyError) as e:
+        print(e)
         return {
             'status': 'error',
             'field': 'username',
@@ -106,9 +108,9 @@ def userID():
 
 def authorize(username, password): #pylint: disable=redefined-outer-name
     try:
-        if postgre.autentithicateUser(username, hash.get(username, password)):
+        if postgre.user.authorize(username, hash.get(username, password)):
             session['username'] = username
-            session['user_id'] = postgre.getUserId(username)
+            session['user_id'] = postgre.user.getUserId(username)
 
             return {
                 'status': 'ok'
@@ -132,4 +134,3 @@ def deauthorize():
 
     del session['username']
     del session['user_id']
-

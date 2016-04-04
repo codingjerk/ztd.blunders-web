@@ -8,20 +8,17 @@ def init(func):
 
 def jsonifyBlunder(data):
     return {
-        'status': 'ok',
-        'data': {
-            'id': str(data['id']),
-            'game_id': str(data['game_id']),
-            'move_index': data['move_index'],
+        'id': str(data['id']),
+        'game_id': str(data['game_id']),
+        'move_index': data['move_index'],
 
-            'forcedLine': data['forced_line'],
-            'pv': data['pv'],
+        'forcedLine': data['forced_line'],
+        'pv': data['pv'],
 
-            'fenBefore': data['fen_before'],
-            'blunderMove': data['blunder_move'],
+        'fenBefore': data['fen_before'],
+        'blunderMove': data['blunder_move'],
 
-            'elo': data['elo']
-        }
+        'elo': data['elo']
     }
 
 def validateUsername(username):

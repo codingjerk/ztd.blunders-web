@@ -2,85 +2,106 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session, tasks
+from app.utils import session, const
 
 from app.utils import elo, crossdomain
 
-def compareLines(blunder_id, userLine):
-    data = postgre.getBlunderById(blunder_id)
+def compareLines(blunder_id, user_line):
+    data = postgre.blunder.getBlunderById(blunder_id)
     if data == None:
         return
 
     originalLine = [data['blunder_move']] + data['forced_line']
 
     # TODO: Compare using pychess
-    return originalLine == userLine
+    return originalLine == user_line
 
 def changeRating(user_id, blunder_id, success):
     if user_id is None:
         return None, None
 
-    blunder = postgre.getBlunderById(blunder_id)
+    blunder = postgre.blunder.getBlunderById(blunder_id)
     if blunder is None:
         return None, None
 
     blunder_elo = blunder['elo']
-    user_elo = postgre.getRating(user_id)
+    user_elo = postgre.user.getRating(user_id)
 
     newUserElo, newBlunderElo = elo.calculate(user_elo, blunder_elo, success)
 
-    postgre.setRatingUser(user_id, newUserElo)
-    postgre.setRatingBlunder(blunder_id, newBlunderElo)
+    postgre.user.setRatingUser(user_id, newUserElo)
+    postgre.blunder.setRatingBlunder(blunder_id, newBlunderElo)
 
     return newUserElo, (newUserElo - user_elo)
 
-def validateExploreBlunder(blunder_id, userLine, spentTime): #pylint: disable=unused-argument
-    postgre.closeBlunderTask(session.userID(), blunder_id, tasks.EXPLORE)
+def validate(blunder_id, user_line, spent_time, task_type):
+    date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
 
-    return jsonify({'status': 'ok'})
-
-def validateRatedBlunder(blunder_id, userLine, spentTime):
-    if session.isAnonymous():
-        return jsonify({'status': 'ok'})
-
-    date_start = postgre.getTaskStartDate(session.userID(), blunder_id, tasks.RATED)
-
-    if not postgre.closeBlunderTask(session.userID(), blunder_id, tasks.RATED):
-        return jsonify({
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
+        return {
             'status': 'error',
             'message': "Validation failed"
-        })
+        }
+    success = compareLines(blunder_id, user_line)
 
-    success = compareLines(blunder_id, userLine)
+    blunder = postgre.blunder.getBlunderById(blunder_id)
+    user_id = session.userID()
+    user_elo = postgre.user.getRating(user_id)
 
-    blunder = postgre.getBlunderById(blunder_id)
-
-    postgre.saveBlunderHistory(
-        session.userID(),
+    postgre.blunder.saveBlunderHistory(
+        user_id,
+        user_elo,
         blunder_id,
         blunder['elo'],
         success,
-        userLine,
+        user_line,
         date_start,
-        spentTime
+        spent_time
     )
 
     newElo, delta = changeRating(session.userID(), blunder_id, success)
 
-    return jsonify({
+    return {
         'data':{
             'elo': newElo,
             'delta': delta
             },
         'status': 'ok'
-    })
+    }
+
+def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
+    # In explore mode, just remove blunder from task list
+    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
+
+    return jsonify({'status': 'ok'})
+
+def validateRatedBlunder(blunder_id, user_line, spent_time):
+    # In rated mode, anonymous users have nothing to validate, this is correct situation
+    if session.isAnonymous():
+        return jsonify({'status': 'ok'})
+
+    return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.RATED))
+
+def validatePackBlunder(blunder_id, user_line, spent_time):
+    # In pack mode, anonymous user can't validate, this is error
+    if session.isAnonymous():
+        return jsonify({
+            'status': 'error',
+            'message': "Working with packs in anonymous mode is not supported"
+        })
+
+    result = validate(blunder_id, user_line, spent_time, const.tasks.PACK)
+
+    postgre.pack.gcHistoryPacks(session.userID())
+
+    return jsonify(result)
 
 @app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
     try:
         blunder_id = request.json['id']
-        userLine = request.json['line']
-        spentTime = request.json['spentTime']
+        user_line = request.json['line']
+        spent_time = request.json['spentTime']
         type = request.json['type']
     except Exception:
         return jsonify({
@@ -88,14 +109,16 @@ def validateBlunder():
             'message': 'Blunder id, user line, spent time and type required'
         })
 
-    if type == tasks.RATED:
-        return validateRatedBlunder(blunder_id, userLine, spentTime)
-    elif type == tasks.EXPLORE:
-        return validateExploreBlunder(blunder_id, userLine, spentTime)
+    if type == const.tasks.RATED:
+        return validateRatedBlunder(blunder_id, user_line, spent_time)
+    elif type == const.tasks.EXPLORE:
+        return validateExploreBlunder(blunder_id, user_line, spent_time)
+    elif type == const.tasks.PACK:
+        return validatePackBlunder(blunder_id, user_line, spent_time)
     else:
         return jsonify({
             'status': 'error',
-            'message': 'Blunder type must be rated or explore'
+            'message': 'Blunder type must be explore,rated or pack'
         })
 
 @app.route('/api/mobile/blunder/validate', methods = ['POST', 'OPTIONS'])

@@ -4,8 +4,6 @@ from app import app
 from app.db import postgre
 from app.utils import session, crossdomain
 
-from app.api.blunder.info import getBlunderInfoById
-
 @app.route('/api/blunder/favorite', methods = ['POST'])
 def favoriteBlunder():
     if session.isAnonymous():
@@ -22,13 +20,23 @@ def favoriteBlunder():
             'message': 'Blunder id required'
         })
 
-    if not postgre.favoriteBlunder(session.userID(), blunder_id):
+    if not postgre.blunder.favoriteBlunder(session.userID(), blunder_id):
         return jsonify({
             'status': 'error',
             'message': "Can't favorite blunder"
         })
 
-    return getBlunderInfoById(blunder_id)
+    result = postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
+    if result is None:
+        return {
+            'status': 'error',
+            'message': 'Invalid blunder id',
+        }
+
+    return jsonify({
+        'status': 'ok',
+        'data': result
+    })
 
 @app.route('/api/mobile/blunder/favorite', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()

@@ -3,38 +3,44 @@ from flask import request, jsonify
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import session, tasks, crossdomain
+from app.utils import session, const, crossdomain
 
 def assignNewBlunder(taskType):
-    blunder = postgre.getRandomBlunder()
+    blunder = postgre.blunder.getRandomBlunder()
 
-    postgre.assignBlunderTask(session.userID(), str(blunder['id']), taskType)
+    postgre.blunder.assignBlunderTask(session.userID(), str(blunder['id']), taskType)
 
     return blunder
 
 def getRatedBlunder():
-    blunder = postgre.getAssignedBlunder(session.userID(), tasks.RATED)
+    blunder = postgre.blunder.getAssignedBlunder(session.userID(), const.tasks.RATED)
 
     if blunder is None:
-        blunder = assignNewBlunder(tasks.RATED)
+        blunder = assignNewBlunder(const.tasks.RATED)
 
-    data = utils.jsonifyBlunder(blunder)
-    return jsonify(data)
+    result = {
+        'status': 'ok',
+        'data': utils.jsonifyBlunder(blunder)
+    }
+    return jsonify(result)
 
 def getExploreBlunder():
-    blunder = postgre.getAssignedBlunder(session.userID(), tasks.EXPLORE)
+    blunder = postgre.blunder.getAssignedBlunder(session.userID(), const.tasks.EXPLORE)
 
     if 'id' in request.json:
         if blunder is not None:
-            postgre.closeBlunderTask(session.userID(), request.json['id'], tasks.EXPLORE)
+            postgre.blunder.closeBlunderTask(session.userID(), request.json['id'], const.tasks.EXPLORE)
 
-        blunder = postgre.getBlunderById(request.json['id'])
+        blunder = postgre.blunder.getBlunderById(request.json['id'])
     else:
         if blunder is None:
-            blunder = assignNewBlunder(tasks.EXPLORE)
+            blunder = assignNewBlunder(const.tasks.EXPLORE)
 
-    data = utils.jsonifyBlunder(blunder)
-    return jsonify(data)
+    result = {
+        'status': 'ok',
+        'data': utils.jsonifyBlunder(blunder)
+    }
+    return jsonify(result)
 
 @app.route('/api/blunder/get', methods = ['POST'])
 def getBlunder():

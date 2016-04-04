@@ -1,7 +1,8 @@
 from flask import jsonify
 
-from app import app, db
+from app import app
+from app.db import postgre
 
 @app.route('/api/global/blunders-count', methods=['POST'])
 def totalBlundersCount():
-    return jsonify(db.getBlundersStatistic())
+    return jsonify(postgre.statistic.getBlundersStatistic())

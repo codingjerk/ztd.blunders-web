@@ -1,2 +1,0 @@
-ADMIN = 0
-USER = 3
