@@ -8,6 +8,7 @@ def getAssignedPacks(user_id):
             SELECT pu.pack_id
             FROM pack_users as pu
             WHERE pu.user_id = %s
+            ORDER BY pu.assign_date DESC
             """, (user_id,)
         )
 
