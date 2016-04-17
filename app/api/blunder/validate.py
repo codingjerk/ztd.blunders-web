@@ -6,12 +6,22 @@ from app.utils import session, const
 
 from app.utils import elo, crossdomain
 
-def compareLines(blunder_id, user_line):
-    data = postgre.blunder.getBlunderById(blunder_id)
-    if data == None:
-        return
+def mismatchCheck(blunder_move, forced_line, user_line):
+    # It is ok, that best line can be recalculated one day and to be changed
+    # We are checking if this happen and return error, so client will reload the pack
+    originalLine = [blunder_move] + forced_line
 
-    originalLine = [data['blunder_move']] + data['forced_line']
+    # Userline can't be longer, then original line
+    if(len(user_line) > len(originalLine)):
+        return True
+
+    if originalLine[0:len(user_line) - 1 ] != user_line[:-1]:
+        return True
+
+    return False
+
+def compareLines(blunder_move, forced_line, user_line):
+    originalLine = [blunder_move] + forced_line
 
     # TODO: Compare using pychess
     return originalLine == user_line
@@ -35,6 +45,13 @@ def changeRating(user_id, blunder_id, success):
     return newUserElo, (newUserElo - user_elo)
 
 def validate(blunder_id, user_line, spent_time, task_type):
+    blunder = postgre.blunder.getBlunderById(blunder_id)
+    if blunder is None:
+        return {
+            'status': 'error',
+            'message': "Invalid blunder id"
+        }
+
     date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
 
     if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
@@ -42,9 +59,16 @@ def validate(blunder_id, user_line, spent_time, task_type):
             'status': 'error',
             'message': "Validation failed"
         }
-    success = compareLines(blunder_id, user_line)
 
-    blunder = postgre.blunder.getBlunderById(blunder_id)
+    blunder_move = blunder['blunder_move']
+    forced_line = blunder['forced_line']
+    if mismatchCheck(blunder_move, forced_line, user_line):
+        return {
+            'status': 'error',
+            'message': "Mismatching with remote."
+        }
+    success = compareLines(blunder_move, forced_line, user_line)
+
     user_id = session.userID()
     user_elo = postgre.user.getRating(user_id)
 
@@ -59,6 +83,7 @@ def validate(blunder_id, user_line, spent_time, task_type):
         spent_time
     )
 
+    elo = blunder['elo']
     newElo, delta = changeRating(session.userID(), blunder_id, success)
 
     return {
@@ -71,7 +96,11 @@ def validate(blunder_id, user_line, spent_time, task_type):
 
 def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
     # In explore mode, just remove blunder from task list
-    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE):
+        return jsonify({
+            'status': 'error',
+            'message': "Validation failed"
+        })
 
     return jsonify({'status': 'ok'})
 
