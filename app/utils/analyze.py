@@ -18,10 +18,11 @@ class Engine:
     def __enter__(self):
         return self
 
-    def new(self, fen):
+    def new(self):
         self.engine.ucinewgame()
         self.engine.isready()
 
+    def set(self, fen):
         self.board = chess.Board(fen)
         self.engine.position(self.board)
         self.engine.isready()
@@ -46,7 +47,6 @@ class Engine:
     def __filterMove(self, index):
         pv = self.handler.info['pv']
         score = self.handler.info['score']
-        print(self.handler.info)
         if pv == {} or score == {}:
             return None
 
@@ -61,8 +61,13 @@ class Engine:
             'score': scoreStr
         }
 
-    def think(self, timeToThink):
-        promise = self.engine.go(movetime=timeToThink, async_callback=True)
+    def think(self, timeToThink, move = None):
+        searchmoves = None
+        self.engine.isready()
+        if move is not None:
+            searchmoves = [self.board.parse_san(move)]
+
+        promise = self.engine.go(movetime=timeToThink, searchmoves=searchmoves, async_callback=True)
 
         promise.result()
         result = self.__filterMove(1)

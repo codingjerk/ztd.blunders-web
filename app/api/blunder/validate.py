@@ -2,29 +2,9 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session, const
+from app.utils import session, const, chess
 
 from app.utils import elo, crossdomain
-
-def mismatchCheck(blunder_move, forced_line, user_line):
-    # It is ok, that best line can be recalculated one day and to be changed
-    # We are checking if this happen and return error, so client will reload the pack
-    originalLine = [blunder_move] + forced_line
-
-    # Userline can't be longer, then original line
-    if(len(user_line) > len(originalLine)):
-        return True
-
-    if originalLine[0:len(user_line) - 1 ] != user_line[:-1]:
-        return True
-
-    return False
-
-def compareLines(blunder_move, forced_line, user_line):
-    originalLine = [blunder_move] + forced_line
-
-    # TODO: Compare using pychess
-    return originalLine == user_line
 
 def changeRating(user_id, blunder_id, success):
     if user_id is None:
@@ -62,12 +42,12 @@ def validate(blunder_id, user_line, spent_time, task_type):
 
     blunder_move = blunder['blunder_move']
     forced_line = blunder['forced_line']
-    if mismatchCheck(blunder_move, forced_line, user_line):
+    if chess.mismatchCheck(blunder_move, forced_line, user_line):
         return {
             'status': 'error',
             'message': "Mismatching with remote."
         }
-    success = compareLines(blunder_move, forced_line, user_line)
+    success = chess.compareLines(blunder_move, forced_line, user_line)
 
     user_id = session.userID()
     user_elo = postgre.user.getRating(user_id)

@@ -2,12 +2,11 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain, const
+from app.utils import session, crossdomain, const, chess
 from app.utils.analyze import Engine
 
 @app.route('/api/blunder/analyze', methods = ['POST'])
 def analyzeBlunder():
-    print(request.json)
     try:
         blunder_id = request.json['blunder_id']
         line = request.json['line']
@@ -34,18 +33,18 @@ def analyzeBlunder():
     blunder_move = blunder['blunder_move']
     forced_line = blunder['forced_line']
 
+    data = chess.boardsToAnalyze(blunder_fen, blunder_move, forced_line, line)
+    result = []
     with Engine(const.engine_path) as engine:
-        engine.new(blunder_fen)
-        engine.moveLine(line)
-        result = engine.think(const.engine_time)
-        print(result)
+        engine.new()
+        for element in data:
+            engine.set(element['fen'])
+            result.append(engine.think(const.engine_time, move = element['move']))
 
     return jsonify({
         'status': 'ok',
         'data': {
-            'variations': [
-                result
-            ]
+            'variations': result
         }
     })
 
