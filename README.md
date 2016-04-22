@@ -111,7 +111,7 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     Your repository location can be in different location than ours so you can edit this file to set it up.
 13. You can conect to the server on port 8089, as set in debug.py. This configuration is for testing purposes only.
 
-## Setup uWSGI+nginx service.
+## Advanced - setup uWSGI+nginx service.
 1. We assume, that all the processed will run as local, non root account, so install user blunders without any permissions. /home/blunders will be it's home.
 Flask is one thread server by definition, so you it's problematic to use it in multiuser mode in production. We will use uWSGI service to create and maintain multi instances and make load balancing between them. Nginx will be configured to sit in fron of them as web server.
 2. If you installed all python packages as we told in previous sections, you probably want skip this step. For production we will set up python virtual environment and install all python packages into /home/blunders/env folder. This is our default. To use global packages you probably want to edit uwsgi.ini file, but it's all up to you.  Read more about  virtual environment here https://virtualenv.pypa.io/en/latest/userguide.html.
@@ -127,3 +127,7 @@ Copy systemd unit to proper directory
   $ yum install nginx
 Copy default Vhost configuration.
   $ cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.conf /etc/nginx/conf.d/
+uWSGI will create directory /var/run/blunder with unix socket for communication with nginx, but this socket is owned by blunders user. To get nginx read access to this socket, add nginx user to blunders group
+  $ usermod -a -G blunders nginx
+Start nginx and service should be available on with your browser.
+  $ systemctl start nginx && systemctl enable nginx
