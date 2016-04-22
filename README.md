@@ -1,8 +1,7 @@
 # Ztd.Blunders Web
-[ ![Codeship Status for ziltoidteam/Ztd.Blunders Web](https://codeship.com/projects/b49b6390-f8e9-0132-c0a7-1e4cf25a7aa5/status?branch=master)](https://codeship.com/projects/86737)
 
 ## Try it online
-Ztd.Blunders available on [blunders.ztd.io](http://blunders.ztd.io) and this is our main server. 
+Ztd.Blunders available on [chessblunders.org](https://chessblunders.org/) and this is our main server. 
 
 ## Introducing
 Ztd.Blunders is the software for deployment a Web server for solving chess problems. This is Open Source project written with use of Flask, PostgreSQL, MongoDB and several other tools and libraries. To use it you will need special prepared databases, you will not find them in this repository.
