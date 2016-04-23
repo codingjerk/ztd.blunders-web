@@ -15,9 +15,12 @@ def boardAfterVariation(fen, line):
 
     return board
 
+def fenAfterVariation(fen, line):
+    return boardAfterVariation(fen, line).fen()
+
 def blunderStartPosition(fenBefore, blunderMove):
-    board = boardAfterVariation(fenBefore, [blunderMove])
-    return board.fen()
+    fen = fenAfterVariation(fenBefore, [blunderMove])
+    return fen
 
 def compareLines(blunder_move, forced_line, user_line):
     # TODO: Compare using pychess
@@ -44,19 +47,17 @@ def boardsToAnalyze(fen_before, blunder_move, forced_line, user_line):
     userMove = user_line[len(line)]
     bestMove = join(blunder_move, forced_line)[len(line)]
 
-    fen = boardAfterVariation(fen_before, line).fen()
-
     if(userMove == bestMove):
         return [{
-            'fen': fen,
-            'move': userMove
+            'user_line': line,
+            'user_move': userMove
         }]
 
     return [{
-            'fen': fen,
-            'move': userMove
+            'user_line': line,
+            'user_move': userMove
         },
         {
-            'fen': fen,
-            'move': bestMove
+            'user_line': line,
+            'user_move': bestMove
         }]

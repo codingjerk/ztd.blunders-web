@@ -39,7 +39,7 @@ def validate(blunder_id, user_line, spent_time, task_type):
     if chess.mismatchCheck(blunder_move, forced_line, user_line):
         return {
             'status': 'error',
-            'message': "Remote database has been changed. Reloading..."
+            'message': "Remote database has been changed"
         }
     success = chess.compareLines(blunder_move, forced_line, user_line)
 

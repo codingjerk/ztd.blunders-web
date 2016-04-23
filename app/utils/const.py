@@ -1,6 +1,7 @@
 
-engine_path = '/opt/stockfish/src/stockfish'
-engine_time = 5000
+class engine(object):
+    path = '/opt/stockfish/src/stockfish'
+    time = 5000
 
 class tasks(object):
     RATED = 'rated'

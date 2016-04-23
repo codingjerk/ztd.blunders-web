@@ -74,8 +74,6 @@ class Engine:
         if result is None:
            raise Exception('Engine failed to analyze blunder')
 
-        result['fen'] = self.board.fen()
-
         return result
 
     def moveLine(self, line):

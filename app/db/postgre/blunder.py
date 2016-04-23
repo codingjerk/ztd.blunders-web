@@ -1,6 +1,6 @@
+from json import dumps
 
 from app.db.postgre import core,user,game
-
 
 # Get random blunder from database
 def getRandomBlunder():
@@ -559,11 +559,62 @@ def getBlunderByTag(tag_name, count):
                FROM blunder_tags AS bt
                INNER JOIN blunder_tag_type AS btt
                       ON bt.type_id = btt.id
-               WHERE btt.name = '%s'
+               WHERE btt.name = %s
                ORDER BY RANDOM()
-               LIMIT %s;""" % (tag_name, count)
+               LIMIT %s;""" , (tag_name, count)
         )
 
         result = connection.cursor.fetchall()
 
         return result
+
+def getAnalyze(blunder_id, fen, move):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """SELECT ba.pv
+               FROM blunder_analyze as ba
+               WHERE ba.blunder_id = %s AND
+                     ba.fen = %s AND
+                     ba.move = %s
+            """, (blunder_id, fen, move)
+        )
+
+        if connection.cursor.rowcount == 0:
+            return None
+
+        if connection.cursor.rowcount > 1:
+            raise Exception('Multiple analyse lines for same blunder')
+
+        (pv,) = connection.cursor.fetchone()
+
+        return pv
+
+def saveAnalyze(user_id, blunder_id, element, time_ms):
+    with core.PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            """
+            INSERT INTO blunder_analyze(
+                    created_by,
+                    blunder_id,
+                    user_line,
+                    user_move,
+                    engine_line,
+                    engine_score,
+                    time_ms
+                )
+            VALUES(%s, %s, %s, %s, %s, %s, %s)
+            """,(
+                 user_id,
+                 blunder_id,
+                 element['user_line'],
+                 element['user_move'],
+                 element['engine']['line'],
+                 dumps(element['engine']['score']),
+                 time_ms
+                )
+        )
+
+        if connection.cursor.rowcount  == 1:
+            return True
+
+        return False

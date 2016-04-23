@@ -5,11 +5,16 @@ from app.db import postgre
 from app.utils import session, crossdomain, const, chess
 from app.utils.analyze import Engine
 
+#def getAnalyzeFromCache(blunder_fen, data):
+#    for element in data:
+#        stored = postgre.blunders.getAnalyze(data['fen'], data['line'])
+
+
 @app.route('/api/blunder/analyze', methods = ['POST'])
 def analyzeBlunder():
     try:
         blunder_id = request.json['blunder_id']
-        user_line = request.json['line']
+        line = request.json['line']
     except Exception:
         return jsonify({
             'status': 'error',
@@ -33,24 +38,26 @@ def analyzeBlunder():
     blunder_move = blunder['blunder_move']
     forced_line = blunder['forced_line']
 
-    if chess.mismatchCheck(blunder_move, forced_line, user_line):
+    if chess.mismatchCheck(blunder_move, forced_line, line):
         return {
             'status': 'error',
-            'message': "Remote database has been changed. Reloading..."
+            'message': "Remote database has been changed"
         }
 
-    data = chess.boardsToAnalyze(blunder_fen, blunder_move, forced_line, user_line)
-    result = []
-    with Engine(const.engine_path) as engine:
+    data = chess.boardsToAnalyze(blunder_fen, blunder_move, forced_line, line)
+
+    with Engine(const.engine.path) as engine:
         engine.new()
         for element in data:
-            engine.set(element['fen'])
-            result.append(engine.think(const.engine_time, move = element['move']))
+            user_fen = chess.fenAfterVariation(blunder_fen, element['user_line'])
+            engine.set(user_fen)
+            element['engine'] = engine.think(const.engine.time, move = element['user_move'])
+            postgre.blunder.saveAnalyze(session.userID(), blunder_id, element, const.engine.time)
 
     return jsonify({
         'status': 'ok',
         'data': {
-            'variations': result
+            'variations': [element['engine'] for element in data ]
         }
     })
 
