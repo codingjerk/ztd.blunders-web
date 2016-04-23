@@ -34,20 +34,20 @@ def validate(blunder_id, user_line, spent_time, task_type):
 
     date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
 
-    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
-        return {
-            'status': 'error',
-            'message': "Validation failed"
-        }
-
     blunder_move = blunder['blunder_move']
     forced_line = blunder['forced_line']
     if chess.mismatchCheck(blunder_move, forced_line, user_line):
         return {
             'status': 'error',
-            'message': "Mismatching with remote."
+            'message': "Remote database has been changed. Reloading..."
         }
     success = chess.compareLines(blunder_move, forced_line, user_line)
+
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
+        return {
+            'status': 'error',
+            'message': "Validation failed"
+        }
 
     user_id = session.userID()
     user_elo = postgre.user.getRating(user_id)
