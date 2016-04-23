@@ -65,11 +65,12 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     Source: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat/  
     Create file /etc/yum.repos.d/mongodb.repo with following content
     ```
-    [mongodb-org-3.0]
+[mongodb-org-3.0]
     name=MongoDB Repository
     baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.0/x86_64/
     gpgcheck=0
-    enabled=1```
+    enabled=1
+    ```
 
     Now install it:
     ```
@@ -77,7 +78,7 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     $ sudo systemctl start mongod
     $ sudo chkconfig mongod on
     ```
-Afrwe mongodb start, application will use it as TTL cache. Records will be created for complex graph generations in database chessdb, collection named cache. It will just work, but to make those records to be temporary, TTL indexes should be created. Open mongo shell and type
+Afer mongodb start, application will use it as TTL cache. Records will be created for complex graph generations in database chessdb, collection named cache. It will just work, but to make those records to be temporary, TTL indexes should be created. Open mongo shell and type
     ```
 use chessdb
 db.cache.createIndex( { "minute": 1 }, { expireAfterSeconds: 60 } )
