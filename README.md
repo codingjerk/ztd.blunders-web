@@ -149,3 +149,15 @@ Start nginx and service should be available on with your browser.
     ```
   $ systemctl start nginx && systemctl enable nginx
     ```
+## Monitoring and maintainance
+1. To monitor uWSGI servicem you can use excelent tool
+    ```
+  $ pip3 install uwsgitop
+    ```
+    ```
+  $ uwsgitop /var/run/blunders/uwsgi-stats.sock
+    ```
+2. If you want to gracefully reload the workers
+    ```
+  $ echo "r" > /var/run/blunders/uwsgi.fifo
+    ```
