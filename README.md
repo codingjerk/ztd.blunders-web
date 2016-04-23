@@ -75,8 +75,15 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     ```
     $ sudo yum install mongodb-org.x86_64
     $ sudo systemctl start mongod
-    $ sudo chkconfig mongod on```
-
+    $ sudo chkconfig mongod on
+    ```
+Afrwe mongodb start, application will use it as TTL cache. Records will be created for complex graph generations in database chessdb, collection named cache. It will just work, but to make those records to be temporary, TTL indexes should be created. Open mongo shell and type
+    ```
+use chessdb
+db.cache.createIndex( { "minute": 1 }, { expireAfterSeconds: 60 } )
+db.cache.createIndex( { "hour": 1 }, { expireAfterSeconds: 3600 } )
+db.cache.createIndex( { "day": 1 }, { expireAfterSeconds: 86400 } )
+    ```
 5. Create secret key to enable sessions  
     Source: http://flask.pocoo.org/docs/0.10/quickstart/  
     We created special script to generate this key. Go to repository root directory and run
@@ -117,17 +124,27 @@ Flask is one thread server by definition, so you it's problematic to use it in m
 2. If you installed all python packages as we told in previous sections, you probably want skip this step. For production we will set up python virtual environment and install all python packages into /home/blunders/env folder. This is our default. To use global packages you probably want to edit uwsgi.ini file, but it's all up to you.  Read more about  virtual environment here https://virtualenv.pypa.io/en/latest/userguide.html.
 
 3. Copy uwsgi.ini to /home/blunders. This is configuration file for uWSGI. We will use pip to install uWSGI, but will install it globally.
+    ```
   $ pip3.4 install uWSGI
+    ```
 Copy systemd unit to proper directory
+    ```
   $ cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.service /usr/lib/systemd/system/
   $ systemctl daemon-reload
   $ systemctl start blunders && systemctl enable blunders
+    ```
 
 4. Install nginx server
+    ```
   $ yum install nginx
+    ```
 Copy default Vhost configuration.
   $ cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.conf /etc/nginx/conf.d/
 uWSGI will create directory /var/run/blunder with unix socket for communication with nginx, but this socket is owned by blunders user. To get nginx read access to this socket, add nginx user to blunders group
+    ```
   $ usermod -a -G blunders nginx
+    ```
 Start nginx and service should be available on with your browser.
+    ```
   $ systemctl start nginx && systemctl enable nginx
+    ```
