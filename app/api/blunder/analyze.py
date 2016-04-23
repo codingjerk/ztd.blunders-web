@@ -9,7 +9,7 @@ from app.utils.analyze import Engine
 def analyzeBlunder():
     try:
         blunder_id = request.json['blunder_id']
-        line = request.json['line']
+        user_line = request.json['line']
     except Exception:
         return jsonify({
             'status': 'error',
@@ -33,7 +33,13 @@ def analyzeBlunder():
     blunder_move = blunder['blunder_move']
     forced_line = blunder['forced_line']
 
-    data = chess.boardsToAnalyze(blunder_fen, blunder_move, forced_line, line)
+    if chess.mismatchCheck(blunder_move, forced_line, user_line):
+        return {
+            'status': 'error',
+            'message': "Remote database has been changed. Reloading..."
+        }
+
+    data = chess.boardsToAnalyze(blunder_fen, blunder_move, forced_line, user_line)
     result = []
     with Engine(const.engine_path) as engine:
         engine.new()
