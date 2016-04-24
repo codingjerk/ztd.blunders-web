@@ -22,42 +22,51 @@ def blunderStartPosition(fenBefore, blunderMove):
     fen = fenAfterVariation(fenBefore, [blunderMove])
     return fen
 
-def compareLines(blunder_move, forced_line, user_line):
+def compareLines(blunder_move, forced_line, line):
     # TODO: Compare using pychess
-    return join(blunder_move, forced_line) == user_line
+    return join(blunder_move, forced_line) == line
 
-def mismatchCheck(blunder_move, forced_line, user_line):
+def mismatchCheck(blunder_move, forced_line, line):
     # It is ok, that best line can be recalculated one day and to be changed
     # We are checking if this happens and return error, so client will reload the pack
     originalLine = join(blunder_move, forced_line)
 
     # Userline can't be longer, then original line
-    if(len(user_line) > len(originalLine)):
+    if(len(line) > len(originalLine)):
         return True
 
-    if originalLine[:len(user_line) - 1 ] != user_line[:-1]:
+    if originalLine[:len(line) - 1 ] != line[:-1]:
         return True
 
     return False
 
 # We assume user_line is shorter(or at least same size), than solution
 # mismatchCheck should be called before and check this
-def boardsToAnalyze(fen_before, blunder_move, forced_line, user_line):
-    line = user_line[:-1]
-    userMove = user_line[len(line)]
-    bestMove = join(blunder_move, forced_line)[len(line)]
+def boardsToAnalyze(fen_before, blunder_move, forced_line, line):
+    preLine = line[:-1]
+    userMove = line[len(preLine)]
+    bestMove = join(blunder_move, forced_line)[len(preLine)]
 
     if(userMove == bestMove):
         return [{
-            'user_line': line,
-            'user_move': userMove
+            'status': 'correct',
+            'user': {
+                'line': preLine,
+                'move': userMove
+            }
         }]
 
     return [{
-            'user_line': line,
-            'user_move': userMove
+            'status': 'wrong',
+            'user': {
+                'line': preLine,
+                'move': userMove
+            }
         },
         {
-            'user_line': line,
-            'user_move': bestMove
+            'status': 'correct',
+            'user': {
+                'line': preLine,
+                'move': bestMove
+            }
         }]
