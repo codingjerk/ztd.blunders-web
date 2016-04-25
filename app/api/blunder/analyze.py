@@ -41,10 +41,14 @@ def calcualteWithEngine(blunder_id, blunder_fen, data):
             user_fen = chess.fenAfterVariation(blunder_fen, user_line)
             engine.set(user_fen)
             element['engine'] = engine.think(const.engine.time, move = user_move)
+
+            engine_line = element['engine']['line']
+            engine_score = element['engine']['score']
             # TODO: calculating is long procedure. In order to avoid error, checking once more
             # In the future, after upgrade to 9.5 please use ON CONFLICT DO NOTHING
-            if postgre.blunder.getAnalyze(blunder_id, user_line, user_move) is not None:
-                postgre.blunder.saveAnalyze(session.userID(), blunder_id, element, const.engine.time)
+            if postgre.blunder.getAnalyze(blunder_id, user_line, user_move) is None:
+                postgre.blunder.saveAnalyze(session.userID(), blunder_id, user_line, user_move,
+                                            engine_line, engine_score, const.engine.time)
 
         return data
 

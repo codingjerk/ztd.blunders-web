@@ -591,7 +591,7 @@ def getAnalyze(blunder_id, user_line, user_move):
 
         return (engine_line, engine_score, time_ms)
 
-def saveAnalyze(user_id, blunder_id, element, time_ms):
+def saveAnalyze(user_id, blunder_id, user_line, user_move, engine_line, engine_score, time_ms):
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute(
             """
@@ -608,10 +608,10 @@ def saveAnalyze(user_id, blunder_id, element, time_ms):
             """,(
                  user_id,
                  blunder_id,
-                 element['user_line'],
-                 element['user_move'],
-                 element['engine']['line'],
-                 dumps(element['engine']['score']),
+                 user_line,
+                 user_move,
+                 engine_line,
+                 dumps(engine_score),
                  time_ms
                 )
         )
