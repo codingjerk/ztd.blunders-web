@@ -1,4 +1,11 @@
 
+# Yes, this is real hostname and password, but it's guarded by firewall
+class database(object):
+    host="blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com"
+    dbname="chessdb"
+    user="postgres"
+    password="chessdb"
+
 class engine(object):
     path = '/opt/stockfish/src/stockfish'
     time = 1000

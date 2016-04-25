@@ -1,6 +1,8 @@
 
 import psycopg2
 
+from app.utils import const
+
 # Yes, this is real hostname and password, but it's guarded by firewall
 hostname="blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com"
 database="chessdb"
@@ -12,7 +14,14 @@ class PostgreConnection:
         self.type = type
         assert type in 'rw'
 
-        self.connection = psycopg2.connect('dbname=%s user=%s password=%s host=%s' % (database, username, password, hostname))
+        self.connection = psycopg2.connect('dbname=%s user=%s password=%s host=%s' %
+            (
+                 const.database.dbname,
+                 const.database.user,
+                 const.database.password,
+                 const.database.host
+             )
+        )
         self.cursor = self.connection.cursor()
 
     def __enter__(self):
