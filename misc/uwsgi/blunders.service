@@ -1,6 +1,6 @@
 [Unit]
 Description=Ztd Blunders
-Requires=postgresql-9.4.service mongod.service
+Requires=mongod.service
 After=nginx.service
 Wants=
 
@@ -9,7 +9,7 @@ User=blunders
 WorkingDirectory=/home/blunders/ztd.blunders-web/
 
 PermissionsStartOnly=true
-ExecStartPre=/usr/bin/mkdir /var/run/blunders
+ExecStartPre=/usr/bin/mkdir -p /var/run/blunders
 ExecStartPre=/usr/bin/chown -R blunders:blunders /var/run/blunders
 
 ExecStart=/bin/uwsgi /home/blunders/uwsgi.ini
