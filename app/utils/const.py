@@ -1,4 +1,8 @@
 
+class engine(object):
+    path = '/opt/stockfish/src/stockfish'
+    time = 1000
+
 class tasks(object):
     RATED = 'rated'
     EXPLORE = 'explore'

@@ -2,19 +2,9 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session, const
+from app.utils import session, const, chess
 
 from app.utils import elo, crossdomain
-
-def compareLines(blunder_id, user_line):
-    data = postgre.blunder.getBlunderById(blunder_id)
-    if data == None:
-        return
-
-    originalLine = [data['blunder_move']] + data['forced_line']
-
-    # TODO: Compare using pychess
-    return originalLine == user_line
 
 def changeRating(user_id, blunder_id, success):
     if user_id is None:
@@ -35,16 +25,30 @@ def changeRating(user_id, blunder_id, success):
     return newUserElo, (newUserElo - user_elo)
 
 def validate(blunder_id, user_line, spent_time, task_type):
+    blunder = postgre.blunder.getBlunderById(blunder_id)
+    if blunder is None:
+        return {
+            'status': 'error',
+            'message': "Invalid blunder id"
+        }
+
     date_start = postgre.blunder.getTaskStartDate(session.userID(), blunder_id, task_type)
+
+    blunder_move = blunder['blunder_move']
+    forced_line = blunder['forced_line']
+    if chess.mismatchCheck(blunder_move, forced_line, user_line):
+        return {
+            'status': 'error',
+            'message': "Remote database has been changed"
+        }
+    success = chess.compareLines(blunder_move, forced_line, user_line)
 
     if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, task_type):
         return {
             'status': 'error',
             'message': "Validation failed"
         }
-    success = compareLines(blunder_id, user_line)
 
-    blunder = postgre.blunder.getBlunderById(blunder_id)
     user_id = session.userID()
     user_elo = postgre.user.getRating(user_id)
 
@@ -59,6 +63,7 @@ def validate(blunder_id, user_line, spent_time, task_type):
         spent_time
     )
 
+    elo = blunder['elo']
     newElo, delta = changeRating(session.userID(), blunder_id, success)
 
     return {
@@ -71,7 +76,11 @@ def validate(blunder_id, user_line, spent_time, task_type):
 
 def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
     # In explore mode, just remove blunder from task list
-    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
+    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE):
+        return jsonify({
+            'status': 'error',
+            'message': "Validation failed"
+        })
 
     return jsonify({'status': 'ok'})
 
