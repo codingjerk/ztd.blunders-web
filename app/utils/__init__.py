@@ -13,7 +13,6 @@ def jsonifyBlunder(data):
         'move_index': data['move_index'],
 
         'forcedLine': data['forced_line'],
-        'pv': data['pv'],
 
         'fenBefore': data['fen_before'],
         'blunderMove': data['blunder_move'],

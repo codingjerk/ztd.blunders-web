@@ -16,7 +16,6 @@ def getRandomBlunder():
         (
             id,
             forced_line,
-            pv,
             elo,
             fen_before,
             blunder_move,
@@ -27,7 +26,6 @@ def getRandomBlunder():
     return {
         'id': id,
         'forced_line': forced_line,
-        'pv': pv,
         'elo': elo,
         'fen_before': fen_before,
         'blunder_move': blunder_move,
@@ -157,7 +155,7 @@ def setRatingBlunder(blunder_id, newBlunderElo):
 def getBlunderById(blunder_id):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT b.id, b.forced_line, b.pv, b.elo, b.fen_before, b.blunder_move, b.move_index, b.game_id
+            SELECT b.id, b.forced_line, b.elo, b.fen_before, b.blunder_move, b.move_index, b.game_id
             FROM blunders AS b
             WHERE b.id = %s
             """, (blunder_id,)
@@ -169,7 +167,6 @@ def getBlunderById(blunder_id):
         (
             id,
             forced_line,
-            pv,
             elo,
             fen_before,
             blunder_move,
@@ -180,7 +177,6 @@ def getBlunderById(blunder_id):
         return {
             'id': id,
             'forced_line': forced_line,
-            'pv': pv,
             'elo': elo,
             'fen_before': fen_before,
             'blunder_move': blunder_move,
