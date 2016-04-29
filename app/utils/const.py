@@ -6,6 +6,13 @@ class database(object):
     user="postgres"
     password="chessdb"
 
+    connectionString = "%s %s %s %s" % (
+        ("host=%s" % host) if host is not None else "",
+        "dbname=%s" % dbname,
+        "user=%s" % user,
+        ("password=%s" % password) if password is not None else ""
+    )
+
 class engine(object):
     path = '/opt/stockfish/src/stockfish'
     time = 1000
