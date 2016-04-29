@@ -11,15 +11,15 @@ def authorize(username, hash):
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT *
-            FROM users
-            WHERE username = %s AND password = %s;
+            SELECT COUNT(1)
+            FROM users AS u
+            WHERE u.username = %s AND u.password = %s;
             """, (username, hash)
         )
 
-        users = connection.cursor.fetchall()
+        (count,) = connection.cursor.fetchone()
 
-        success = len(users) == 1
+        success = (count == 1)
 
     if success:
         with core.PostgreConnection('w') as connection:
