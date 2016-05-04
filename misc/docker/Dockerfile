@@ -12,7 +12,7 @@ ADD mongodb/mongodb-org.repo /etc/yum.repos.d/mongodb-org.repo
 RUN yum update -y
 
 # Installing system packages
-RUN yum install git gcc -y
+RUN yum install git gcc gcc-c++ -y
 RUN yum install python34u.x86_64 python34u-pip.noarch python34u-devel.x86_64 -y
 RUN yum install nginx -y
 RUN yum install postgresql94.x86_64 postgresql94-devel.x86_64 -y
@@ -51,6 +51,11 @@ RUN cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.conf /etc/nginx/conf.
 
 # Copying script, that initializes mongodb TTL indexes
 ADD mongodb/init.js /tmp/init.js
+
+# Compiling Stockfish chess engine for analyzation service
+RUN git clone https://github.com/mcostalba/Stockfish.git /opt/stockfish
+RUN make build ARCH=x86-64 -C /opt/stockfish/src/
+RUN chown blunders:blunders /opt/stockfish/src/stockfish
 
 EXPOSE 80
 
