@@ -567,7 +567,8 @@ def getBlunderByTag(tag_name, count):
 def getAnalyze(blunder_id, user_line, user_move):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute(
-            """SELECT ba.engine_line,
+            """SELECT ba.id,
+                      ba.engine_line,
                       ba.engine_score,
                       ba.time_ms
                FROM blunder_analyze as ba
@@ -583,9 +584,17 @@ def getAnalyze(blunder_id, user_line, user_move):
         if connection.cursor.rowcount > 1:
             raise Exception('Multiple analyse lines for same blunder')
 
-        (engine_line, engine_score, time_ms) = connection.cursor.fetchone()
+        (analyze_id, engine_line, engine_score, time_ms) = connection.cursor.fetchone()
 
-        return (engine_line, engine_score, time_ms)
+    with core.PostgreConnection('w') as connection:
+        connection.cursor.execute(
+            """UPDATE blunder_analyze
+               SET reuse_count = reuse_count + 1
+               WHERE id = %s;
+            """, (analyze_id,)
+        )
+
+    return (engine_line, engine_score, time_ms)
 
 def saveAnalyze(user_id, blunder_id, user_line, user_move, engine_line, engine_score, time_ms):
     with core.PostgreConnection('w') as connection:
