@@ -8,7 +8,6 @@ FROM library/centos
 # Installing repositories
 RUN yum install https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm -y
 RUN yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-1.noarch.rpm -y
-ADD mongodb/mongodb-org.repo /etc/yum.repos.d/mongodb-org.repo
 RUN yum update -y
 
 # Installing system packages
@@ -18,13 +17,14 @@ RUN yum install nginx -y
 RUN yum install postgresql94.x86_64 postgresql94-devel.x86_64 -y
 RUN yum install libpqxx libpqxx-devel -y
 RUN yum install libffi-devel.x86_64 -y
-RUN yum install mongodb-org.x86_64 -y
+RUN yum install redis.x86_64 -y
+RUN yum install supervisor -y
 
 # Installing python packages
 RUN pip3.4 install --upgrade pip
 RUN pip3.4 install uWSGI
 RUN pip3.4 install Flask
-RUN pip3.4 install pymongo
+RUN pip3.4 install redis
 RUN PATH=$PATH:/usr/pgsql-9.4/bin pip3.4 install psycopg2
 RUN pip3.4 install bcrypt 
 RUN pip3.4 install python-chess
@@ -36,6 +36,7 @@ RUN usermod -a -G blunders nginx # nginx must read uwsgi sockets
 
 # Cloning the Blunders project
 RUN su -l blunders bash -c "git clone https://jackalsh@bitbucket.org/ziltoidteam/ztd.blunders-web.git /home/blunders/ztd.blunders-web"
+RUN su -l blunders bash -c "cd /home/blunders/ztd.blunders-web && git checkout redis"
 RUN su -l blunders bash -c "cd /home/blunders/ztd.blunders-web && git submodule init && git submodule update"
 RUN cd /home/blunders/ztd.blunders-web && misc/generateSecretKey.py
 
@@ -49,9 +50,6 @@ RUN grep -v virtualenv /home/blunders/ztd.blunders-web/misc/uwsgi/uwsgi.ini > /h
 
 RUN cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.conf /etc/nginx/conf.d/blunders.conf
 
-# Copying script, that initializes mongodb TTL indexes
-ADD mongodb/init.js /tmp/init.js
-
 # Compiling Stockfish chess engine for analyzation service
 RUN git clone https://github.com/mcostalba/Stockfish.git /opt/stockfish
 RUN make build ARCH=x86-64 -C /opt/stockfish/src/
@@ -59,5 +57,5 @@ RUN chown blunders:blunders /opt/stockfish/src/stockfish
 
 EXPOSE 80
 
-ADD executor.sh /root/executor.sh
-CMD /bin/bash /root/executor.sh ; bash
+ADD supervisord.ini /etc/supervisord.d/supervisord.ini
+CMD /usr/bin/supervisord -c /etc/supervisord.conf
