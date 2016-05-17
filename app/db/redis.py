@@ -2,8 +2,6 @@ import redis
 import json
 from datetime import datetime
 
-from bson.objectid import ObjectId
-
 from app import utils
 from app.utils import const
 
