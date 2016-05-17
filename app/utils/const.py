@@ -1,10 +1,10 @@
 
 # Yes, this is real hostname and password, but it's guarded by firewall
 class database(object):
-    host="blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com"
+    host=None
     dbname="chessdb"
     user="postgres"
-    password="chessdb"
+    password=None
 
     connectionString = "%s %s %s %s" % (
         ("host=%s" % host) if host is not None else "",
@@ -12,6 +12,11 @@ class database(object):
         "user=%s" % user,
         ("password=%s" % password) if password is not None else ""
     )
+
+class redis(object):
+    host='127.0.0.1'
+    port=6379
+    db=0
 
 class engine(object):
     path = '/opt/stockfish/src/stockfish'
@@ -33,3 +38,8 @@ class pack_type(object):
     ENDGAME = "Endgame"
     PROMOTION = "Promotion"
     CLOSEDGAME = "Closed game"
+
+class time(object):
+    MINUTE = 60
+    HOUR = 60 * 60
+    DAY = 60 * 60 * 24
