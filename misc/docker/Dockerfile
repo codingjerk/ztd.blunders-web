@@ -45,18 +45,18 @@ RUN chown -R blunders:blunders /var/run/blunders
 
 # Copying uwsgi configuration
 WORKDIR /home/blunders
-RUN grep -v virtualenv /home/blunders/ztd.blunders-web/misc/uwsgi/uwsgi.ini > /home/blunders/uwsgi.ini
 
-RUN cp /home/blunders/ztd.blunders-web/misc/uwsgi/blunders.conf /etc/nginx/conf.d/blunders.conf
+ADD uwsgi/uwsgi.ini /home/blunders/uwsgi.ini
+ADD nginx/blunders.conf /etc/nginx/conf.d/blunders.conf
 
 # Compiling Stockfish chess engine for analyzation service
 RUN git clone https://github.com/mcostalba/Stockfish.git /opt/stockfish
-RUN make build ARCH=x86-64 -C /opt/stockfish/src/
+RUN make -j4 build ARCH=x86-64 -C /opt/stockfish/src/
 RUN chown blunders:blunders /opt/stockfish/src/stockfish
 
 EXPOSE 80
 
-ADD supervisord.ini /etc/supervisord.d/supervisord.ini
+ADD supervisord/supervisord.ini /etc/supervisord.d/supervisord.ini
 ADD executor.sh /root/executor.sh
 
 CMD /root/executor.sh
