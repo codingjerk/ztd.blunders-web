@@ -1,10 +1,10 @@
 
 # Yes, this is real hostname and password, but it's guarded by firewall
 class database(object):
-    host=None
+    host="blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com"
     dbname="chessdb"
     user="postgres"
-    password=None
+    password="chessdb"
 
     connectionString = "%s %s %s %s" % (
         ("host=%s" % host) if host is not None else "",
