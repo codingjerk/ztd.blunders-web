@@ -1,5 +1,5 @@
 
-from app.utils import cache,chess
+from app.utils import cache,const,chess
 from app.db.postgre import core,user,blunder
 
 def getActiveUsers(interval):
@@ -57,7 +57,7 @@ def getUsersCount():
         }
     }
 
-@cache.cached('usersByRating','hour')
+@cache.cached('usersByRating', const.time.HOUR)
 def getUsersByRating(interval):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
@@ -79,7 +79,7 @@ def getUsersByRating(interval):
         }
     }
 
-@cache.cached('blundersByRating','day')
+@cache.cached('blundersByRating', const.time.DAY)
 def getBlundersByRating(interval):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
