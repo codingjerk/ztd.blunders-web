@@ -57,4 +57,6 @@ RUN chown blunders:blunders /opt/stockfish/src/stockfish
 EXPOSE 80
 
 ADD supervisord.ini /etc/supervisord.d/supervisord.ini
-CMD /usr/bin/supervisord -c /etc/supervisord.conf
+ADD executor.sh /root/executor.sh
+
+CMD /root/executor.sh
