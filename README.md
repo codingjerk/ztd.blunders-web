@@ -10,13 +10,23 @@ Ztd.Blunders is the software for deployment a Web server for solving chess probl
 
 Those databases are result of several months of research and analyzing for over 6000000+ officially registered chess games.  From all this data, we derived 1700000+ positions, where one of the players makes brute mistake and it's opponent can win in an elegant way. More, sophisticated algorithm was developed to assign each position a rating score, showing relative difficulty for finding best move.
 
-## Installing
+## Dockerize it!
+Yes, we support docker, do in order to run server just 
+
+```
+#!bash
+cd misc/docker
+docker build -t docker-blunders .
+docker run -d -p 80:80 -t docker-blunders
+```
+## Manual installing
 In this article we will cover deployment of Ztd.Blunders server. We are focusing on CentOS 7 x64 distribution, however this is not step by step manual. Variations are possible and different software versions can cause some problems.
 
 1. Install repository and update submodules  
     ```
-    $ yum install git  
-    $ git clone git@bitbucket.org:ziltoidteam/chessdb-web.git```
+    yum install git  
+    git clone git@bitbucket.org:ziltoidteam/chessdb-web.git
+    ```
 
     Enter to Git repository's directory and update modules  
     ```
@@ -62,31 +72,10 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     Second, we will load scheme to use in our project. It is just a dump stored in our repository.
     ```$ psql -U postgres chessdb < misc/postgresql_scheme.sql```  
 
-4. Installing MongoDB server.   
-    Once more, we will use custom repository with more recent version of software. At standard repository there is version 2.6.9, but we will install version 3.0.4  
-    Source: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat/  
-    Create file /etc/yum.repos.d/mongodb.repo with following content
-    ```
-[mongodb-org-3.0]
-    name=MongoDB Repository
-    baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.0/x86_64/
-    gpgcheck=0
-    enabled=1
-    ```
-
-    Now install it:
-    ```
-    $ sudo yum install mongodb-org.x86_64
-    $ sudo systemctl start mongod
-    $ sudo chkconfig mongod on
-    ```
-Afer mongodb start, application will use it as TTL cache. Records will be created for complex graph generations in database chessdb, collection named cache. It will just work, but to make those records to be temporary, TTL indexes should be created. Open mongo shell and type
-    ```
-use chessdb
-db.cache.createIndex( { "minute": 1 }, { expireAfterSeconds: 60 } )
-db.cache.createIndex( { "hour": 1 }, { expireAfterSeconds: 3600 } )
-db.cache.createIndex( { "day": 1 }, { expireAfterSeconds: 86400 } )
-    ```
+4. Installing Redis
+    We use Redis as TTL cache.
+    ```$ yum install redis ```
+    ```$ pip3.4 install redis ```
 5. Create secret key to enable sessions  
     Source: http://flask.pocoo.org/docs/0.10/quickstart/  
     We created special script to generate this key. Go to repository root directory and run
@@ -96,30 +85,27 @@ db.cache.createIndex( { "day": 1 }, { expireAfterSeconds: 86400 } )
 6. Installing dependencies for flask project.  
     ```$ sudo pip install Flask```  
 
-7. Install Python driver for MongoDB  
-    ```$ sudo pip install pymongo```  
-
-8. We need to install Python driver for PostgreSQL.  
+7. We need to install Python driver for PostgreSQL.  
     ```$ sudo yum install gcc python34u-devel libpqxx libpqxx-devel```  
     Do following as root: 
     ```$ export PATH=$PATH:/usr/pgsql-9.4/bin```  
     ```$ pip3.4 install psycopg2```  
 
-9. Install Python BCrypt library  
+8. Install Python BCrypt library  
     ```$ sudo yum install libffi-devel $ sudo pip3.4 install bcrypt```  
 
-10. Install python-chess library  
+9. Install python-chess library  
     ```$ sudo pip3.4 install python-chess```  
 
-11. Load games and blunders databases  
+10. Load games and blunders databases  
     We assume you have specially prepared collection of database, you will not find it here. We will publish it's schema when it will be stable. Ideally, you will use separate postgresql database instance.
     Now you have all the data to run the service.
-12. You can run server from repository's root directory  
+11. You can run server from repository's root directory  
     ```$ sudo python3.4 ./debug.py```  
     If you want systemd script, we prepared one for you
     ```$ sudo cp misc/blunders.service /usr/lib/systemd/system/```  
     Your repository location can be in different location than ours so you can edit this file to set it up.
-13. You can conect to the server on port 8089, as set in debug.py. This configuration is for testing purposes only.
+12. You can conect to the server on port 8089, as set in debug.py. This configuration is for testing purposes only.
 
 ## Advanced - setup uWSGI+nginx service.
 1. We assume, that all the processed will run as local, non root account, so install user blunders without any permissions. /home/blunders will be it's home.
