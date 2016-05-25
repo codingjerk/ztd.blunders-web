@@ -22,6 +22,10 @@ class engine(object):
     path = '/opt/stockfish/src/stockfish'
     time = 1000
 
+class app(object):
+    name = 'Chess Blunders',
+    title = '%s - endless database of chess puzzles' % name
+
 class tasks(object):
     RATED = 'rated'
     EXPLORE = 'explore'

@@ -1,7 +1,7 @@
 from flask import render_template, request
 
 from app import app
-from app.utils import session
+from app.utils import session,const
 
 @app.route('/profile', methods=['GET'])
 def profile():
@@ -10,7 +10,7 @@ def profile():
 
     return render_template(
         'profile.html',
-        title = 'Ztd.Blunders',
+        title = const.app.title,
         session = session,
         username = username
     )
