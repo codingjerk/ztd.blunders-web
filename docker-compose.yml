@@ -1,0 +1,17 @@
+# To run it in foreground mode
+# docker-compose up --build
+# To run it in detached mode
+# docker-compose up --build -d
+
+version: '2'
+services:
+  web:
+    build: misc/docker
+    restart: always
+    ports:
+    - 80:80
+    links:
+    - redis
+  redis:
+    image: redis
+    restart: always

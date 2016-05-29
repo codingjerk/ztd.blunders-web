@@ -14,7 +14,7 @@ class database(object):
     )
 
 class redis(object):
-    host='127.0.0.1'
+    host='redis' # docker link
     port=6379
     db=0
 

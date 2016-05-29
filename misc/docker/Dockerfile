@@ -17,7 +17,6 @@ RUN yum install nginx -y
 RUN yum install postgresql94.x86_64 postgresql94-devel.x86_64 -y
 RUN yum install libpqxx libpqxx-devel -y
 RUN yum install libffi-devel.x86_64 -y
-RUN yum install redis.x86_64 -y
 RUN yum install supervisor -y
 
 # Installing python packages
