@@ -11,13 +11,11 @@ Ztd.Blunders is the software for deployment a Web server for solving chess probl
 Those databases are result of several months of research and analyzing for over 6000000+ officially registered chess games.  From all this data, we derived 1700000+ positions, where one of the players makes brute mistake and it's opponent can win in an elegant way. More, sophisticated algorithm was developed to assign each position a rating score, showing relative difficulty for finding best move.
 
 ## Dockerize it!
-Yes, we support docker, in order to run server just 
+Yes, we support docker, in order to run server just run in project root directory:
 
 ```
 #!bash
-cd misc/docker
-docker build -t docker-blunders .
-docker run -d -p 80:80 -t docker-blunders
+docker-compose up
 ```
 ## Manual installing
 In this article we will cover deployment of Ztd.Blunders server. We are focusing on CentOS 7 x64 distribution, however this is not step by step manual. Variations are possible and different software versions can cause some problems.
