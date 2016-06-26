@@ -17,6 +17,7 @@ Yes, we support docker, in order to run server just run in project root director
 #!bash
 docker-compose up
 ```
+You will get running application server, supporting both mobile and web API. To check it just enter to [http://localhost:80](Link URL). You should see project welcome page.
 ## Manual installing
 In this article we will cover deployment of Ztd.Blunders server. We are focusing on CentOS 7 x64 distribution, however this is not step by step manual. Variations are possible and different software versions can cause some problems.
 
