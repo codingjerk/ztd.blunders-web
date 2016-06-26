@@ -107,9 +107,9 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
 12. You can conect to the server on port 8089, as set in debug.py. This configuration is for testing purposes only.
 
 ## Advanced - setup uWSGI+nginx service.
-1. We assume, that all the processed will run as local, non root account, so install user blunders without any permissions. /home/blunders will be it's home.
-Flask is one thread server by definition, so you it's problematic to use it in multiuser mode in production. We will use uWSGI service to create and maintain multi instances and make load balancing between them. Nginx will be configured to sit in fron of them as web server.
-2. If you installed all python packages as we told in previous sections, you probably want skip this step. For production we will set up python virtual environment and install all python packages into /home/blunders/env folder. This is our default. To use global packages you probably want to edit uwsgi.ini file, but it's all up to you.  Read more about  virtual environment here https://virtualenv.pypa.io/en/latest/userguide.html.
+1. We assume, that all the processed will run as local, non root account, so install user blunders without any permissions. **/home/blunders** will be it's home.
+Flask is one thread server by definition, so you it's problematic to use it in multiuser mode in production. We will use uWSGI service to create and maintain multi instances and load balancing between them. Nginx will be configured to sit in front of them as web server.
+2. If you installed all python packages as we told in previous sections, you probably want to skip this step. For production we will set up python virtual environment and install all python packages into /home/blunders/env folder. This is our default. To use global packages you probably want to edit uwsgi.ini file, but it's all up to you.  Read more about  virtual environment here https://virtualenv.pypa.io/en/latest/userguide.html.
 
 3. Copy uwsgi.ini to /home/blunders. This is configuration file for uWSGI. We will use pip to install uWSGI, but will install it globally.
     ```
