@@ -1,10 +1,12 @@
 
+import os
+
 # Yes, this is real hostname and password, but it's guarded by firewall
 class database(object):
-    host="blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com"
-    dbname="chessdb"
-    user="postgres"
-    password="chessdb"
+    host=os.environ.get('DB_HOST')
+    dbname=os.environ.get('DB_NAME')
+    user=os.environ.get('DB_USER')
+    password=os.environ.get('DB_PASSWORD')
 
     connectionString = "%s %s %s %s" % (
         ("host=%s" % host) if host is not None else "",

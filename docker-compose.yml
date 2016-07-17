@@ -12,6 +12,11 @@ services:
     - 80:80
     links:
     - redis
+    environment:
+    - DB_HOST='blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com'
+    - DB_NAME='chessdb'
+    - DB_USER='postgres'
+    - DB_PASSWORD='chessdb'
   redis:
     image: redis
     restart: always
