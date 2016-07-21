@@ -9,18 +9,16 @@ services:
     build:
       context: misc/docker
       args:
-        GIT_BRANCH: master
+        GIT_BRANCH: mobilecomments
     restart: always
     ports:
     - 80:80
     links:
     - redis
     environment:
-    - GIT_BRANCH=master
-    - DB_HOST='blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com'
-    - DB_NAME='chessdb'
+    - DB_HOST='172.25.60.138'
+    - DB_NAME='postgres'
     - DB_USER='postgres'
-    - DB_PASSWORD='chessdb'
   redis:
     image: redis
     restart: always

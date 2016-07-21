@@ -34,7 +34,8 @@ RUN useradd -m blunders
 RUN usermod -a -G blunders nginx # nginx must read uwsgi sockets
 
 # Cloning the Blunders project
-RUN su -l blunders bash -c "git clone https://jackalsh@bitbucket.org/ziltoidteam/ztd.blunders-web.git /home/blunders/ztd.blunders-web"
+ARG GIT_BRANCH
+RUN su -l blunders bash -c "git clone -b $GIT_BRANCH https://jackalsh@bitbucket.org/ziltoidteam/ztd.blunders-web.git /home/blunders/ztd.blunders-web"
 RUN su -l blunders bash -c "cd /home/blunders/ztd.blunders-web && git submodule init && git submodule update"
 RUN cd /home/blunders/ztd.blunders-web && misc/generateSecretKey.py
 
