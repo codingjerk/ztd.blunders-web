@@ -2,9 +2,7 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session
-
-MAX_MESSAGE_SIZE = 500
+from app.utils import session, const, crossdomain
 
 @app.route('/api/comment/send', methods = ['POST'])
 def commentBlunder():
@@ -29,7 +27,7 @@ def commentBlunder():
     if comment_id == 0:
         comment_id = None
 
-    if len(user_input) > MAX_MESSAGE_SIZE:
+    if len(user_input) > const.comment.MAX_SIZE:
         return jsonify({
             'status': 'error',
             'message': 'Input length can\'t be greater than %d' % MAX_MESSAGE_SIZE

@@ -2,7 +2,7 @@ from flask import request, jsonify
 
 from app import app
 from app.db import postgre
-from app.utils import session
+from app.utils import session, const, crossdomain
 
 @app.route('/api/comment/vote', methods = ['POST'])
 def voteBlunderComment():
@@ -41,3 +41,4 @@ def voteBlunderComment():
 @session.tokenize()
 def voteBlunderCommentMobile():
     return voteBlunderComment()
+
