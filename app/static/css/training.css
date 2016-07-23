@@ -251,6 +251,10 @@ a.move:active {
     margin-top: -2px;
 }
 
+#comments > ul {
+    padding-left: 15px;
+}
+
 .comment-header {
     margin-left: 10px;
     font-size: 82%;
