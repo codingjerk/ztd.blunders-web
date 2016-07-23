@@ -35,3 +35,9 @@ def voteBlunderComment():
         })
 
     return jsonify(postgre.blunder.getBlunderInfoById(session.userID(), blunder_id))
+
+@app.route('/api/mobile/comment/vote', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def voteBlunderCommentMobile():
+    return voteBlunderComment()

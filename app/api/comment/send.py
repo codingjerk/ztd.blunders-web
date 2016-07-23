@@ -42,3 +42,9 @@ def commentBlunder():
         })
 
     return jsonify(postgre.blunder.getBlunderInfoById(session.userID(), blunder_id))
+
+@app.route('/api/mobile/comment/send', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def commentBlunderMobile():
+    return commentBlunder()
