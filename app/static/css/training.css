@@ -256,7 +256,6 @@ a.move:active {
 }
 
 .comment-header {
-    margin-left: 10px;
     font-size: 82%;
     margin-bottom: 5px;
 }
@@ -271,9 +270,12 @@ a.move:active {
     font-size: 85%;
 }
 
+.comment-body {
+    padding-left: 10px;
+}
+
 .comment-controls {
     margin-top: 5px;
-    margin-left: 10px;
     color: #777;
     font-size: 80%;
 }
@@ -288,6 +290,10 @@ a.move:active {
 .comment-rating {
     text-align: right;
     margin-left: 20px;
+}
+
+.comment-responses {
+    padding-left: 20px;
 }
 
 #blunder-rating-container, #blunder-success-rate-container, #game-info-container, #spent-time-container {
