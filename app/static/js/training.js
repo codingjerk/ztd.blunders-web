@@ -468,7 +468,6 @@
 		}
 
 		data = response.data;
-                console.log(response)
 
 		if (data.myFavorite) {
 			$('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
