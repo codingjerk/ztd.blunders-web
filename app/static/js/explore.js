@@ -360,16 +360,16 @@
     }
 
     function voteBlunderComment(blunder_id, comment_id, vote) {
-        $.ajax({
-            type: 'POST',
+        sync.ajax({
+            id: 'loading-spin',
             url: "/api/comment/vote",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                blunder_id: blunder_id,
-                comment_id: comment_id,
-                vote: vote
-            })
-        }).done(onInfoRequest);
+            data: {
+              blunder_id: blunder_id,
+              comment_id: comment_id,
+              vote: vote
+            },
+            onDone: onInfoRequest
+        });
     }
 
     function commentOnReply(comment_id) {
@@ -556,16 +556,16 @@
     }
 
     function sendComment(blunder_id, comment_id, text) {
-        $.ajax({
-            type: 'POST',
+        sync.ajax({
+            id: 'loading-spin',
             url: "/api/comment/send",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                blunder_id: blunder_id,
-                comment_id: comment_id,
-                user_input: text
-            })
-        }).done(onInfoRequest);
+            data: {
+              blunder_id: blunder_id,
+              comment_id: comment_id,
+              user_input: text
+            },
+            onDone: onInfoRequest
+        });
     }
 
     function pieceTheme(piece) {

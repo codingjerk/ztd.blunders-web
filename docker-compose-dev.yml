@@ -16,7 +16,7 @@ services:
     links:
     - redis
     environment:
-    - DB_HOST='172.25.60.138'
+    - DB_HOST='10.0.0.6'
     - DB_NAME='postgres'
     - DB_USER='postgres'
   redis:
