@@ -52,6 +52,7 @@ def getUnlockedPacks(user_id, packs):
         connection.cursor.execute("""
             SELECT id, name, description
             FROM pack_type as pt
+            ORDER BY priority ASC
             """
         )
 
