@@ -36,7 +36,7 @@ def getUnlockedMateInN(name, description):
             'N' : N
         }
     }
-    for N in [1,2,3]]
+    for N in [1,2,3,4]]
 
     return result
 
@@ -63,6 +63,8 @@ def getUnlockedPacks(user_id, packs):
                 result.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.MATEINN:
                 result.extend(getUnlockedMateInN(name, description))
+            elif name == const.pack_type.GRANDMASTERS:
+                result.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.OPENING:
                 result.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.ENDGAME:

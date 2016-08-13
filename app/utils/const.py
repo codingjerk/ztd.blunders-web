@@ -44,6 +44,7 @@ class pack_type(object):
     ENDGAME = "Endgame"
     PROMOTION = "Promotion"
     CLOSEDGAME = "Closed game"
+    GRANDMASTERS = "Grandmasters"
 
 class time(object):
     MINUTE = 60
