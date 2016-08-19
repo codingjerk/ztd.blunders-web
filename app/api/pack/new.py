@@ -98,6 +98,8 @@ def packSelector(pack_type_name, pack_type_args):
         pack_id = newRandomPack(pack_description)
     elif pack_type_name == const.pack_type.MATEINN:
         pack_id = newMateInNPack(pack_type_args, pack_description)
+    elif pack_type_name == const.pack_type.GRANDMASTERS:
+        pack_id = newPackByTagName(pack_type_name, pack_description)
     elif pack_type_name == const.pack_type.OPENING:
         pack_id = newPackByTagName(pack_type_name, pack_description)
     elif pack_type_name == const.pack_type.ENDGAME:
@@ -106,6 +108,7 @@ def packSelector(pack_type_name, pack_type_args):
         pack_id = newPackByTagName(pack_type_name, pack_description)
     elif pack_type_name == const.pack_type.CLOSEDGAME:
         pack_id = newPackByTagName(pack_type_name, pack_description)
+
     else:
         return {
             'status': 'error',

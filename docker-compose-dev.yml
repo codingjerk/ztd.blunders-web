@@ -1,7 +1,6 @@
-# To run it in foreground mode
-# docker-compose up --build
-# To run it in detached mode
-# docker-compose up --build -d
+# This file is to use service in developer mode
+# docker-compose -f ./docker-compose-dev.yml up --build
+# We expose 8089 port do you can run flask server manually
 
 version: '2'
 services:
@@ -17,7 +16,7 @@ services:
     links:
     - redis
     environment:
-    - DB_HOST='10.0.0.6'
+    - DB_HOST='10.0.0.4'
     - DB_NAME='postgres'
     - DB_USER='postgres'
   redis:
