@@ -8,7 +8,7 @@ services:
     build:
       context: misc/docker
       args:
-        GIT_BRANCH: mobilecomments
+        GIT_BRANCH: master
     restart: always
     ports:
     - 80:80
