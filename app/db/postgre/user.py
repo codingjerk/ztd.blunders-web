@@ -371,10 +371,12 @@ def getRatingByDate(username):
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date,
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
                    AVG(b.user_elo)
             FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC;"""
             , (user_id,)
         )
 
@@ -394,12 +396,14 @@ def getBlundersByDate(username):
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date,
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
                    COUNT(b.id) as total,
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s"""
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC"""
             , (user_id,)
         )
 

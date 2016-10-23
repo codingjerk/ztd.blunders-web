@@ -2,6 +2,7 @@ from flask import jsonify, request
 
 from app import app
 from app.db import postgre
+from app.utils import session, crossdomain
 
 @app.route('/api/user/blunders-by-date', methods=['POST'])
 def getBlundersByDate():
@@ -14,3 +15,9 @@ def getBlundersByDate():
         })
 
     return jsonify(postgre.user.getBlundersByDate(username))
+
+@app.route('/api/mobile/user/blunders-by-date', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getBlundersByDateMobile():
+    return getBlundersByDate()

@@ -2,6 +2,7 @@ from flask import jsonify, request
 
 from app import app
 from app.db import postgre
+from app.utils import session, crossdomain
 
 @app.route('/api/user/comments', methods = ['POST'])
 def getCommentsByUser():
@@ -16,3 +17,9 @@ def getCommentsByUser():
         })
 
     return jsonify(postgre.statistic.getCommentsByUser(username, offset, limit))
+
+@app.route('/api/mobile/user/comments', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getCommentsByUserMobile():
+    return getCommentsByUser()
