@@ -7,7 +7,7 @@ version: '2'
 services:
   web:
     build:
-      context: misc/docker
+      context: misc/docker/web
       args:
         GIT_BRANCH: master
     restart: always
@@ -16,7 +16,6 @@ services:
     links:
     - redis
     environment:
-    - GIT_BRANCH=master
     - DB_HOST='blunders-master.clotqfqonef0.eu-west-1.rds.amazonaws.com'
     - DB_NAME='chessdb'
     - DB_USER='postgres'
