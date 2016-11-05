@@ -406,7 +406,7 @@ def getRatingByDate(username):
         'status': 'ok',
         'username': username,
         'data' : {
-            'timestamp': timestamp
+            'timestamp': timestamp,
             'rating-statistic': rating
         }
     }
