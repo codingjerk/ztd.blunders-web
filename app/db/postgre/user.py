@@ -382,7 +382,7 @@ def getRatingByDate(username, interval):
             SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
                    AVG(b.user_elo)
             FROM blunder_history AS b
-            WHERE b.date_finish > NOW() - INTERVAL 1 MONTH
+            WHERE b.date_finish > NOW() - INTERVAL '1 MONTH'
             GROUP BY date, b.user_id
             HAVING b.user_id = %s
             ORDER BY date ASC;"""
@@ -426,7 +426,7 @@ def getBlundersByDate(username, interval):
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM blunder_history AS b
-            WHERE b.date_finish > NOW() - INTERVAL 1 MONTH
+            WHERE b.date_finish > NOW() - INTERVAL '1 MONTH'
             GROUP BY date, b.user_id
             HAVING b.user_id = %s
             ORDER BY date ASC"""
