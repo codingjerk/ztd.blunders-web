@@ -134,3 +134,26 @@ def deauthorize():
 
     del session['username']
     del session['user_id']
+
+# If there is not username, set default username to me
+def defaultUsername():
+    def decorator(f):
+        def wrapped():
+            try:
+                if not 'username' in request.json:
+                    request.json['username'] = username()
+
+                result = f()
+            except Exception as e:
+                print(e) # Useful debug printing
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Internal server error'
+                })
+
+
+            return result
+
+        return update_wrapper(wrapped, f)
+
+    return decorator
