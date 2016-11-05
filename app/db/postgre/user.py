@@ -412,7 +412,6 @@ def getBlundersByDate(username, interval):
     if interval == 'all':
         query = """
             SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
-                   COUNT(b.id) as total,
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM blunder_history AS b
@@ -422,7 +421,6 @@ def getBlundersByDate(username, interval):
     elif interval == 'last-month': # TODO: NOW() - INTERVAL 1 MONTH -> use date_trunct to set to midnight?
         query = """
             SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
-                   COUNT(b.id) as total,
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM blunder_history AS b
@@ -441,16 +439,14 @@ def getBlundersByDate(username, interval):
 
         data = connection.cursor.fetchall()
 
-        total = [[date, total] for (date, total, _1, _2) in data]     #pylint: disable=unused-variable
-        solved = [[date, solved] for (date, _1, solved, _2) in data]  #pylint: disable=unused-variable
-        failed = [[date, failed] for (date, _1, _2, failed) in data]  #pylint: disable=unused-variable
+        solved = [[date, solved] for (date, solved, _1) in data]  #pylint: disable=unused-variable
+        failed = [[date, failed] for (date, _1, failed) in data]  #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
         'username': username,
         'data': {
             'blunder-count-statistic': {
-                'total' : total,
                 'solved': solved,
                 'failed': failed
             }
