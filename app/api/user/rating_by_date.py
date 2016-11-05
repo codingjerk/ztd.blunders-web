@@ -8,13 +8,14 @@ from app.utils import session, crossdomain
 def getRatingByDate():
     try:
         username = request.json['username']
+        interval = request.json['interval']
     except Exception:
         return jsonify({
             'status': 'error',
             'message': 'Username required'
         })
 
-    return jsonify(postgre.user.getRatingByDate(username))
+    return jsonify(postgre.user.getRatingByDate(username, mode))
 
 @app.route('/api/mobile/user/rating-by-date', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
