@@ -19,7 +19,6 @@ def getRatingByDate():
 @app.route('/api/mobile/user/rating-by-date', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 @session.tokenize()
-@session.defaultUsername()
 def getRatingByDateMobile():
     # If 'username' not set, use username associated with token.
     if not 'username' in request.json:

@@ -20,4 +20,8 @@ def getBlundersByDate():
 @crossdomain.crossdomain()
 @session.tokenize()
 def getBlundersByDateMobile():
+    # If 'username' not set, use username associated with token.
+    if not 'username' in request.json:
+        request.json['username'] = session.username()
+        
     return getBlundersByDate()
