@@ -130,7 +130,7 @@
     }
 
     function drawBlunderChart(id, data) {
-        if (data.total.length === 0) {
+        if (data.solved.length === 0) {
             utils.insertTooFewDataMessage(id, 'There will be your game history');
 
             return;
