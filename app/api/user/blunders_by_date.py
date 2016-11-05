@@ -12,10 +12,10 @@ def getBlundersByDate():
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Username required'
+            'message': 'Username and interval required'
         })
 
-    return jsonify(postgre.user.getBlundersByDate(username, mode))
+    return jsonify(postgre.user.getBlundersByDate(username, interval))
 
 @app.route('/api/mobile/user/blunders-by-date', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
