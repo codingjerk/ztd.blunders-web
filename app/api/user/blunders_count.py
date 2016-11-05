@@ -20,8 +20,8 @@ def userBlundersCount():
 @crossdomain.crossdomain()
 @session.tokenize()
 def userBlundersCountMobile():
-    # If 'username' not set, use username associated with token.
+    # If 'username' not set, use default username associated with token.
     if not 'username' in request.json:
         request.json['username'] = session.username()
-        
+
     return userBlundersCount()

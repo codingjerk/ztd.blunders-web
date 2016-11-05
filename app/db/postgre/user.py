@@ -366,6 +366,18 @@ def getBlundersStatistic(username):
         }
     }
 
+def getTimestamp():
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT TO_CHAR(NOW(), 'YYYY/MM/DD 12:00') AS date;"""
+        )
+
+        if connection.cursor.rowcount != 1:
+            return None
+
+        (date,) = connection.cursor.fetchone()
+    return date
+
 def getRatingByDate(username):
     user_id = getUserId(username)
 
@@ -383,10 +395,18 @@ def getRatingByDate(username):
         data = connection.cursor.fetchall()
         rating = [[date, int(elo)] for (date, elo) in data]
 
+    timestamp = getTimestamp()
+    if timestamp is None:
+        return {
+            'status': 'error',
+            'message': 'Error when querying database for current date'
+        }
+
     return {
         'status': 'ok',
         'username': username,
         'data' : {
+            'timestamp': timestamp
             'rating-statistic': rating
         }
     }
