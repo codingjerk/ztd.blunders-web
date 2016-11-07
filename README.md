@@ -52,7 +52,7 @@ In this article we will cover deployment of Ztd.Blunders server. We are focusing
     We can use special repository from PostgreSQL maintainers. Current available version is 9.4.  
     Source: http://www.postgresql.org/download/linux/redhat/#  
     ```
-    $ yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-1.noarch.rpm
+    $ yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-3.noarch.rpm
     ```  
     ```
     $ sudo yum install postgresql94.x86_64postgresql94-server.x86_64postgresql94-devel.x86_64  
