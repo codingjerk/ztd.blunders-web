@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from app.utils import chess, const
+from app.utils import chess, const, cache
 from app.db.postgre import core
 
 from psycopg2 import IntegrityError
@@ -366,6 +366,7 @@ def getBlundersStatistic(username):
         }
     }
 
+@cache.cached('ratingByDate', const.time.HOUR)
 def getRatingByDate(username, interval):
     user_id = getUserId(username)
 
@@ -406,6 +407,7 @@ def getRatingByDate(username, interval):
         }
     }
 
+@cache.cached('blundersByDate', const.time.HOUR) 
 def getBlundersByDate(username, interval):
     user_id = getUserId(username)
 
