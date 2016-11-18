@@ -2,8 +2,9 @@ from flask import jsonify, request
 
 from app import app
 from app.db import postgre
+from app.utils import session, crossdomain
 
-@app.route('/api/user/passed-blunders', methods = ['POST'])
+@app.route('/api/user/history-blunders', methods = ['POST'])
 def getBlundersHistory():
     try:
         username = request.json['username']
@@ -16,3 +17,13 @@ def getBlundersHistory():
         })
 
     return jsonify(postgre.statistic.getBlundersHistory(username, offset, limit))
+
+@app.route('/api/mobile/user/history-blunders', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getBlundersHistoryMobile():
+    # If 'username' not set, use default username associated with token.
+    if not 'username' in request.json:
+        request.json['username'] = session.username()
+
+    return getBlundersHistory()

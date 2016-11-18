@@ -4,7 +4,7 @@
             caption: 'Blunders',
             rows: [
                 {
-                    type: 'wide', 
+                    type: 'wide',
                     id: 'rating-statistic'
                 },
                 {
@@ -26,7 +26,7 @@
                     additional: 'all time'
                 },
                 {
-                    type: 'wide', 
+                    type: 'wide',
                     id: 'blunder-count-statistic'
                 }
             ]
@@ -63,7 +63,8 @@
         url: "/api/user/rating-by-date",
         contentType: 'application/json',
         data: JSON.stringify({
-            username: $.url('?user')
+            username: $.url('?user'),
+            interval: 'all'
         })
     }).done(onUpdateRatingChartRequest);
 
@@ -74,7 +75,7 @@
         }
 
         grid.update(response.data,  {'rating-statistic': drawRatingChart});
-    } 
+    }
 
     function drawRatingChart(id, data) {
         if (data.length === 0) {
@@ -84,7 +85,7 @@
         }
 
         var chart = data.mapIndex(0, utils.fixDate);
-        
+
         $.jqplot(id, [data], {
             title: "User rating dynamics",
             series: [{
@@ -98,12 +99,12 @@
                     renderer: $.jqplot.DateAxisRenderer
                 }
             },
-            cursor:{ 
+            cursor:{
                 show: true,
-                zoom:true, 
+                zoom:true,
                 showTooltip:false,
                 clickReset:true
-            } 
+            }
         });
     }
 })();
@@ -114,7 +115,8 @@
         url: "/api/user/blunders-by-date",
         contentType: 'application/json',
         data: JSON.stringify({
-            username: $.url('?user')
+            username: $.url('?user'),
+            interval: 'all'
         })
     }).done(onUpdateBlunderChartRequest);
 
@@ -123,12 +125,12 @@
             notify.error(response.message);
             return;
         }
-        
+
         grid.update(response.data, {'blunder-count-statistic': drawBlunderChart});
-    } 
+    }
 
     function drawBlunderChart(id, data) {
-        if (data.total.length === 0) {
+        if (data.solved.length === 0) {
             utils.insertTooFewDataMessage(id, 'There will be your game history');
 
             return;
@@ -145,11 +147,11 @@
 	solved.sort(sortDate);
 
         var firstDate = Math.min(
-		failed[0][0] || (new Date()), 
+		failed[0][0] || (new Date()),
 		solved[0][0] || (new Date())
 	);
         var lastDate = Math.max(
-		failed[failed.length - 1][0] || 0, 
+		failed[failed.length - 1][0] || 0,
 		solved[solved.length - 1][0] || 0
 	);
 
@@ -174,7 +176,7 @@
                 rendererOptions: {
                     barWidth: 10,
                     barMargin: 1,
-                    highlightMouseDown: true   
+                    highlightMouseDown: true
                 },
                 pointLabels: {
                     show: true

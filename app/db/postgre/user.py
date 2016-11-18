@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from app.utils import chess, const
+from app.utils import chess, const, cache
 from app.db.postgre import core
 
 from psycopg2 import IntegrityError
@@ -366,17 +366,35 @@ def getBlundersStatistic(username):
         }
     }
 
-def getRatingByDate(username):
+@cache.cached('ratingByDate', const.time.HOUR)
+def getRatingByDate(username, interval):
     user_id = getUserId(username)
 
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD HH:00') AS date,
+    if interval == 'all':
+        query = """
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
                    AVG(b.user_elo)
             FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s;"""
-            , (user_id,)
-        )
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC;"""
+    elif interval == 'last-month':  # TODO: NOW() - INTERVAL 1 MONTH -> use date_trunct to set to midnight?
+        query = """
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
+                   AVG(b.user_elo)
+            FROM blunder_history AS b
+            WHERE b.date_finish > NOW() - INTERVAL '1 MONTH'
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC;"""
+    else:
+        return {
+            'status': 'error',
+            'message': 'Error value for interval parameter: %s' % interval
+        }
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(query, (user_id,))
 
         data = connection.cursor.fetchall()
         rating = [[date, int(elo)] for (date, elo) in data]
@@ -389,32 +407,48 @@ def getRatingByDate(username):
         }
     }
 
-def getBlundersByDate(username):
+@cache.cached('blundersByDate', const.time.HOUR) 
+def getBlundersByDate(username, interval):
     user_id = getUserId(username)
 
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 00:00') AS date,
-                   COUNT(b.id) as total,
+    if interval == 'all':
+        query = """
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
                    COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
                    COUNT(b.id) FILTER (WHERE b.result = 0) as failed
             FROM blunder_history AS b
-            GROUP BY date, b.user_id HAVING b.user_id = %s"""
-            , (user_id,)
-        )
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC"""
+    elif interval == 'last-month': # TODO: NOW() - INTERVAL 1 MONTH -> use date_trunct to set to midnight?
+        query = """
+            SELECT TO_CHAR(b.date_finish, 'YYYY/MM/DD 12:00') AS date,
+                   COUNT(b.id) FILTER (WHERE b.result = 1) as solved,
+                   COUNT(b.id) FILTER (WHERE b.result = 0) as failed
+            FROM blunder_history AS b
+            WHERE b.date_finish > NOW() - INTERVAL '1 MONTH'
+            GROUP BY date, b.user_id
+            HAVING b.user_id = %s
+            ORDER BY date ASC"""
+    else:
+        return {
+            'status': 'error',
+            'message': 'Error value for interval parameter: %s' % interval
+        }
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(query, (user_id,))
 
         data = connection.cursor.fetchall()
 
-        total = [[date, total] for (date, total, _1, _2) in data]     #pylint: disable=unused-variable
-        solved = [[date, solved] for (date, _1, solved, _2) in data]  #pylint: disable=unused-variable
-        failed = [[date, failed] for (date, _1, _2, failed) in data]  #pylint: disable=unused-variable
+        solved = [[date, solved] for (date, solved, _1) in data]  #pylint: disable=unused-variable
+        failed = [[date, failed] for (date, _1, failed) in data]  #pylint: disable=unused-variable
 
     return {
         'status': 'ok',
         'username': username,
         'data': {
             'blunder-count-statistic': {
-                'total' : total,
                 'solved': solved,
                 'failed': failed
             }

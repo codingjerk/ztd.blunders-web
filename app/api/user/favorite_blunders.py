@@ -2,6 +2,7 @@ from flask import jsonify, request
 
 from app import app
 from app.db import postgre
+from app.utils import session, crossdomain
 
 @app.route('/api/user/favorite-blunders', methods = ['POST'])
 def getBlundersFavorites():
@@ -16,3 +17,13 @@ def getBlundersFavorites():
         })
 
     return jsonify(postgre.statistic.getBlundersFavorites(username, offset, limit))
+
+@app.route('/api/mobile/user/favorite-blunders', methods = ['POST', 'OPTIONS'])
+@crossdomain.crossdomain()
+@session.tokenize()
+def getBlundersFavoritesMobile():
+    # If 'username' not set, use default username associated with token.
+    if not 'username' in request.json:
+        request.json['username'] = session.username()
+
+    return getBlundersFavorites()

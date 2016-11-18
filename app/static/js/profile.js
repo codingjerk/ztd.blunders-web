@@ -97,7 +97,7 @@ function pieceTheme(piece) {
     grid.setupPager(id, itemsOnPage, function(page) {
         $.ajax({
             type: 'POST',
-            url: "/api/user/passed-blunders",
+            url: "/api/user/history-blunders",
             contentType: 'application/json',
             data: JSON.stringify({
                 username: $.url('?user'),

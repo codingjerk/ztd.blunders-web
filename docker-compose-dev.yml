@@ -6,19 +6,28 @@ version: '2'
 services:
   web:
     build:
-      context: misc/docker
+      context: misc/docker/web
       args:
-        GIT_BRANCH: master
+        GIT_BRANCH: devel
     restart: always
     ports:
     - 80:80
     - 8089:8089
     links:
+    - postgres
     - redis
     environment:
-    - DB_HOST='10.0.0.4'
+    - DB_HOST='postgres'
     - DB_NAME='postgres'
     - DB_USER='postgres'
+    - DB_PASSWORD='chessdb'
+  postgres:
+    image: postgres:9.4.1
+    environment:
+    - POSTGRES_PASSWORD=chessdb
+    - POSTGRES_USER=postgres
+    - POSTGRES_DB=postgres
+    restart: always
   redis:
     image: redis
     restart: always
