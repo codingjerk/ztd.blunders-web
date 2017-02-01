@@ -1,6 +1,12 @@
+@font-face {
+    font-family: 'CMUSansSerifMedium';
+    src: url("../font/cmu-sans-serif/cmunss.ttf");
+}
+
 body {
-    font-family: 'CMUSansSerifMedium', sans-serif;
     color: #333333;
+
+    font-family: 'CMUSansSerifMedium', sans-serif;  
 }
 
 a {
