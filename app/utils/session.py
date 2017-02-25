@@ -15,9 +15,15 @@ class State:
         raise Exception("State is static class, can't call State.__init__")
 
     def authorize(token): #pylint: disable=no-self-argument
+        userId = postgre.user.getUserIdByToken(token)
+        if userId is None:
+            return False
+
         State.token = token
-        State.userID = postgre.user.getUserIdByToken(token)
+        State.userID = userId
         State.username = postgre.user.getUsernameById(State.userID)
+
+        return True
 
     #pylint: disable=no-method-argument
     def clean():
@@ -27,7 +33,7 @@ class State:
 
 def tokenize():
     def decorator(f):
-        def wrapped():
+        def wrapped(*args, **kwargs):
             try:
                 token = request.json['token']
             except Exception:
@@ -37,14 +43,19 @@ def tokenize():
                 })
 
             try:
-                State.authorize(token)
+                success = State.authorize(token)
+                if not success:
+                    return jsonify({
+                        'status': 'error',
+                        'message': 'Invalid API token'
+                    })
 
-                result = f()
+                result = f(*args, **kwargs)
             except Exception as e:
                 print(e) # Useful debug printing
                 return jsonify({
                     'status': 'error',
-                    'message': 'Invalid API token'
+                    'message': 'Unknown API error'
                 })
 
             State.clean()
