@@ -40,10 +40,11 @@ def getUserIdByToken(token):
         )
 
         result = connection.cursor.fetchone()
-        if result in None:
+        if result is None:
             return None
 
-        return result[0]
+        (userId,) = result
+        return userId
 
 def getTokenForUser(username):
     user_id = getUserId(username)
