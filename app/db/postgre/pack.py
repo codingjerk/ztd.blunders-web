@@ -33,7 +33,7 @@ def getUnlockedFromCoach(user_id):
         result = connection.cursor.fetchall()
 
         unlocked = []
-        [ unlocked.extend(pack) for pack in result ]
+        [ unlocked.extend(pack) for (pack,) in result ]
 
         return unlocked
 
@@ -75,27 +75,44 @@ def getUnlockedPacks(user_id, packs):
 
         pack_types = connection.cursor.fetchall()
 
-        result = []
+        coach_packs = getUnlockedFromCoach(user_id)
+
+        basic_packs = []
         for (id, name, description) in pack_types:
             if name == const.pack_type.RANDOM:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.MATEINN:
-                result.extend(getUnlockedMateInN(name, description))
+                basic_packs.extend(getUnlockedMateInN(name, description))
             elif name == const.pack_type.GRANDMASTERS:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.OPENING:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.ENDGAME:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.PROMOTION:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.CLOSEDGAME:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             #else:
             #    raise Exception('')
 
-        #Add packs proposed by coach
-        result.extend(getUnlockedFromCoach(user_id))
+        # Remove from basic pack those already proposed by coach
+        basic_packs = list(filter(
+            lambda pack: 
+                not (
+                    pack['type_name'],
+                    pack['args'] if 'args' in pack else {}
+                ) in [(
+                    pack['type_name'],
+                    pack['args'] if 'args' in pack else {}
+                )
+                for pack in coach_packs], 
+            basic_packs
+        ))
+                      
+        result = []
+        result.extend(coach_packs)
+        result.extend(basic_packs) 
 
         return result
 

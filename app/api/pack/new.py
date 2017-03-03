@@ -73,6 +73,13 @@ def packSelector(pack_type_name, pack_type_args):
                             pack_type_args
                         )
                 ]
+
+    if len(filtered) > 1:
+        return { # Duplicates in pack_type_name's in unlocked array are now allowed
+            'status': 'error',
+            'message': 'Internal error in algorithm of pack creation: %s' % pack_type_name
+        }
+
     if len(filtered) != 1:
         return {
             'status': 'error',
@@ -108,7 +115,6 @@ def packSelector(pack_type_name, pack_type_args):
         pack_id = newPackByTagName(pack_type_name, pack_description)
     elif pack_type_name == const.pack_type.CLOSEDGAME:
         pack_id = newPackByTagName(pack_type_name, pack_description)
-
     else:
         return {
             'status': 'error',
