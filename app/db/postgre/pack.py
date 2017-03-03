@@ -21,6 +21,23 @@ def getAssignedPacks(user_id):
 
         return result
 
+def getUnlockedFromCoach(user_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT vwcm.unlocked_packs
+            FROM vw_coach_messages as vwcm
+            WHERE vwcm.user_id = %s;
+            """, (user_id,)
+        )
+
+        result = connection.cursor.fetchall()
+
+        unlocked = []
+        [ unlocked.extend(pack) for pack in result ]
+
+        return unlocked
+
+
 def getUnlockedAsIs(name, description):
     return [{
         'type_name': name,
@@ -76,6 +93,9 @@ def getUnlockedPacks(user_id, packs):
                 result.extend(getUnlockedAsIs(name, description))
             #else:
             #    raise Exception('')
+
+        #Add packs proposed by coach
+        result.extend(getUnlockedFromCoach(user_id))
 
         return result
 
