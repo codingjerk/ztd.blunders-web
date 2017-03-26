@@ -57,6 +57,32 @@ def getUnlockedMateInN(name, description):
 
     return result
 
+def getRatingAboutX(name, description):
+    ## Example of usage. By default we do not show this in unlocked
+    #result = [{
+    #    'type_name': name,
+    #    'description': description % 1200,
+    #    'args' : {
+    #        'rating' : 1200
+    #    }
+    #}]
+    
+    result = []
+
+    return result
+
+# This is virtual unlock, because user rating can be calculated
+# during pack generation time, not now. When you confirm it,
+# It will be transformed into RatingAboutX unlock
+def getUserLevel(name, description):
+    result = [{
+        'type_name': name,
+        'description': description
+    }]
+
+    return result
+    
+
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy things
 # Total limit, dependencies etc
@@ -93,6 +119,10 @@ def getUnlockedPacks(user_id, packs):
                 basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.CLOSEDGAME:
                 basic_packs.extend(getUnlockedAsIs(name, description))
+            elif name == const.pack_type.RATINGABOUTX:
+                basic_packs.extend(getRatingAboutX(name, description))
+            elif name == const.pack_type.USERLEVEL:
+                basic_packs.extend(getUserLevel(name, description))
             #else:
             #    raise Exception('')
 
