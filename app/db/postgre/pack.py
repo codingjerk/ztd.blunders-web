@@ -21,11 +21,30 @@ def getAssignedPacks(user_id):
 
         return result
 
+def getUnlockedFromCoach(user_id):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT vwcm.unlocked_packs
+            FROM vw_coach_messages as vwcm
+            WHERE vwcm.user_id = %s;
+            """, (user_id,)
+        )
+
+        result = connection.cursor.fetchall()
+
+        unlocked = []
+        [ unlocked.extend(pack) for (pack,) in result ]
+
+        return unlocked
+
+
 def getUnlockedAsIs(name, description):
-    return [{
+    result = [{
         'type_name': name,
         'description': description
     }]
+    
+    return result
 
 def getUnlockedMateInN(name, description):
     # all N 1-10 should work now, however, we artificially limit N to 3
@@ -40,6 +59,25 @@ def getUnlockedMateInN(name, description):
 
     return result
 
+def getRatingAboutX(name, description):
+    ## Example of usage. By default we do not show this in unlocked
+    #result = [{
+    #    'type_name': name,
+    #    'description': description % 1200,
+    #    'args' : {
+    #        'rating' : 1200
+    #    }
+    #}]
+    
+    result = []
+
+    return result
+
+# Note about User Level pack:
+# This is virtual unlock, because user rating can be calculated
+# during pack generation time, not now. When you confirm it,
+# It will be transformed into RatingAboutX unlock
+
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy things
 # Total limit, dependencies etc
@@ -52,30 +90,54 @@ def getUnlockedPacks(user_id, packs):
         connection.cursor.execute("""
             SELECT id, name, description
             FROM pack_type as pt
-            ORDER BY priority ASC
+            ORDER BY priority DESC
             """
         )
 
         pack_types = connection.cursor.fetchall()
 
-        result = []
+        coach_packs = getUnlockedFromCoach(user_id)
+
+        basic_packs = []
         for (id, name, description) in pack_types:
             if name == const.pack_type.RANDOM:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.MATEINN:
-                result.extend(getUnlockedMateInN(name, description))
+                basic_packs.extend(getUnlockedMateInN(name, description))
             elif name == const.pack_type.GRANDMASTERS:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.OPENING:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.ENDGAME:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.PROMOTION:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             elif name == const.pack_type.CLOSEDGAME:
-                result.extend(getUnlockedAsIs(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
+            elif name == const.pack_type.RATINGABOUTX:
+                basic_packs.extend(getRatingAboutX(name, description))
+            elif name == const.pack_type.USERLEVEL:
+                basic_packs.extend(getUnlockedAsIs(name, description))
             #else:
             #    raise Exception('')
+
+        # Remove from basic pack those already proposed by coach
+        basic_packs = list(filter(
+            lambda pack: 
+                not (
+                    pack['type_name'],
+                    pack['args'] if 'args' in pack else {}
+                ) in [(
+                    pack['type_name'],
+                    pack['args'] if 'args' in pack else {}
+                )
+                for pack in coach_packs], 
+            basic_packs
+        ))
+                      
+        result = []
+        result.extend(coach_packs)
+        result.extend(basic_packs) 
 
         return result
 

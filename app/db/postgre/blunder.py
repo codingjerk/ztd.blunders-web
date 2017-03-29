@@ -564,6 +564,34 @@ def getBlunderByTag(tag_name, count):
 
         return result
 
+def getBlunderByRating(expected_elo, deviation_elo, count):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """SELECT b.id
+               FROM blunders AS b 
+               LEFT JOIN (
+                   SELECT pb.blunder_id
+                   FROM pack_blunders AS pb 
+                   INNER JOIN packs AS p 
+                       ON p.id = pb.pack_id 
+                   WHERE p.type_id = (
+                       SELECT pt.id
+                       FROM pack_type AS pt
+                       WHERE pt.name = 'Rating about X'
+                   )
+               ) AS ba 
+                   ON b.id = ba.blunder_id  
+               WHERE b.elo > %s 
+                 AND b.elo <= %s 
+                 AND b.enabled = 1
+                 AND ba.blunder_id IS NULL 
+               LIMIT %s;""" , (expected_elo - deviation_elo/2, expected_elo + deviation_elo/2, count)
+        )
+
+        result = connection.cursor.fetchall()
+
+        return result
+
 def getAnalyze(blunder_id, user_line, user_move):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute(

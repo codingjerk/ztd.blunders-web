@@ -14,20 +14,13 @@ services:
     - 80:80
     - 8089:8089
     links:
-    - postgres
     - redis
     environment:
-    - DB_HOST='postgres'
-    - DB_NAME='postgres'
+    - DB_NAME='chessdb'
     - DB_USER='postgres'
     - DB_PASSWORD='chessdb'
-  postgres:
-    image: postgres:9.4.1
-    environment:
-    - POSTGRES_PASSWORD=chessdb
-    - POSTGRES_USER=postgres
-    - POSTGRES_DB=postgres
-    restart: always
+    volumes:
+    - /var/run/postgresql:/var/run/postgresql/
   redis:
     image: redis
     restart: always
