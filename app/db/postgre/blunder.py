@@ -583,8 +583,9 @@ def getBlunderByRating(expected_elo, deviation_elo, count):
                    ON b.id = ba.blunder_id  
                WHERE b.elo > %s 
                  AND b.elo <= %s 
+                 AND b.enabled = 1
                  AND ba.blunder_id IS NULL 
-               LIMIT %s;  ;""" , (expected_elo - deviation_elo/2, expected_elo + deviation_elo/2, count)
+               LIMIT %s;""" , (expected_elo - deviation_elo/2, expected_elo + deviation_elo/2, count)
         )
 
         result = connection.cursor.fetchall()

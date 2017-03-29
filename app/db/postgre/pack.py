@@ -39,10 +39,12 @@ def getUnlockedFromCoach(user_id):
 
 
 def getUnlockedAsIs(name, description):
-    return [{
+    result = [{
         'type_name': name,
         'description': description
     }]
+    
+    return result
 
 def getUnlockedMateInN(name, description):
     # all N 1-10 should work now, however, we artificially limit N to 3
@@ -71,17 +73,10 @@ def getRatingAboutX(name, description):
 
     return result
 
+# Note about User Level pack:
 # This is virtual unlock, because user rating can be calculated
 # during pack generation time, not now. When you confirm it,
 # It will be transformed into RatingAboutX unlock
-def getUserLevel(name, description):
-    result = [{
-        'type_name': name,
-        'description': description
-    }]
-
-    return result
-    
 
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy things
@@ -95,7 +90,7 @@ def getUnlockedPacks(user_id, packs):
         connection.cursor.execute("""
             SELECT id, name, description
             FROM pack_type as pt
-            ORDER BY priority ASC
+            ORDER BY priority DESC
             """
         )
 
@@ -122,7 +117,7 @@ def getUnlockedPacks(user_id, packs):
             elif name == const.pack_type.RATINGABOUTX:
                 basic_packs.extend(getRatingAboutX(name, description))
             elif name == const.pack_type.USERLEVEL:
-                basic_packs.extend(getUserLevel(name, description))
+                basic_packs.extend(getUnlockedAsIs(name, description))
             #else:
             #    raise Exception('')
 
