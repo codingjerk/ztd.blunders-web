@@ -117,7 +117,8 @@ def getUnlockedPacks(user_id, packs):
             elif name == const.pack_type.RATINGABOUTX:
                 basic_packs.extend(getRatingAboutX(name, description))
             elif name == const.pack_type.USERLEVEL:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                #basic_packs.extend(getUnlockedAsIs(name, description))
+                pass
             #else:
             #    raise Exception('')
 
