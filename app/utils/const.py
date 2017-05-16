@@ -21,7 +21,7 @@ class redis(object):
     db=0
 
 class engine(object):
-    path = '/opt/stockfish/src/stockfish'
+    path = '/opt/stockfish-8-linux/Linux/stockfish_8_x64'
     time = 1000
 
 class app(object):
