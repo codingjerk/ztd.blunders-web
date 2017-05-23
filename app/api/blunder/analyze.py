@@ -29,7 +29,6 @@ def searchForPreanalyzed(blunder_id, data):
 
 def calcualteWithEngine(blunder_id, blunder_fen, data):
     with Engine(const.engine.path) as engine:
-        engine.new()
         for element in data:
             if 'engine' in element:
                 continue;
@@ -39,6 +38,8 @@ def calcualteWithEngine(blunder_id, blunder_fen, data):
 
             # Mathematical equality: element['user_line'] + element['user_move'] = user_line
             user_fen = chess.fenAfterVariation(blunder_fen, user_line)
+
+            engine.new()
             engine.set(user_fen)
             element['engine'] = engine.think(const.engine.time, move = user_move)
 
