@@ -1,4 +1,4 @@
-from app.db.postgre import core, blunder
+from app.db.postgre import core, blunder, user
 from app.utils import const
 from json import dumps
 
@@ -21,55 +21,58 @@ def getAssignedPacks(user_id):
 
         return result
 
-def getUnlockedFromCoach(user_id):
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute("""
-            SELECT vwcm.unlocked_packs
-            FROM vw_coach_messages as vwcm
-            WHERE vwcm.user_id = %s;
-            """, (user_id,)
-        )
-
-        result = connection.cursor.fetchall()
-
-        unlocked = []
-        [ unlocked.extend(pack) for (pack,) in result ]
-
-        return unlocked
-
-
-def getUnlockedAsIs(name, description):
+def getUnlockedAsIs(name, caption, body):
     result = [{
         'type_name': name,
-        'description': description
+        'caption': caption,
+        'body': body
     }]
-    
+
     return result
 
-def getUnlockedMateInN(name, description):
+def getUnlockedMateInN(name, caption, body):
     # all N 1-10 should work now, however, we artificially limit N to 3
     result = [{
         'type_name': name,
-        'description': description % (N,),
+        'caption': caption,
+        'body': body,
         'args' : {
-            'N' : N
+            'N' : {
+                "type": "slider",
+                "min": 1,
+                "max": 4,
+                "step": 1,
+                "default": 2
+            }
         }
-    }
-    for N in [1,2,3,4]]
+    }]
 
     return result
 
-def getRatingAboutX(name, description):
-    ## Example of usage. By default we do not show this in unlocked
-    #result = [{
-    #    'type_name': name,
-    #    'description': description % 1200,
-    #    'args' : {
-    #        'rating' : 1200
-    #    }
-    #}]
-    
-    result = []
+def normalize_rating(user_id, minimum, maximim, step):
+    rating = int(user.getRating(user_id) / step) * step
+
+    rating = max(rating, minimum)
+    rating = min(maximim, rating)
+
+    return rating
+
+def getRatingAboutX(user_id, name, caption, body):
+
+    result = [{
+        'type_name': name,
+        'caption': caption,
+        'body': body,
+        'args' : {
+            'Rating' : {
+                "type": "slider",
+                "min": 1200,
+                "max": 3000,
+                "step": 50,
+                "default": normalize_rating(user_id, 1200, 3000, 50)
+            }
+        }
+    }]
 
     return result
 
@@ -88,7 +91,7 @@ def getUnlockedPacks(user_id, packs):
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT id, name, description
+            SELECT id, name, caption, body
             FROM pack_type as pt
             ORDER BY priority DESC
             """
@@ -96,49 +99,26 @@ def getUnlockedPacks(user_id, packs):
 
         pack_types = connection.cursor.fetchall()
 
-        coach_packs = getUnlockedFromCoach(user_id)
-
-        basic_packs = []
-        for (id, name, description) in pack_types:
+        result = []
+        for (id, name, caption, body) in pack_types:
             if name == const.pack_type.RANDOM:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.MATEINN:
-                basic_packs.extend(getUnlockedMateInN(name, description))
+                result.extend(getUnlockedMateInN(name, caption, body))
             elif name == const.pack_type.GRANDMASTERS:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.OPENING:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.ENDGAME:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.PROMOTION:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.CLOSEDGAME:
-                basic_packs.extend(getUnlockedAsIs(name, description))
+                result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.RATINGABOUTX:
-                basic_packs.extend(getRatingAboutX(name, description))
-            elif name == const.pack_type.USERLEVEL:
-                #basic_packs.extend(getUnlockedAsIs(name, description))
-                pass
+                result.extend(getRatingAboutX(user_id, name, caption, body))
             #else:
             #    raise Exception('')
-
-        # Remove from basic pack those already proposed by coach
-        basic_packs = list(filter(
-            lambda pack: 
-                not (
-                    pack['type_name'],
-                    pack['args'] if 'args' in pack else {}
-                ) in [(
-                    pack['type_name'],
-                    pack['args'] if 'args' in pack else {}
-                )
-                for pack in coach_packs], 
-            basic_packs
-        ))
-                      
-        result = []
-        result.extend(coach_packs)
-        result.extend(basic_packs) 
 
         return result
 
@@ -169,15 +149,15 @@ def getPackTypeId(pack_type_name):
 # may not have this pack assigned to him and, in fact, will not after calling
 # this function
 #TODO: filter blunder_ids to remove already exist
-def createPack(created_by, blunder_ids, pack_type_name, pack_type_args, pack_description):
+def createPack(created_by, blunder_ids, pack_type_name, pack_type_args, pack_caption, pack_body):
     pack_type_id = getPackTypeId(pack_type_name)
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
-            INSERT INTO packs(description,created_by,type_id,type_args)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO packs(created_by, type_id, type_args, caption, body)
+            VALUES (%s, %s, %s, %s, %s)
             RETURNING id
-            """, (pack_description, created_by, pack_type_id, dumps(pack_type_args))
+            """, (created_by, pack_type_id, dumps(pack_type_args), pack_caption, pack_body)
         )
         if connection.cursor.rowcount != 1:
             raise Exception('Failed to create pack')
@@ -271,7 +251,8 @@ def getAssignedBlunders(user_id, pack_id):
 def getPackInfo(pack_id):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT p.description
+            SELECT p.caption,
+                   p.body
             FROM packs as p
             WHERE p.id = %s
             """, (pack_id,)
@@ -280,9 +261,10 @@ def getPackInfo(pack_id):
         if connection.cursor.rowcount != 1:
             return None
 
-        description, = connection.cursor.fetchone()
+        caption, body = connection.cursor.fetchone()
         result = {
-            'description': description
+            'caption': caption,
+            'body': body
         }
         return result
 

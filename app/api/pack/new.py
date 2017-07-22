@@ -22,15 +22,15 @@ def newRandomPack(pack_description):
 # Type name and tag name is different beasts, but this function handles
 # the most simple case when they are the same.
 # Request for pack type_name, which consists of blunders tagged by tag name equals to type_name
-def newPackByTagName(pack_type_name, pack_description):
+def newPackByTagName(pack_type_name, pack_caption, pack_body):
     blunder_ids = postgre.blunder.getBlunderByTag(pack_type_name, 25)
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, pack_type_name, {}, pack_description)
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, pack_type_name, {}, pack_caption, pack_body)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return pack_id
 
-def newMateInNPack(pack_type_args, pack_description):
+def newMateInNPack(pack_type_args, pack_caption, pack_body):
     try:
         N = pack_type_args['N']
     except Exception:
@@ -39,12 +39,14 @@ def newMateInNPack(pack_type_args, pack_description):
     tag_name = "Mate in %s" % (N,)
     blunder_ids = postgre.blunder.getBlunderByTag(tag_name, 25)
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.MATEINN, pack_type_args, pack_description)
+    pack_caption = "Mate in %s" % (N,) # override default caption
+
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.MATEINN, pack_type_args, pack_caption, pack_body)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return pack_id
 
-def newPackRatingAboutX(pack_type_args, pack_description):
+def newPackRatingAboutX(pack_type_args, pack_caption, pack_body):
     try:
         rating = pack_type_args['rating']
     except Exception:
@@ -59,25 +61,12 @@ def newPackRatingAboutX(pack_type_args, pack_description):
     if len(blunder_ids) < 25:
         return None
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.RATINGABOUTX, pack_type_args, pack_description)
+    pack_caption = 'Rating about %s' % rating # override default caption
+
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.RATINGABOUTX, pack_type_args, pack_caption, pack_body)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return pack_id
-
-# Some requests mean virtual pack requests, where parameters must
-# Be calculated only during creation time, now.
-# For most cases, will be just identity method
-def transformPackRequest(pack_type_name, pack_type_args, pack_description):
-    # USERLEVEL packs are simply RATINGABOUTX packs with rating taken from user current rating
-    if pack_type_name == const.pack_type.USERLEVEL:
-        rating = int(round(postgre.user.getRating(session.userID())/50)*50) # Round to closest xx50
-        pack_type_name = const.pack_type.RATINGABOUTX
-        pack_type_args = {
-            'rating' : rating
-        }
-        pack_description = "Rating about %s" % rating
-
-    return pack_type_name, pack_type_args, pack_description
 
 def reusePack(pack_type_name, pack_type_args):
     pack_id = postgre.pack.reusePack(session.userID(), pack_type_name, pack_type_args)
@@ -122,10 +111,10 @@ def packSelector(pack_type_name, pack_type_args):
         }
 
     # Setting new pack's description. Can be anything, changeable by user
-    pack_description = filtered[0]['description']
-
-    # If we need to transform some unlocked requests, do it here
-    pack_type_name, pack_type_args, pack_description = transformPackRequest(pack_type_name, pack_type_args, pack_description)
+    # Currently, we create empty body for pack, reserving it for future use.
+    # For example, user might want to edit pack body
+    pack_caption = filtered[0]['caption']
+    pack_body = '' #filtered[0]['body']
 
     # Reuse pack mechanism. This keeps database from growing too much and
     # give better interaction experience between users
@@ -141,19 +130,19 @@ def packSelector(pack_type_name, pack_type_args):
     if pack_type_name == const.pack_type.RANDOM:
         pack_id = newRandomPack(pack_description)
     elif pack_type_name == const.pack_type.MATEINN:
-        pack_id = newMateInNPack(pack_type_args, pack_description)
+        pack_id = newMateInNPack(pack_type_args, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.GRANDMASTERS:
-        pack_id = newPackByTagName(pack_type_name, pack_description)
+        pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.OPENING:
-        pack_id = newPackByTagName(pack_type_name, pack_description)
+        pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.ENDGAME:
-        pack_id = newPackByTagName(pack_type_name, pack_description)
+        pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.PROMOTION:
-        pack_id = newPackByTagName(pack_type_name, pack_description)
+        pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.CLOSEDGAME:
-        pack_id = newPackByTagName(pack_type_name, pack_description)
+        pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.RATINGABOUTX:
-        pack_id = newPackRatingAboutX(pack_type_args, pack_description)
+        pack_id = newPackRatingAboutX(pack_type_args, pack_caption, pack_body)
     else:
         return {
             'status': 'error',

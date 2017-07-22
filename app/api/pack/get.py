@@ -34,7 +34,8 @@ def getPack():
             'status': 'error',
             'message': 'This pack not exist'
         })
-    description = pack_info['description']
+    caption = pack_info['caption']
+    body = pack_info['body']
 
     blunder_ids = postgre.pack.getAssignedBlunders(session.userID(), pack_id)
     if blunder_ids is None:
@@ -54,7 +55,8 @@ def getPack():
     return jsonify({
         'status':'ok',
         'data': {
-            'description': description,
+            'caption': caption,
+            'body': body,
             'pack_id': postgre.pack.idToHashId(pack_id),
             'blunders': blunders
         }
