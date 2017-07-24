@@ -42,7 +42,8 @@ def getUnlockedMateInN(name, caption, body):
                 "min": 1,
                 "max": 4,
                 "step": 1,
-                "default": 2
+                "default": 2,
+                "label": "N"
             }
         }
     }]
@@ -57,29 +58,25 @@ def normalize_rating(user_id, minimum, maximim, step):
 
     return rating
 
-def getRatingAboutX(user_id, name, caption, body):
+def getDifficultyLevels(user_id, name, caption, body):
 
     result = [{
         'type_name': name,
         'caption': caption,
         'body': body,
         'args' : {
-            'Rating' : {
+            'rating' : {
                 "type": "slider",
                 "min": 1200,
                 "max": 3000,
                 "step": 50,
-                "default": normalize_rating(user_id, 1200, 3000, 50)
+                "default": normalize_rating(user_id, 1200, 3000, 50),
+                "label": "Rating"
             }
         }
     }]
 
     return result
-
-# Note about User Level pack:
-# This is virtual unlock, because user rating can be calculated
-# during pack generation time, not now. When you confirm it,
-# It will be transformed into RatingAboutX unlock
 
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy things
@@ -115,8 +112,8 @@ def getUnlockedPacks(user_id, packs):
                 result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.CLOSEDGAME:
                 result.extend(getUnlockedAsIs(name, caption, body))
-            elif name == const.pack_type.RATINGABOUTX:
-                result.extend(getRatingAboutX(user_id, name, caption, body))
+            elif name == const.pack_type.DIFFICULTYLEVELS:
+                result.extend(getDifficultyLevels(user_id, name, caption, body))
             #else:
             #    raise Exception('')
 

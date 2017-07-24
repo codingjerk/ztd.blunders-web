@@ -45,8 +45,7 @@ class pack_type(object):
     PROMOTION = "Promotion"
     CLOSEDGAME = "Closed game"
     GRANDMASTERS = "Grandmasters"
-    RATINGABOUTX = "Rating about X"
-    USERLEVEL = "User level"
+    DIFFICULTYLEVELS = "Difficulty levels"
 
 class time(object):
     MINUTE = 60
