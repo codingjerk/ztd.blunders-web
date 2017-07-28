@@ -31,7 +31,7 @@ def getUnlockedAsIs(name, caption, body):
     return result
 
 def getUnlockedMateInN(name, caption, body):
-    # all N 1-10 should work now, however, we artificially limit N to 3
+    # all N 1-10 should work now, however, we artificially limit N to 4
     result = [{
         'type_name': name,
         'caption': caption,
@@ -78,6 +78,15 @@ def getDifficultyLevels(user_id, name, caption, body):
 
     return result
 
+def getReplayFailed(user_id, name, caption, body):
+    # Do not show replay pack option if you do not have enougth blunders to assign to it
+    blunder_ids = blunder.getBlunderForReplayFailed(user_id, const.pack.DEFAULT_SIZE)
+    size = len(blunder_ids)
+    if size < const.pack.DEFAULT_SIZE:
+        return []
+
+    return getUnlockedAsIs(name, caption, body)
+
 # Returns all pack types user can request in this time
 # This function must limit user from doing crazy things
 # Total limit, dependencies etc
@@ -114,6 +123,9 @@ def getUnlockedPacks(user_id, packs):
                 result.extend(getUnlockedAsIs(name, caption, body))
             elif name == const.pack_type.DIFFICULTYLEVELS:
                 result.extend(getDifficultyLevels(user_id, name, caption, body))
+            elif name == const.pack_type.REPLAYFAILED:
+                result.extend(getReplayFailed(user_id, name, caption, body))
+
             #else:
             #    raise Exception('')
 
@@ -126,10 +138,10 @@ def getPacks(user_id):
 
     return packs, unlocked
 
-def getPackTypeId(pack_type_name):
+def getPackTypeByName(pack_type_name):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT id
+            SELECT id, name, priority, caption, body, use_cache
             FROM pack_type as pt
             WHERE pt.name = %s
             """, (pack_type_name,)
@@ -138,16 +150,25 @@ def getPackTypeId(pack_type_name):
         if connection.cursor.rowcount != 1:
             raise Exception('Wrong pack type name')
 
-        pack_type_id = connection.cursor.fetchone()
 
-        return pack_type_id
+        (id, name, priority, caption, body, use_cache) = connection.cursor.fetchone()
+
+        return {
+            'id': id,
+            'name': name,
+            'priority': priority,
+            'caption': caption,
+            'body': body,
+            'use_cache': use_cache
+        }
 
 # created_by is the user id, who phisically created the pack. This user
 # may not have this pack assigned to him and, in fact, will not after calling
 # this function
 #TODO: filter blunder_ids to remove already exist
 def createPack(created_by, blunder_ids, pack_type_name, pack_type_args, pack_caption, pack_body):
-    pack_type_id = getPackTypeId(pack_type_name)
+    pack_type = getPackTypeByName(pack_type_name)
+    pack_type_id = pack_type['id']
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -355,8 +376,17 @@ def gcHistoryPacks(user_id):
  # by the user. It gives 2 advantages - packs are reused and not growing too much
  # and new users receive the same packs/blunders as others. Those packs should
  # accamulate better statistics and feedback.
+ # cannot reuse blunder when special use_cache flag set to 0
 def reusePack(user_id, pack_type_name, pack_type_args):
-    pack_type_id = getPackTypeId(pack_type_name)
+    pack_type = getPackTypeByName(pack_type_name)
+
+    pack_type_id = pack_type['id']
+    pack_type_use_cache = pack_type['use_cache']
+
+    # Cache is disabled by special final_args
+    # This pack is personal and
+    if pack_type_use_cache == 0:
+        return None
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""

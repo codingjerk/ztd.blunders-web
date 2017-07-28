@@ -46,6 +46,10 @@ class pack_type(object):
     CLOSEDGAME = "Closed game"
     GRANDMASTERS = "Grandmasters"
     DIFFICULTYLEVELS = "Difficulty levels"
+    REPLAYFAILED = "Replay failed"
+
+class pack(object):
+    DEFAULT_SIZE = 25
 
 class time(object):
     MINUTE = 60

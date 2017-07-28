@@ -35,27 +35,27 @@ def validateSelects(pack_type_args_user, pack_type_args_unlocked):
 
     return True
 
-def newRandomPack(pack_caption, pack_body):
-    blunder_ids = [
-        postgre.blunder.getRandomBlunder()['id']
-        for index in range(25)
-    ]
-
+def createPack(blunder_ids, pack_type_name, pack_type_args, pack_caption, pack_body):
     pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.RANDOM, {}, pack_caption, pack_body)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return pack_id
 
+def newRandomPack(pack_caption, pack_body):
+    blunder_ids = [
+        postgre.blunder.getRandomBlunder()['id']
+        for index in range(const.pack.DEFAULT_SIZE)
+    ]
+
+    return createPack(blunder_ids, const.pack_type.RANDOM, {}, pack_caption, pack_body)
+
 # Type name and tag name is different beasts, but this function handles
 # the most simple case when they are the same.
 # Request for pack type_name, which consists of blunders tagged by tag name equals to type_name
 def newPackByTagName(pack_type_name, pack_caption, pack_body):
-    blunder_ids = postgre.blunder.getBlunderByTag(pack_type_name, 25)
+    blunder_ids = postgre.blunder.getBlunderByTag(pack_type_name, const.pack.DEFAULT_SIZE)
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, pack_type_name, {}, pack_caption, pack_body)
-    postgre.pack.assignPack(session.userID(), pack_id)
-
-    return pack_id
+    return createPack(blunder_ids, pack_type_name, {}, pack_caption, pack_body)
 
 def newMateInNPack(pack_type_args, pack_caption, pack_body):
     try:
@@ -64,14 +64,11 @@ def newMateInNPack(pack_type_args, pack_caption, pack_body):
         return None
 
     tag_name = "Mate in %s" % (N,)
-    blunder_ids = postgre.blunder.getBlunderByTag(tag_name, 25)
+    blunder_ids = postgre.blunder.getBlunderByTag(tag_name, const.pack.DEFAULT_SIZE)
 
     pack_caption = "Mate in %s" % (N,) # override default caption
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.MATEINN, pack_type_args, pack_caption, pack_body)
-    postgre.pack.assignPack(session.userID(), pack_id)
-
-    return pack_id
+    return createPack(blunder_ids, const.pack_type.MATEINN, pack_type_args, pack_caption, pack_body)
 
 def newPackDifficultyLevels(pack_type_args, pack_caption, pack_body):
     try:
@@ -84,16 +81,18 @@ def newPackDifficultyLevels(pack_type_args, pack_caption, pack_body):
 
     deviation = 50
 
-    blunder_ids = postgre.blunder.getBlunderByRating(rating, deviation, 25)
-    if len(blunder_ids) < 25:
+    blunder_ids = postgre.blunder.getBlunderByRating(rating, deviation, const.pack.DEFAULT_SIZE)
+    if len(blunder_ids) < const.pack.DEFAULT_SIZE:
         return None
 
     pack_caption = 'Difficulty: %s' % rating # override default caption
 
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.DIFFICULTYLEVELS, pack_type_args, pack_caption, pack_body)
-    postgre.pack.assignPack(session.userID(), pack_id)
+    return createPack(blunder_ids, const.pack_type.DIFFICULTYLEVELS, pack_type_args, pack_caption, pack_body)
 
-    return pack_id
+def newPackReplayFailed(pack_type_args, pack_caption, pack_body):
+    blunder_ids = postgre.blunder.getBlunderForReplayFailed(session.userID(), const.pack.DEFAULT_SIZE)
+
+    return createPack(blunder_ids, const.pack_type.REPLAYFAILED, {}, pack_caption, pack_body)
 
 def reusePack(pack_type_name, pack_type_args):
     pack_id = postgre.pack.reusePack(session.userID(), pack_type_name, pack_type_args)
@@ -143,7 +142,6 @@ def packSelector(pack_type_name, pack_type_args_user):
     # give better interaction experience between users
     pack_id = reusePack(pack_type_name, pack_type_args_user)
     if(pack_id != None):
-        print("Reused")
         return {
             'status': 'ok',
             'data': {
@@ -167,6 +165,8 @@ def packSelector(pack_type_name, pack_type_args_user):
         pack_id = newPackByTagName(pack_type_name, pack_caption, pack_body)
     elif pack_type_name == const.pack_type.DIFFICULTYLEVELS:
         pack_id = newPackDifficultyLevels(pack_type_args_user, pack_caption, pack_body)
+    elif pack_type_name == const.pack_type.REPLAYFAILED:
+        pack_id = newPackReplayFailed(pack_type_args_user, pack_caption, pack_body)
     else:
         return {
             'status': 'error',
