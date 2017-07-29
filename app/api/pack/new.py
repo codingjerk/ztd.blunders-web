@@ -36,7 +36,7 @@ def validateSelects(pack_type_args_user, pack_type_args_unlocked):
     return True
 
 def createPack(blunder_ids, pack_type_name, pack_type_args, pack_caption, pack_body):
-    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, const.pack_type.RANDOM, {}, pack_caption, pack_body)
+    pack_id = postgre.pack.createPack(session.userID(), blunder_ids, pack_type_name, pack_type_args, pack_caption, pack_body)
     postgre.pack.assignPack(session.userID(), pack_id)
 
     return pack_id
