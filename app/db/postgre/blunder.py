@@ -1,6 +1,7 @@
 from json import dumps
 
 from app.db.postgre import core,user,game
+from app.utils import const
 
 # Get random blunder from database
 def getRandomBlunder():
@@ -228,18 +229,27 @@ def getBlunderInfoById(user_id, blunder_id):
 
     gameInfo = gameShortInfo(game.getGameById(blunder['game_id']))
 
-    return {
+    myHistory = getUserHistory(user_id, blunder_id)
+
+    result = {
         'elo': elo,
         'totalTries': totalTries,
         'successTries': successTries,
         'comments': comments,
-        'myFavorite': myFavorite,
-        'myVote': myVote,
         'likes': likes,
         'dislikes': dislikes,
         'favorites': favorites,
         'game-info': gameInfo
     }
+
+    if user_id != None:
+        result['my'] = {
+            'favorite': myFavorite,
+            'vote': myVote,
+            'history': myHistory
+        }
+
+    return result
 
 def getAssignedBlunder(user_id, type):
     if user_id is None:
@@ -349,6 +359,27 @@ def getUserVote(user_id, blunder_id):
             return connection.cursor.fetchone()[0]
 
     return 0
+
+# Returns all user's history for solving given blunder
+def getUserHistory(user_id, blunder_id):
+    if user_id is None:
+        return False
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """SELECT bh.result AS score,
+                      bh.date_finish AS date_finish
+               FROM blunder_history AS bh
+               WHERE bh.user_id = %s
+                  AND bh.blunder_id=%s;
+"""
+            , (user_id, blunder_id)
+        )
+
+        history = connection.cursor.fetchall()
+        result = [ {'score': score, 'date': date} for score, date in history ]
+
+        return result
 
 def getBlunderPopularity(blunder_id):
     with core.PostgreConnection('r') as connection:
@@ -568,27 +599,66 @@ def getBlunderByRating(expected_elo, deviation_elo, count):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT b.id
-               FROM blunders AS b 
+               FROM blunders AS b
                LEFT JOIN (
                    SELECT pb.blunder_id
-                   FROM pack_blunders AS pb 
-                   INNER JOIN packs AS p 
-                       ON p.id = pb.pack_id 
+                   FROM pack_blunders AS pb
+                   INNER JOIN packs AS p
+                       ON p.id = pb.pack_id
                    WHERE p.type_id = (
                        SELECT pt.id
                        FROM pack_type AS pt
-                       WHERE pt.name = 'Rating about X'
+                       WHERE pt.name = %s
                    )
-               ) AS ba 
-                   ON b.id = ba.blunder_id  
-               WHERE b.elo > %s 
-                 AND b.elo <= %s 
+               ) AS ba
+                   ON b.id = ba.blunder_id
+               WHERE b.elo > %s
+                 AND b.elo <= %s
                  AND b.enabled = 1
-                 AND ba.blunder_id IS NULL 
-               LIMIT %s;""" , (expected_elo - deviation_elo/2, expected_elo + deviation_elo/2, count)
+                 AND ba.blunder_id IS NULL
+               LIMIT %s;""" , (const.pack_type.DIFFICULTYLEVELS, expected_elo - deviation_elo/2, expected_elo + deviation_elo/2, count)
         )
 
         result = connection.cursor.fetchall()
+
+        return result
+
+def getBlunderForReplayFailed(user_id, count):
+    forgot_interval = '1 week'
+
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute(
+            """ SELECT grouped.blunder_id
+                FROM
+                  (SELECT f.blunder_id,
+                          sum(f.result) AS success_tries,
+                          count(1) AS total_tries,
+                          max(f.date_finish) AS date_last
+                   FROM
+                     (SELECT *
+                      FROM
+                        (SELECT bh.blunder_id,
+                                bh.result,
+                                bh.date_finish
+                         FROM blunder_history AS bh
+                         WHERE bh.user_id = %s) AS history
+                      LEFT JOIN
+                        (SELECT pb.blunder_id
+                         FROM pack_users AS pu
+                         INNER JOIN pack_blunders AS pb ON pu.pack_id = pb.pack_id
+                         AND pu.user_id = %s) AS CURRENT USING(blunder_id)
+                      WHERE current.blunder_id IS NULL) AS f
+                   GROUP BY f.blunder_id) AS grouped
+                WHERE grouped.success_tries = 0
+                  AND grouped.date_last < now() - interval %s
+                ORDER BY grouped.date_last
+                LIMIT %s;""" , (user_id, user_id, forgot_interval, count)
+        )
+
+        result = [ 
+            blunder_id
+            for (blunder_id,) in connection.cursor.fetchall()
+        ]
 
         return result
 

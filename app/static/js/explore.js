@@ -450,10 +450,12 @@
 
         data = response.data;
 
-        if (data.myFavorite) {
-            $('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
-        } else {
-            $('#favorite-icon').removeClass('fa-star').addClass('fa-star-o').removeClass('active-star-icon');
+		if(data.hasOwnProperty('my')) {
+            if (data.my.favorite) {
+                $('#favorite-icon').removeClass('fa-star-o').addClass('fa-star').addClass('active-star-icon');
+            } else {
+                $('#favorite-icon').removeClass('fa-star').addClass('fa-star-o').removeClass('active-star-icon');
+            }
         }
 
         $('#favorites').html(data.favorites);
