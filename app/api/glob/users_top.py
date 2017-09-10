@@ -8,6 +8,7 @@ def getUsersTop():
     return jsonify({
         'status': 'ok',
         'data': {
-            "users-top-list": postgre.statistic.getUsersTop(10)
+            "users-top-by-rating": postgre.statistic.getUsersTopByRating(10),
+            "users-top-by-activity": postgre.statistic.getUsersTopByActivity('1 WEEK', 10),
         }
     })

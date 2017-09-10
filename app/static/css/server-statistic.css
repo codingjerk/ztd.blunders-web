@@ -7,8 +7,13 @@
     font-size: 80%;
 }
 
-#users-top-list > table {
+#users-top-by-rating  > table, #users-top-by-activity > table {
     size: 100%;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
+
+}
+
+.table-center-cell{
+    text-align:center;
 }

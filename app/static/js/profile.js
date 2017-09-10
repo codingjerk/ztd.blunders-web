@@ -119,7 +119,10 @@ function pieceTheme(piece) {
 
             var content = generateTable(columnsRow, rowsNum, response.data.blunders, function(item) {
                 var style = (item.result) ? 'blunder-history-board-win' : 'blunder-history-board-fail';
-                var title = 'Date: {0}, Spent time: {1}'.format(item.date_finish, utils.timePrettyFormat(item.spent_time));
+                var title = 'Date: {0}, Spent time: {1}'.format(
+                    utils.timePrettyFormat(item.date_finish),
+                    utils.intervalPrettyFormat(item.spent_time)
+                );
                 return '<a href="/explore/{1}"><div class="{0}" id="board-history-{1}" title="{2}" style="width: 180px"></div></a>'.format(style, item.blunder_id, title);
             });
 
@@ -214,7 +217,10 @@ function pieceTheme(piece) {
             }
 
             var commentMaker = function(comment) {
-                return '<div class="blunder-comment">{0}</div>'.format(utils.escapeHtml(comment.text));
+                return '<div><div class="comment-date">{0}</div><div class="blunder-comment">{1}</div></div>'.format(
+                    utils.timePrettyFormat(comment.date),
+                    utils.escapeHtml(comment.text)
+                );
             };
 
             var rows = '';

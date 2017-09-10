@@ -99,7 +99,7 @@ section {
 }
 
 #blunder-history-content > table {
-    margin-left:auto; 
+    margin-left:auto;
     margin-right:auto;
 }
 
@@ -122,7 +122,7 @@ section {
 }
 
 #blunder-favorites-content > table {
-    margin-left:auto; 
+    margin-left:auto;
     margin-right:auto;
 }
 
@@ -135,7 +135,6 @@ section {
 }
 
 .blunder-comment {
-    margin-bottom: 20px;
     margin-left: 15px;
     text-align: left;
 }
@@ -143,6 +142,14 @@ section {
 .comments-board {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.comment-date {
+    color: #777;
+    font-size: 85%;
+    margin-bottom: 20px;
+    margin-left: 15px;
+    text-align: left;
 }
 
 @media screen and (max-width: 2920px) {section {left: 150px;}}

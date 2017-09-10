@@ -20,7 +20,8 @@ def getActiveUsers(interval):
 
         return users
 
-def getUsersTop(number):
+@cache.cached('getUsersTopByRating', const.time.HOUR)
+def getUsersTopByRating(number):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT u.username,
@@ -36,6 +37,33 @@ def getUsersTop(number):
         top = [{'username':username, 'elo':elo} for (username, elo) in data]
 
     return top
+
+@cache.cached('getUsersTopByActivity', const.time.HOUR)
+def getUsersTopByActivity(interval, number):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT u.username,
+                   COUNT(bh.result) AS totalTries,
+                   SUM(bh.result) AS successTries
+            FROM users AS u
+            INNER JOIN blunder_history AS bh
+              ON u.id = bh.user_id
+            WHERE bh.date_finish > NOW() - INTERVAL %s
+            GROUP BY u.username
+            ORDER BY totalTries DESC
+            LIMIT %s;"""
+            , (interval, number)
+        )
+
+        data = connection.cursor.fetchall()
+
+        top = [{
+                'username':username,
+                'totalTries':totalTries,
+                'successTries': successTries
+               } for (username, totalTries, successTries) in data ]
+
+        return top
 
 def getUsersCount():
     with core.PostgreConnection('r') as connection:

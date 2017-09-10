@@ -19,7 +19,7 @@
     var counter = utils.counter(1000, function () {
         var totalSeconds = counter.total();
 
-        var formatted = utils.timePrettyFormat(totalSeconds);
+        var formatted = utils.intervalPrettyFormat(totalSeconds);
 
         $('#spent-time-value').html(formatted);
     });
@@ -439,7 +439,14 @@
 
         var subcommentsData = buildCommentReplies(comments, data.id);
 
-        return comment.format(data.username, data.date, utils.escapeHtml(data.text), replyButton, commentRating, subcommentsData);
+        return comment.format(
+			data.username,
+			utils.timePrettyFormat(data.date),
+		    utils.escapeHtml(data.text),
+			replyButton,
+			commentRating,
+			subcommentsData
+		);
     }
 
     function onInfoRequest(response) {

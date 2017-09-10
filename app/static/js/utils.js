@@ -78,12 +78,12 @@ var utils = {};
     Array.prototype.destructiveChunk = function(groupsize){
         var sets = [], chunks, i = 0;
         chunks = this.length / groupsize;
-     
+
         while(i < chunks){
             sets[i] = this.splice(0,groupsize);
         i++;
         }
-        
+
         return sets;
     };
 
@@ -115,7 +115,7 @@ var utils = {};
         var that = {
             startTime: null,
             enabled: false,
-            
+
             tick: tickCallback,
 
             total: function () {
@@ -154,13 +154,18 @@ var utils = {};
             .replace(/\n/g, '<br/>');
     };
 
-    module.timePrettyFormat = function(seconds) {
+    module.intervalPrettyFormat = function(seconds) {
         var mins = Math.floor(seconds / 60);
         var secs = Math.floor(seconds % 60);
 
         var spentTimeText = mins + ':' + secs.pad(2);
 
         return spentTimeText;
+    };
+
+    module.timePrettyFormat = function(datetime) {
+        var result = new Date(datetime).toLocaleString()
+        return result
     };
 
     module.normalizeTicks = function(ticks, tickSize) {
@@ -187,4 +192,3 @@ var utils = {};
         $('#{0}'.format(id)).html(module.generateTooFewDataMessage(message));
     };
 })(utils);
-

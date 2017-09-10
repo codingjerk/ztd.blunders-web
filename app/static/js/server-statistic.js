@@ -5,7 +5,7 @@
             caption: 'Users',
             rows: [
                 {
-                    type: 'wide', 
+                    type: 'wide',
                     id: 'users-rating-distribution'
                 },
                 {
@@ -29,12 +29,22 @@
             ]
         },
         {
-            id: 'top-block',
-            caption: 'Top 10',
+            id: 'top-block-by-rating',
+            caption: 'Top users by rating',
             rows: [
                 {
                     type: 'wide',
-                    id: 'users-top-list'
+                    id: 'users-top-by-rating'
+                }
+            ]
+        },
+        {
+            id: 'top-block-by-activity',
+            caption: 'Top active users',
+            rows: [
+                {
+                    type: 'wide',
+                    id: 'users-top-by-activity'
                 }
             ]
         },
@@ -43,7 +53,7 @@
             caption: 'Blunders',
             rows: [
                 {
-                    type: 'wide', 
+                    type: 'wide',
                     id: 'blunders-rating-distribution'
                 },
                 {
@@ -59,7 +69,7 @@
             caption: 'Online',
             rows: [
                 {
-                    type: 'wide', 
+                    type: 'wide',
                     id: 'users-online-list'
                 }
             ]
@@ -81,14 +91,30 @@
 })();
 
 (function updateUsersTop() {
-    function drawUsersTopList(id, users) {
+    function drawUsersTopByRating(id, users) {
         var usersList = users.map(function(user) {
             var username = user.username;
             var elo = user.elo;
-            return '<tr><td><a href="/profile?user={0}">{1}</a></td><td>{2}</td></tr>'.format(username, username, elo);
+            return '<tr><td><a href="/profile?user={0}">{1}</a></td><td class="table-center-cell">{2}</td></tr>'.format(username, username, elo);
         }).join('');
 
-        var content = '<table>{0}</table>'.format(usersList);
+        var header = '<tr> <td><b>Username</b></td> <td class="table-center-cell"><b>Elo</b></td> </tr>'
+
+        var content = '<table>{0}{1}</table>'.format(header, usersList);
+        $('#' + id).html(content);
+    }
+
+    function drawUsersTopByActivity(id, users) {
+        var usersList = users.map(function(user) {
+            var username = user.username;
+            var totalTries = user.totalTries;
+            var successRate = Math.round(100.0*(user.successTries/user.totalTries));
+            return '<tr><td><a href="/profile?user={0}">{1}</a></td><td class="table-center-cell">{2}</td><td class="table-center-cell">{3}%</td></tr>'.format(username, username, totalTries, successRate);
+        }).join('');
+
+        var header = '<tr> <td><b>Username</b></td> <td class="table-center-cell"><b>Last week</b></td> <td class="table-center-cell"><b>Success rate</b></td> </tr>'
+
+        var content = '<table>{0}{1}</table>'.format(header, usersList);
         $('#' + id).html(content);
     }
 
@@ -102,7 +128,7 @@
             return;
         }
 
-        grid.update(response.data, {"users-top-list": drawUsersTopList});
+        grid.update(response.data, {"users-top-by-rating": drawUsersTopByRating, "users-top-by-activity": drawUsersTopByActivity});
     });
 })();
 
@@ -146,7 +172,7 @@
                 rendererOptions: {
                     barWidth: 10,
                     barMargin: 1,
-                    highlightMouseDown: true   
+                    highlightMouseDown: true
                 },
                 pointLabels: {
                     show: true
@@ -211,7 +237,7 @@
                 rendererOptions: {
                     barWidth: 10,
                     barMargin: 1,
-                    highlightMouseDown: true   
+                    highlightMouseDown: true
                 },
                 pointLabels: {
                     show: true
@@ -266,7 +292,8 @@
 
 (function setupSpoilers() {
     grid.setupSpoiler('users-block');
-    grid.setupSpoiler('top-block');
+    grid.setupSpoiler('top-block-by-rating');
+    grid.setupSpoiler('top-block-by-activity');
     grid.setupSpoiler('blunders-block');
     grid.setupSpoiler('online-block');
 })();
