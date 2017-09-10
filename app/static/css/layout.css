@@ -6,11 +6,25 @@
 body {
     color: #333333;
 
-    font-family: 'CMUSansSerifMedium', sans-serif;  
+    font-family: 'CMUSansSerifMedium', sans-serif;
 }
 
 a {
     cursor: pointer;
+    color: #333333;
+    text-decoration: none;
+}
+
+nav > ul > li > a {
+    font-size: 130%;
+}
+
+nav > ul > li > ul > li > a {
+    font-size: 100%;
+}
+
+a:hover, a:active {
+    text-decoration: underline;
 }
 
 nav {
@@ -26,14 +40,6 @@ nav {
 
 nav > ul > li, nav > ul > li > ul > li {
     margin-top: 10px;
-}
-
-nav > ul > li > a {
-    font-size: 130%;
-}
-
-nav > ul > li > ul > li > a {
-    font-size: 100%;
 }
 
 #user-bar {
@@ -61,7 +67,7 @@ footer {
     left: 230px;
     bottom: 0px;
     right: 0px;
-    
+
     text-align: center;
     padding: 0px;
 
@@ -76,15 +82,6 @@ footer > ul > li {
 
 ul {
     list-style-type: none;
-}
-
-a {
-    color: #333333;
-    text-decoration: none;
-}
-
-a:hover, a:active {
-    text-decoration: underline;
 }
 
 .green {
@@ -109,7 +106,7 @@ a:hover, a:active {
         width: 100%;
 
         line-height: 45px;
-        padding-bottom: 5px; 
+        padding-bottom: 5px;
 
         border-right: none;
         border-bottom: 1px solid #dedede;
