@@ -77,12 +77,10 @@ def validate(blunder_id, user_line, spent_time, task_type):
 def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
     if session.isAnonymous():
         return jsonify({'status': 'ok'})
+
     # In explore mode, just remove blunder from task list
-    if not postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE):
-        return jsonify({
-            'status': 'error',
-            'message': "Validation failed"
-        })
+    # It is also ok, that there is no blunder to delete
+    postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
 
     return jsonify({'status': 'ok'})
 
