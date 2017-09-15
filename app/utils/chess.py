@@ -26,16 +26,16 @@ def compareLines(blunder_move, forced_line, line):
     # TODO: Compare using pychess
     return join(blunder_move, forced_line) == line
 
-def mismatchCheck(blunder_move, forced_line, line):
+def mismatchCheck(blunder_move, forced_line, user_line):
     # It is ok, that best line can be recalculated one day and to be changed
     # We are checking if this happens and return error, so client will reload the pack
-    originalLine = join(blunder_move, forced_line)
+    correct_line = join(blunder_move, forced_line)
 
     # Userline can't be longer, then original line
-    if(len(line) > len(originalLine)):
+    if(len(user_line) > len(correct_line)):
         return True
 
-    if originalLine[:len(line) - 1 ] != line[:-1]:
+    if correct_line[:len(user_line) - 1 ] != user_line[:-1]:
         return True
 
     return False
