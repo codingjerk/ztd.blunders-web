@@ -278,6 +278,9 @@ def variationSanity(variations, blunder):
            (not chess.compareLines(blunder['blunder_move'], blunder['forced_line'], variation['line']))
     ]
 
+    for variation in result: # Remove first move because it's blunder move
+        variation['line'] = variation['line'][1:]
+
     return result
 
 def getCommonHistory(blunder_id, blunder):

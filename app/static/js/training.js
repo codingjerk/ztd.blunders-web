@@ -496,11 +496,11 @@
 			'black-elo-value':  info.BlackElo
 		});
 
-		var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0;
+		var successRate = (data.history.total !== 0)? (data.history.success * 100 / data.history.total): 0;
 		grid.update({
 			'blunder-rating': data.elo,
-			'success-played': data.successTries,
-			'total-played': data.totalTries,
+			'success-played': data.history.success,
+			'total-played': data.history.total,
 			'success-rate': successRate.toFixed(1)
 		});
 
