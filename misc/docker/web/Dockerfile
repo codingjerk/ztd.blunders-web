@@ -7,14 +7,15 @@ FROM library/centos
 
 # Installing repositories
 RUN yum install -y https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm \
-                   http://download.postgresql.org/pub/repos/yum/9.4/redhat/rhel-6-x86_64/pgdg-redhat94-9.4-3.noarch.rpm
+                   https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
 RUN yum update -y
 
+RUN yum clean all
 # Installing system packages
 RUN yum install -y git unzip gcc gcc-c++ \
          python34u.x86_64 python34u-pip.noarch python34u-devel.x86_64 \
          nginx \
-         postgresql94.x86_64 postgresql94-devel.x86_64 \
+         postgresql96.x86_64 postgresql96-devel.x86_64 \
          libpqxx libpqxx-devel \
          libffi-devel.x86_64 \
          supervisor \
