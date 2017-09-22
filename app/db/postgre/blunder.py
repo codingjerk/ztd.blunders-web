@@ -1,7 +1,7 @@
 from json import dumps
 
 from app.db.postgre import core,user,game
-from app.utils import const
+from app.utils import const,chess
 
 # Get random blunder from database
 def getRandomBlunder():
@@ -108,7 +108,7 @@ def saveBlunderHistory(user_id, user_elo, blunder_id, blunder_elo, success, user
 
     result = 1 if success else 0
     if success:
-        userLine = ''
+        userLine = []
 
     with core.PostgreConnection('w') as connection:
         connection.cursor.execute("""
@@ -218,36 +218,31 @@ def getBlunderInfoById(user_id, blunder_id):
         return None
 
     elo = blunder['elo']
-
-    successTries, totalTries = getTries(blunder_id)
-
     comments = getBlunderComments(blunder_id)
-    myFavorite = isFavorite(user_id, blunder_id)
-    myVote = getUserVote(user_id, blunder_id)
     favorites = getBlunderPopularity(blunder_id)
     likes, dislikes = getBlunderVotes(blunder_id)
-
     gameInfo = gameShortInfo(game.getGameById(blunder['game_id']))
-
-    myHistory = getUserHistory(user_id, blunder_id)
 
     result = {
         'elo': elo,
-        'totalTries': totalTries,
-        'successTries': successTries,
         'comments': comments,
         'likes': likes,
         'dislikes': dislikes,
         'favorites': favorites,
-        'game-info': gameInfo
+        'game-info': gameInfo,
+        'history': getCommonHistory(blunder_id, blunder)
     }
 
     if user_id != None:
         result['my'] = {
-            'favorite': myFavorite,
-            'vote': myVote,
-            'history': myHistory
+            'favorite': isFavorite(user_id, blunder_id),
+            'vote': getUserVote(user_id, blunder_id),
+            'history': getUserHistory(user_id, blunder)
         }
+
+    # Back compatibility, TODO: remove in the future
+    result['totalTries'] = result['history']['total']
+    result['successTries'] = result['history']['success']
 
     return result
 
@@ -273,26 +268,58 @@ def getAssignedBlunder(user_id, type):
 
         return getBlunderById(blunder_id)
 
-def getTries(blunder_id):
+# Some variations can be obsolete and not relevant due to solution line change
+# We need to filter such variations to not confuse user with obsolete variations
+def variationSanity(variations, blunder):
+    result = [
+        variation
+        for variation in variations
+        if (not chess.mismatchCheck(blunder['blunder_move'], blunder['forced_line'], variation['line'])) and
+           (not chess.compareLines(blunder['blunder_move'], blunder['forced_line'], variation['line']))
+    ]
+
+    for variation in result: # Remove first move because it's blunder move
+        variation['line'] = variation['line'][1:]
+
+    return result
+
+def getCommonHistory(blunder_id, blunder):
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
-            SELECT *
-            FROM blunder_history
-            WHERE blunder_id = %s;
+            SELECT bh.user_line,
+                   COUNT(1) AS times
+            FROM blunder_history as bh
+            WHERE bh.blunder_id = %s
+            GROUP BY bh.user_line
             """, (blunder_id,)
         )
 
-        total = connection.cursor.rowcount
+        history = connection.cursor.fetchall()
 
-    with core.PostgreConnection('r') as connection:
-        connection.cursor.execute(
-            'SELECT * from blunder_history where blunder_id = %s AND result = 1;'
-            , (blunder_id,)
-        )
+        success = [
+            {'line': 'correct_line', 'times': times }
+            for (line, times) in history
+            if len(line) == 0
+        ]
 
-        success = connection.cursor.rowcount
+        if len(success) > 1:
+            raise Exception('Invalid data received from database')
 
-    return success, total
+        failures = variationSanity([
+            {'line': line, 'times': times }
+            for (line, times) in history
+            if len(line) != 0
+        ], blunder)
+
+        success_times = success[0]['times'] if len(success) > 0 else 0
+        failure_times = sum(variation['times'] for variation in failures)
+
+        return {
+            'total': success_times + failure_times,
+            'success': success_times,
+            'failures': failures
+        }
+
 
 def getBlunderComments(blunder_id):
     result = []
@@ -318,7 +345,6 @@ def getBlunderComments(blunder_id):
                 'parent_id': parent_id if parent_id is not None else 0,
                 'username': username,
                 'text': text,
-
                 'likes': likes,
                 'dislikes': dislikes,
             }
@@ -361,13 +387,16 @@ def getUserVote(user_id, blunder_id):
     return 0
 
 # Returns all user's history for solving given blunder
-def getUserHistory(user_id, blunder_id):
+def getUserHistory(user_id, blunder):
     if user_id is None:
         return False
+
+    blunder_id = blunder['id']
 
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute(
             """SELECT bh.result AS score,
+                      bh.user_line AS user_line,
                       bh.date_finish AS date_finish
                FROM blunder_history AS bh
                WHERE bh.user_id = %s
@@ -377,7 +406,14 @@ def getUserHistory(user_id, blunder_id):
         )
 
         history = connection.cursor.fetchall()
-        result = [ {'score': score, 'date': date} for score, date in history ]
+        result = [ {
+                'score': score,
+                'date': date,
+                'line': line if line != '' else correct_line
+            } for (score, line, date) in history
+        ]
+
+        result = variationSanity(result, blunder)
 
         return result
 
@@ -655,7 +691,7 @@ def getBlunderForReplayFailed(user_id, count):
                 LIMIT %s;""" , (user_id, user_id, forgot_interval, count)
         )
 
-        result = [ 
+        result = [
             blunder_id
             for (blunder_id,) in connection.cursor.fetchall()
         ]

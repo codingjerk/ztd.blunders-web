@@ -1,7 +1,6 @@
 
 import os
 
-# Yes, this is real hostname and password, but it's guarded by firewall
 class database(object):
     host=os.environ.get('DB_HOST')
     dbname=os.environ.get('DB_NAME')

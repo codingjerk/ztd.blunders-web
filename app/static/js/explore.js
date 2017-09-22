@@ -477,13 +477,13 @@
             'black-elo-value':  info.BlackElo
         });
 
-        var successRate = (data.totalTries !== 0)? (data.successTries * 100 / data.totalTries): 0;
-        grid.update({
-            'blunder-rating': data.elo,
-            'success-played': data.successTries,
-            'total-played': data.totalTries,
-            'success-rate': successRate.toFixed(1)
-        });
+        var successRate = (data.history.total !== 0)? (data.history.success * 100 / data.history.total): 0;
+		grid.update({
+			'blunder-rating': data.elo,
+			'success-played': data.history.success,
+			'total-played': data.history.total,
+			'success-rate': successRate.toFixed(1)
+		});
 
         var rootComment = '<a id="comment-reply-button-0"><i class="fa fa-reply fa-rotate-90"></i> Describe...</a>';
         var rootControls = '<div id="comment-controls-0" class="comment-controls">' + rootComment + '</div><div id="comment-user-input-0"></div>';
