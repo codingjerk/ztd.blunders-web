@@ -274,8 +274,7 @@ def variationSanity(variations, blunder):
     result = [
         variation
         for variation in variations
-        if (not chess.mismatchCheck(blunder['blunder_move'], blunder['forced_line'], variation['line'])) and
-           (not chess.compareLines(blunder['blunder_move'], blunder['forced_line'], variation['line']))
+        if (not chess.mismatchCheck(blunder['blunder_move'], blunder['forced_line'], variation['line']))
     ]
 
     for variation in result: # Remove first move because it's blunder move
@@ -297,7 +296,7 @@ def getCommonHistory(blunder_id, blunder):
         history = connection.cursor.fetchall()
 
         success = [
-            {'line': 'correct_line', 'times': times }
+            {'line': blunder['forced_line'], 'times': times, 'correct': True }
             for (line, times) in history
             if len(line) == 0
         ]
@@ -305,19 +304,19 @@ def getCommonHistory(blunder_id, blunder):
         if len(success) > 1:
             raise Exception('Invalid data received from database')
 
-        failures = variationSanity([
+        failure = variationSanity([
             {'line': line, 'times': times }
             for (line, times) in history
             if len(line) != 0
         ], blunder)
 
-        success_times = success[0]['times'] if len(success) > 0 else 0
-        failure_times = sum(variation['times'] for variation in failures)
+        success_times = sum(variation['times'] for variation in success)
+        failure_times = sum(variation['times'] for variation in failure)
 
         return {
             'total': success_times + failure_times,
             'success': success_times,
-            'failures': failures
+            'variations': success + failure
         }
 
 
@@ -406,10 +405,12 @@ def getUserHistory(user_id, blunder):
         )
 
         history = connection.cursor.fetchall()
+
+        correct_line = chess.join(blunder['blunder_move'], blunder['forced_line'])
         result = [ {
                 'score': score,
                 'date': date,
-                'line': line if line != '' else correct_line
+                'line': line if len(line) != 0 else correct_line
             } for (score, line, date) in history
         ]
 
