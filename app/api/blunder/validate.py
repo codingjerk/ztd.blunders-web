@@ -101,6 +101,13 @@ def validatePackBlunder(blunder_id, user_line, spent_time):
 
     result = validate(blunder_id, user_line, spent_time, const.tasks.PACK)
 
+    # This is optional field, client should not rely on. Gets updated info of the position
+    # so user can update it without need of sending separate info request
+    result['data'].update({
+        'info': postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
+    })
+
+    # Remove user asociated packs which are complatelly solved
     postgre.pack.gcHistoryPacks(session.userID())
 
     return jsonify(result)
