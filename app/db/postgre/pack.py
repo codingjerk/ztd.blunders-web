@@ -388,6 +388,10 @@ def reusePack(user_id, pack_type_name, pack_type_args):
     if pack_type_use_cache == 0:
         return None
 
+    # NOTE: ORDER BY p.id was used previously so each user will get packs in
+    # exactly same order as averyone else. But this lead to strategy when some
+    # user can create new users to take advantage of previous attemts.
+    # This creates many fake users we want to avoid.
     with core.PostgreConnection('r') as connection:
         connection.cursor.execute("""
             SELECT p.id
@@ -405,7 +409,7 @@ def reusePack(user_id, pack_type_name, pack_type_args):
             WHERE pa.id IS NULL AND
                   p.type_id = %s AND
                   p.type_args = %s
-            ORDER BY p.id
+            ORDER BY RANDOM()
             LIMIT 1;
         """, (user_id, user_id, pack_type_id, dumps(pack_type_args))
         )
