@@ -7,6 +7,11 @@ from app.utils import hash, session, crossdomain
 
 @app.route('/api/session/signup', methods=['POST'])
 def signup_post():
+    return jsonify({
+        'status': 'error',
+        'message': 'New users are temporary disabled'
+    })
+
     username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
 
     validateResult = utils.validateUser(username, password, email)
@@ -24,6 +29,10 @@ def signup_post():
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def signup_post_mobile():
+    return jsonify({
+        'status': 'error',
+        'message': 'New users are temporary disabled'
+    })
     try:
         username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
     except Exception:
