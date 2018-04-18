@@ -21,6 +21,9 @@ def jsonifyBlunder(data):
     }
 
 def validateUsername(username):
+    if username is None:
+        return "Username is empty"
+
     if len(username) < 3:
         return "Username must contains at least 3 letter"
 
@@ -33,19 +36,23 @@ def validateUsername(username):
     return None
 
 def validatePassword(password):
+    if password is None:
+        return "Password is empty"
+
     if len(password) < 5:
         return "Your password must be at least 5 characters long"
 
     return None
 
 def validateEmail(email):
-    if len(email.strip()) == 0:
-        return None
+    if email is None:
+        return "Email is empty"
 
-    # TODO: Use precompiled regexes
-    emailRegex = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$'
+    if email.strip() != email or email.lower() != email:
+        return "Invalid email"
 
-    if not re.match(emailRegex, email):
+    from app.utils.email import MXDomainValidation
+    if not MXDomainValidation(email):
         return "Invalid email"
 
     return None
@@ -73,6 +80,34 @@ def validateUser(username, password, email):
             'status': 'error',
             'field': 'email',
             'message': emailValidation
+        }
+
+    return None
+
+def validateCode(email, validation_code):
+    if validation_code is None:
+        return {
+            'status': 'error',
+            'field': 'validation_code',
+            'message': 'Validation Code is empty'
+        }
+
+    from app.db import postgre
+    validation = postgre.user.validateUserGet(email=email)
+    if validation is None:
+        return {
+            'status': 'error',
+            'field': 'validation_code',
+            'message': 'Incorrect validation code'
+        }
+
+    (count_tries, stored_code, date_create, date_update) = validation
+    print(stored_code, validation_code, stored_code != validation_code)
+    if stored_code != validation_code:
+        return {
+            'status': 'error',
+            'field': 'validation_code',
+            'message': 'Incorrect validation code'
         }
 
     return None

@@ -1,2 +1,1 @@
-from app.api.session import rating, login, logout, signup
-
+from app.api.session import rating, login, logout, signup, validate

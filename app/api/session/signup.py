@@ -7,16 +7,41 @@ from app.utils import hash, session, crossdomain
 
 @app.route('/api/session/signup', methods=['POST'])
 def signup_post():
-    return jsonify({
-        'status': 'error',
-        'message': 'New users are temporary disabled'
-    })
+    try:
+        username = request.json['username']
+        password = request.json['password']
+        email = request.json['email']
+        validation_code = request.json['validation_code']
+    except Exception:
+        return jsonify({
+            'status': 'error',
+            'message': 'Required: username, password, validation_code, email'
+        })
 
-    username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
+    validateUserResult = utils.validateUser(
+        username = username,
+        password = password,
+        email = email
+    )
+    if validateUserResult is not None:
+        return jsonify(validateUserResult)
 
-    validateResult = utils.validateUser(username, password, email)
-    if validateResult is not None:
-        return jsonify(validateResult)
+    duplicate_count = postgre.user.checkUserDuplicate(
+        username = username,
+        email = email
+    )
+    if duplicate_count > 0:
+        return jsonify({
+            'status': 'error',
+            'message': 'username or email are already in use'
+        })
+
+    validateCodeResult = utils.validateCode(
+        email = email,
+        validation_code = validation_code
+    )
+    if validateCodeResult is not None:
+        return jsonify(validateCodeResult)
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)
@@ -29,21 +54,41 @@ def signup_post():
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def signup_post_mobile():
-    return jsonify({
-        'status': 'error',
-        'message': 'New users are temporary disabled'
-    })
     try:
-        username, password, email = (request.json[key] for key in ['username', 'password', 'email'])
+        username = request.json['username']
+        password = request.json['password']
+        email = request.json['email']
+        validation_code = request.json['validation_code']
     except Exception:
         return jsonify({
             'status': 'error',
-            'message': 'Username, password and email is required'
+            'message': 'Required: username, password, validation_code, email'
         })
 
-    validateResult = utils.validateUser(username, password, email)
-    if validateResult is not None:
-        return jsonify(validateResult)
+    validateUserResult = utils.validateUser(
+        username = username,
+        password = password,
+        email = email
+    )
+    if validateUserResult is not None:
+        return jsonify(validateUserResult)
+
+    duplicate_count = postgre.user.checkUserDuplicate(
+        username = username,
+        email = email
+    )
+    if duplicate_count > 0:
+        return jsonify({
+            'status': 'error',
+            'message': 'username or email are already in use'
+        })
+
+    validateCodeResult = utils.validateCode(
+        email = email,
+        validation_code = validation_code
+    )
+    if validateCodeResult is not None:
+        return jsonify(validateCodeResult)
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)

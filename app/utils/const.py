@@ -2,10 +2,10 @@
 import os
 
 class database(object):
-    host=os.environ.get('DB_HOST')
-    dbname=os.environ.get('DB_NAME')
-    user=os.environ.get('DB_USER')
-    password=os.environ.get('DB_PASSWORD')
+    host='127.0.0.1'
+    dbname='chessdb'
+    user='postgres'
+    password='chessdb'
 
     connectionString = "%s %s %s %s" % (
         ("host=%s" % host) if host is not None else "",
@@ -57,3 +57,8 @@ class time(object):
 
 class comment(object):
     MAX_SIZE = 500
+
+class email_validation(object):
+    limit = 3
+    credential_path = "./gmail_api_token.key"
+    sender_email = "ztd.team.dev@gmail.com"

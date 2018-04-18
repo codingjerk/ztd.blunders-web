@@ -2,13 +2,16 @@
 
 {% block section %}
 	<div id="form">
-	
+
 		<div id="avatar-wrapper"><img id="avatar" src="/static/img/default-avatar.png"/></div>
 
 	    <form action="#" method="POST">
 		    <input type="text" placeholder="Pick a username" id="username" name="username">
+		    <input type="text" placeholder="Enter your email (required)" id="email" name="email">
 		    <input type="password" placeholder="Create a password" id="password" name="password">
-		    <input type="text" placeholder="Enter your email (optional)" id="email" name="email">
+
+			<a id="validate">email validation</a>
+			<input type="text" placeholder="Code will be sent to email" id="validation_code" name="validation_code">
 
 			<a id="submit">Sign Up!</a>
 	    </form>
@@ -22,4 +25,3 @@
 {% block style %}
 	<link rel="stylesheet" href="/static/css/signup.css">
 {% endblock %}
-

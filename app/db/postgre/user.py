@@ -412,7 +412,7 @@ def getRatingByDate(username, interval):
         }
     }
 
-@cache.cached('blundersByDate', const.time.HOUR) 
+@cache.cached('blundersByDate', const.time.HOUR)
 def getBlundersByDate(username, interval):
     user_id = getUserId(username)
 
@@ -459,3 +459,75 @@ def getBlundersByDate(username, interval):
             }
         }
     }
+
+def validateUserGet(email):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT uv.count_tries,
+                   uv.code,
+                   uv.date_create,
+                   uv.date_update
+            FROM user_validations AS uv
+            WHERE uv.email = %s;""", (email,)
+        )
+
+        if connection.cursor.rowcount == 0:
+            return None
+
+        if connection.cursor.rowcount > 1:
+            raise Exception("Multiple records for one email")
+
+        result = connection.cursor.fetchall()[0]
+
+    return result
+
+def validateUserCreate(email, code):
+    with core.PostgreConnection('w') as connection:
+        try:
+            connection.cursor.execute("""
+                INSERT INTO user_validations (email, code)
+                VALUES (%s, %s);
+                """, (email, code)
+            )
+        except IntegrityError:
+            return False
+
+        success = (connection.cursor.rowcount == 1)
+
+        if not success:
+            return False
+
+    return True
+
+def validateUserIncrement(email):
+    with core.PostgreConnection('w') as connection:
+        try:
+            connection.cursor.execute("""
+                UPDATE user_validations
+                SET count_tries = count_tries + 1,
+                date_update = NOW()
+                WHERE email = %s;""", (email,)
+            )
+        except IntegrityError:
+            return False
+
+        success = (connection.cursor.rowcount == 1)
+
+        if not success:
+            return False
+
+    return True
+
+def checkUserDuplicate(username, email):
+    with core.PostgreConnection('r') as connection:
+        connection.cursor.execute("""
+            SELECT COUNT(1)
+            FROM users AS u
+            WHERE u.username = %s OR
+                  u.email = %s;"""
+            , (username, email)
+        )
+
+        (count,) = connection.cursor.fetchone()
+
+    return count
