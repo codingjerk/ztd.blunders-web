@@ -39,7 +39,7 @@ class GMailAPIValidation():
     def __send_internal(self, service, user_id, message):
         try:
             message = (service.users().messages().send(userId=user_id, body=message).execute())
-            print('Message Id: %s' % message['id'])
+            #print('Message Id: %s' % message['id'])
             return message
         except errors.HttpError as error:
             print('An error occurred: %s' % error)
@@ -66,7 +66,6 @@ class GMailAPIValidation():
                 validation_code
             )
 
-        print(msg_html)
         msg_plain = \
             'Dear %s,\n' \
             'Your validation code is %s\n' \

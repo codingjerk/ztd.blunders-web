@@ -102,7 +102,6 @@ def validateCode(email, validation_code):
         }
 
     (count_tries, stored_code, date_create, date_update) = validation
-    print(stored_code, validation_code, stored_code != validation_code)
     if stored_code != validation_code:
         return {
             'status': 'error',

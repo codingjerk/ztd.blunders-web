@@ -20,6 +20,7 @@ services:
     - DB_NAME='chessdb'
     - DB_USER='postgres'
     - DB_PASSWORD='chessdb'
+    - GMAIL_API_TOKEN=''
   redis:
     image: redis
     restart: always

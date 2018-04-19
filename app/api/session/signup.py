@@ -54,6 +54,12 @@ def signup_post():
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
 def signup_post_mobile():
+    if 'validation_code' not in request.json:
+        return jsonify({
+            'status': 'error',
+            'message': 'Upgrade your application. Current client is deprecated.'
+        })
+
     try:
         username = request.json['username']
         password = request.json['password']
