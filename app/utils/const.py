@@ -60,5 +60,5 @@ class comment(object):
 
 class email_validation(object):
     limit = 3
-    credential_path = "./gmail_api_token.key"
+    credential_path = "/home/blunders/ztd.blunders-web/gmail_api_token.key"
     sender_email = "ztd.team.dev@gmail.com"
