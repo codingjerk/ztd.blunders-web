@@ -5,8 +5,8 @@ from random import randint
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import crossdomain, const
-from app.utils.email import GMailAPIValidation
+from app.utils import crossdomain, session, const
+from app.utils.email import SendGridAPIValidation
 
 @app.route('/api/session/validate', methods=['POST'])
 def validate_post():
@@ -55,7 +55,7 @@ def validate_post():
         })
 
     if count_tries < const.email_validation.limit:
-        email_validation = GMailAPIValidation()
+        email_validation = SendGridAPIValidation()
 
         email_validation.send(
             user_name = username,
@@ -69,5 +69,6 @@ def validate_post():
 
 @app.route('/api/mobile/session/validate', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
+@session.nullable()
 def validate_post_mobile():
     return validate_post()

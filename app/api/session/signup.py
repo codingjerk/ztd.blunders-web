@@ -5,7 +5,39 @@ from app.db import postgre
 from app import utils
 from app.utils import hash, session, crossdomain
 
+def validate_user(username, password, email, validation_code):
+    # Basic staqtic validations for username, email and email
+    validateUserResult = utils.validateUser(
+        username = username,
+        password = password,
+        email = email
+    )
+    if validateUserResult is not None:
+        return validateUserResult
+
+    # Check if user or email already in use
+    duplicate_count = postgre.user.checkUserDuplicate(
+        username = username,
+        email = email
+    )
+    if duplicate_count > 0:
+        return {
+            'status': 'error',
+            'message': 'username or email are already in use'
+        }
+
+    # Check if providen validation code correct
+    validateCodeResult = utils.validateCode(
+        email = email,
+        validation_code = validation_code
+    )
+    if validateCodeResult is not None:
+        return validateCodeResult
+
+    return None
+
 @app.route('/api/session/signup', methods=['POST'])
+@session.nullable()
 def signup_post():
     try:
         username = request.json['username']
@@ -18,30 +50,14 @@ def signup_post():
             'message': 'Required: username, password, validation_code, email'
         })
 
-    validateUserResult = utils.validateUser(
-        username = username,
-        password = password,
-        email = email
+    validation = validate_user(
+        username,
+        password,
+        email,
+        validation_code
     )
-    if validateUserResult is not None:
-        return jsonify(validateUserResult)
-
-    duplicate_count = postgre.user.checkUserDuplicate(
-        username = username,
-        email = email
-    )
-    if duplicate_count > 0:
-        return jsonify({
-            'status': 'error',
-            'message': 'username or email are already in use'
-        })
-
-    validateCodeResult = utils.validateCode(
-        email = email,
-        validation_code = validation_code
-    )
-    if validateCodeResult is not None:
-        return jsonify(validateCodeResult)
+    if validation is not None:
+        return jsonify(validation)
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)
@@ -53,6 +69,7 @@ def signup_post():
 
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
+@session.nullable()
 def signup_post_mobile():
     if 'validation_code' not in request.json:
         return jsonify({
@@ -71,30 +88,14 @@ def signup_post_mobile():
             'message': 'Required: username, password, validation_code, email'
         })
 
-    validateUserResult = utils.validateUser(
-        username = username,
-        password = password,
-        email = email
+    validation = validate_user(
+        username,
+        password,
+        email,
+        validation_code
     )
-    if validateUserResult is not None:
-        return jsonify(validateUserResult)
-
-    duplicate_count = postgre.user.checkUserDuplicate(
-        username = username,
-        email = email
-    )
-    if duplicate_count > 0:
-        return jsonify({
-            'status': 'error',
-            'message': 'username or email are already in use'
-        })
-
-    validateCodeResult = utils.validateCode(
-        email = email,
-        validation_code = validation_code
-    )
-    if validateCodeResult is not None:
-        return jsonify(validateCodeResult)
+    if validation is not None:
+        return jsonify(validation)
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)

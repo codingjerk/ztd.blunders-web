@@ -66,6 +66,29 @@ def tokenize():
 
     return decorator
 
+def nullable():
+    """
+    Some API endponts dont have session state and does not need authorization.
+    But it is very usefull to define decorator for those requests as well to
+    be able to catch exceptions and transform them to json
+    """
+    def decorator(f):
+        def wrapped(*args, **kwargs):
+            try:
+                result = f(*args, **kwargs)
+            except Exception as e:
+                print(e) # Useful debug printing
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Unknown API error'
+                })
+
+            return result
+
+        return update_wrapper(wrapped, f)
+
+    return decorator
+
 #pylint: disable=redefined-outer-name
 def authorizeWithToken(username, password):
     try:

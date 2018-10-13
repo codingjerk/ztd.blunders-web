@@ -60,5 +60,6 @@ class comment(object):
 
 class email_validation(object):
     limit = 3
-    credential_path = "/home/blunders/ztd.blunders-web/gmail_api_token.key"
     sender_email = "ztd.team.dev@gmail.com"
+    credential_path = "/home/blunders/ztd.blunders-web/gmail_api_token.key" # For Gmail
+    api_token = os.environ.get('SENDGRID_API_KEY')  # For SendGrid
