@@ -1,5 +1,7 @@
 import re
 
+from app.utils import email
+
 def init(func):
     """Decorator, that calls function on module import"""
 
