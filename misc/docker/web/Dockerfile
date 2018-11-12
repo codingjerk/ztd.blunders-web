@@ -23,7 +23,7 @@ RUN yum install -y git unzip gcc gcc-c++ \
 # Installing python packages
 RUN pip3.4 upgrade pip
 RUN pip3.4 install uWSGI Flask redis bcrypt python-chess uwsgitop \
-           google-api-python-client validate_email py3dns
+           google-api-python-client validate_email py3dns oauth2client
 
 RUN PATH=$PATH:/usr/pgsql-9.4/bin pip3.4 install psycopg2
 
