@@ -1,93 +1,52 @@
-from flask import session, request, jsonify
+from flask import session
 
 from app.db import postgre
 from app.utils import hash
 
-from functools import update_wrapper
+class Singleton(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
 #pylint: disable=too-few-public-methods
-class State:
-    token = None
-    username = None
-    userID = None
+class State(metaclass = Singleton):
+    __token = None
+    __username = None
+    __userID = None
+
+    @property
+    def token(self):
+        return self.__token
+
+    @property
+    def username(self):
+        return self.__username
+
+    @property
+    def userID(self):
+        return self.__userID
 
     def __init__(self):
-        raise Exception("State is static class, can't call State.__init__")
+        pass
 
-    def authorize(token): #pylint: disable=no-self-argument
+    def authorize(self, token): #pylint: disable=no-self-argument
         userId = postgre.user.getUserIdByToken(token)
         if userId is None:
             return False
 
-        State.token = token
-        State.userID = userId
-        State.username = postgre.user.getUsernameById(State.userID)
+        self.__token = token
+        self.__userID = userId
+        self.__username = postgre.user.getUsernameById(self.userID)
 
         return True
 
     #pylint: disable=no-method-argument
-    def clean():
-        State.token = None
-        State.userID = None
-        State.username = None
-
-def tokenize():
-    def decorator(f):
-        def wrapped(*args, **kwargs):
-            try:
-                token = request.json['token']
-            except Exception:
-                return jsonify({
-                    'status': 'error',
-                    'message': 'API token is required'
-                })
-
-            try:
-                success = State.authorize(token)
-                if not success:
-                    return jsonify({
-                        'status': 'error',
-                        'message': 'Invalid API token'
-                    })
-
-                result = f(*args, **kwargs)
-            except Exception as e:
-                print(e) # Useful debug printing
-                return jsonify({
-                    'status': 'error',
-                    'message': 'Unknown API error'
-                })
-
-            State.clean()
-
-            return result
-
-        return update_wrapper(wrapped, f)
-
-    return decorator
-
-def nullable():
-    """
-    Some API endponts dont have session state and does not need authorization.
-    But it is very usefull to define decorator for those requests as well to
-    be able to catch exceptions and transform them to json
-    """
-    def decorator(f):
-        def wrapped(*args, **kwargs):
-            try:
-                result = f(*args, **kwargs)
-            except Exception as e:
-                print(e) # Useful debug printing
-                return jsonify({
-                    'status': 'error',
-                    'message': 'Unknown API error'
-                })
-
-            return result
-
-        return update_wrapper(wrapped, f)
-
-    return decorator
+    def clean(self):
+        State.__token = None
+        State.__userID = None
+        State.__username = None
 
 #pylint: disable=redefined-outer-name
 def authorizeWithToken(username, password):
@@ -114,7 +73,7 @@ def authorizeWithToken(username, password):
     }
 
 def isAnonymous():
-    if State.token:
+    if State().token:
         return False
 
     return 'user_id' not in session
@@ -123,8 +82,8 @@ def isAuthorized():
     return not isAnonymous()
 
 def username():
-    if State.token:
-        return State.username
+    if State().token:
+        return State().username
 
     if isAnonymous():
         return None
@@ -132,8 +91,8 @@ def username():
     return session['username']
 
 def userID():
-    if State.token:
-        return State.userID
+    if State().token:
+        return State().userID
 
     if isAnonymous():
         return None

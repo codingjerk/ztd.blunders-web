@@ -2,17 +2,21 @@ import flask
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/session/rating')
 def getRating():
-    return flask.jsonify({
+    return {
         'status': 'ok',
         'rating': postgre.user.getRating(session.userID())
-    })
+    }
+
+@app.route('/api/session/rating')
+@wrappers.nullable()
+def getRatingWeb():
+    return getRating()
 
 @app.route('/api/mobile/session/rating', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getRatingMobile():
     return getRating()

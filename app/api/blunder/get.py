@@ -1,9 +1,11 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import session, const, crossdomain
+from app.utils import wrappers, session, const, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def assignNewBlunder(taskType):
     blunder = postgre.blunder.getRandomBlunder()
@@ -18,11 +20,10 @@ def getRatedBlunder():
     if blunder is None:
         blunder = assignNewBlunder(const.tasks.RATED)
 
-    result = {
+    return {
         'status': 'ok',
         'data': utils.jsonifyBlunder(blunder)
     }
-    return jsonify(result)
 
 def getExploreBlunder():
     blunder = postgre.blunder.getAssignedBlunder(session.userID(), const.tasks.EXPLORE)
@@ -36,34 +37,39 @@ def getExploreBlunder():
         if blunder is None:
             blunder = assignNewBlunder(const.tasks.EXPLORE)
 
-    result = {
+    return {
         'status': 'ok',
         'data': utils.jsonifyBlunder(blunder)
     }
-    return jsonify(result)
 
-@app.route('/api/blunder/get', methods = ['POST'])
 def getBlunder():
+    logger.info("API Handler blunder/get")
+
     try:
         type = request.json['type']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder type required'
-        })
+        }
 
     if type == 'rated':
         return getRatedBlunder()
     elif type == 'explore':
         return getExploreBlunder()
     else:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder type must be rated or explore'
-        })
+        }
+
+@app.route('/api/blunder/get', methods = ['POST'])
+@wrappers.nullable()
+def getBlunderWeb():
+    return getBlunder()
 
 @app.route('/api/mobile/blunder/get', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getBlunderMobile():
     return getBlunder()

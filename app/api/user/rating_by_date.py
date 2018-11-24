@@ -1,25 +1,29 @@
-from flask import jsonify, request
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/user/rating-by-date', methods=['POST'])
 def getRatingByDate():
     try:
         username = request.json['username']
         interval = request.json['interval']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Username and interval required'
-        })
+        }
 
-    return jsonify(postgre.user.getRatingByDate(username, interval))
+    return postgre.user.getRatingByDate(username, interval)
+
+@app.route('/api/user/rating-by-date', methods=['POST'])
+@wrappers.nullable()
+def getRatingByDateWeb():
+    return getRatingByDate()
 
 @app.route('/api/mobile/user/rating-by-date', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getRatingByDateMobile():
     # If 'username' not set, use default username associated with token.
     if not 'username' in request.json:

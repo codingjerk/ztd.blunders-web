@@ -1,8 +1,13 @@
-from flask import jsonify
 
 from app import app
 from app.db import postgre
 
-@app.route('/api/global/blunders-by-rating', methods = ['POST'])
+from app.utils import wrappers
+
 def getBlundersByRating():
-    return jsonify(postgre.statistic.getBlundersByRating(50))
+    return postgre.statistic.getBlundersByRating(50)
+
+@app.route('/api/global/blunders-by-rating', methods = ['POST'])
+@wrappers.nullable()
+def getBlundersByRatingWeb():
+    return getBlundersByRating()

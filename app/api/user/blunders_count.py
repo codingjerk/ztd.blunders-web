@@ -1,24 +1,28 @@
-from flask import jsonify, request
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/user/blunders-count', methods=['POST'])
 def userBlundersCount():
     try:
         username = request.json['username']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Username required'
-        })
+        }
 
-    return jsonify(postgre.user.getBlundersStatistic(username))
+    return postgre.user.getBlundersStatistic(username)
+
+@app.route('/api/user/blunders-count', methods=['POST'])
+@wrappers.nullable()
+def userBlundersCountWeb():
+    return userBlundersCount()
 
 @app.route('/api/mobile/user/blunders-count', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def userBlundersCountMobile():
     # If 'username' not set, use default username associated with token.
     if not 'username' in request.json:

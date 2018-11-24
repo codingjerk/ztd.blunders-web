@@ -1,31 +1,30 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/blunder/vote', methods = ['POST'])
 def voteBlunder():
     if session.isAnonymous():
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Voting allowed only for authorized user'
-        })
+        }
 
     try:
         blunder_id = request.json['blunder_id']
         vote = request.json['vote']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder id and vote required'
-        })
+        }
 
     if not postgre.blunder.voteBlunder(session.userID(), blunder_id, vote):
-        return jsonify({
+        return {
             'status': 'error',
             'message': "Can't vote blunder"
-        })
+        }
 
     result = postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
     if result is None:
@@ -34,13 +33,18 @@ def voteBlunder():
             'message': 'Invalid blunder id',
         }
 
-    return jsonify({
+    return {
         'status': 'ok',
         'data': result
-    })
+    }
+
+@app.route('/api/blunder/vote', methods = ['POST'])
+@wrappers.nullable()
+def voteBlunderWeb():
+    return voteBlunder()
 
 @app.route('/api/mobile/blunder/vote', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def voteBlunderMobile():
     return voteBlunder()

@@ -1,12 +1,11 @@
-from flask import jsonify
 
 from app import app
-from app.utils import session
+from app.utils import wrappers, session
 
 @app.route('/api/session/logout', methods = ['POST'])
-def logout():
+@wrappers.nullable()
+def logoutWeb():
     session.deauthorize()
-    return jsonify({
+    return {
         'status': 'ok'
-    })
-
+    }

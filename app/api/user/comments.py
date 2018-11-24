@@ -1,26 +1,30 @@
-from flask import jsonify, request
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/user/comments', methods = ['POST'])
 def getCommentsByUser():
     try:
         username = request.json['username']
         offset = request.json['offset']
         limit = request.json['limit']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Username, offset and limit required'
-        })
+        }
 
-    return jsonify(postgre.statistic.getCommentsByUser(username, offset, limit))
+    return postgre.statistic.getCommentsByUser(username, offset, limit)
+
+@app.route('/api/user/comments', methods = ['POST'])
+@wrappers.nullable()
+def getCommentsByUserWeb():
+    return getCommentsByUser()
 
 @app.route('/api/mobile/user/comments', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getCommentsByUserMobile():
     # If 'username' not set, use default username associated with token.
     if not 'username' in request.json:

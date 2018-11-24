@@ -1,9 +1,9 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import hash, session, crossdomain
+from app.utils import hash, wrappers, session, crossdomain
 
 def validate_user(username, password, email, validation_code):
     # Basic staqtic validations for username, email and email
@@ -37,18 +37,18 @@ def validate_user(username, password, email, validation_code):
     return None
 
 @app.route('/api/session/signup', methods=['POST'])
-@session.nullable()
-def signup_post():
+@wrappers.nullable()
+def signupPostWeb():
     try:
         username = request.json['username']
         password = request.json['password']
         email = request.json['email']
         validation_code = request.json['validation_code']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Required: username, password, validation_code, email'
-        })
+        }
 
     validation = validate_user(
         username,
@@ -57,7 +57,7 @@ def signup_post():
         validation_code
     )
     if validation is not None:
-        return jsonify(validation)
+        return validation
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)
@@ -65,17 +65,17 @@ def signup_post():
     if status['status'] == 'ok':
         session.authorize(username, password)
 
-    return jsonify(status)
+    return status
 
 @app.route('/api/mobile/session/signup', methods=['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.nullable()
-def signup_post_mobile():
+@wrappers.nullable()
+def signupPostMobile():
     if 'validation_code' not in request.json:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Upgrade your application. Current client is deprecated.'
-        })
+        }
 
     try:
         username = request.json['username']
@@ -83,10 +83,10 @@ def signup_post_mobile():
         email = request.json['email']
         validation_code = request.json['validation_code']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Required: username, password, validation_code, email'
-        })
+        }
 
     validation = validate_user(
         username,
@@ -95,14 +95,12 @@ def signup_post_mobile():
         validation_code
     )
     if validation is not None:
-        return jsonify(validation)
+        return validation
 
     salt, hashPass = hash.new(password)
     status = postgre.user.signupUser(username, salt, hashPass, email)
 
     if status['status'] != 'ok':
-        return jsonify(status)
+        return status
 
-    return jsonify(
-        session.authorizeWithToken(username, password)
-    )
+    return session.authorizeWithToken(username, password)

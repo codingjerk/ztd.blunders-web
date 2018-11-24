@@ -1,39 +1,43 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/pack/info', methods = ['POST'])
 def getPackInfo():
     try:
         pass
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Unknown'
-        })
+        }
 
     if(session.isAnonymous()):
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Working with packs in anonymous mode is not supported'
-        })
+        }
 
     packs, unlocked = postgre.pack.getPacks(session.userID())
     packs = [ postgre.pack.idToHashId(pack_id) for pack_id in packs]
 
-    return jsonify({
+    return {
         'status':'ok',
         'data': {
             'packs': packs,
             'unlocked': unlocked
         }
-    })
+    }
+
+@app.route('/api/pack/info', methods = ['POST'])
+@wrappers.nullable()
+def getPackInfoWeb():
+    return getPackInfo()
 
 @app.route('/api/mobile/pack/info', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getPackInfoMobile():
     return getPackInfo()

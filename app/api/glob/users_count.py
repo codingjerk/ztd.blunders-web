@@ -1,8 +1,13 @@
-from flask import jsonify
 
 from app import app
 from app.db import postgre
 
-@app.route('/api/global/users-count', methods=['POST'])
+from app.utils import wrappers
+
 def getUsersCount():
-    return jsonify(postgre.statistic.getUsersCount())
+    return postgre.statistic.getUsersCount()
+
+@app.route('/api/global/users-count', methods=['POST'])
+@wrappers.nullable()
+def getUsersCountWeb():
+    return getUsersCount()

@@ -1,8 +1,8 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, const, chess
+from app.utils import wrappers, session, const, chess
 
 from app.utils import elo, crossdomain
 
@@ -76,28 +76,28 @@ def validate(blunder_id, user_line, spent_time, task_type):
 
 def validateExploreBlunder(blunder_id, user_line, spent_time): #pylint: disable=unused-argument
     if session.isAnonymous():
-        return jsonify({'status': 'ok'})
+        return {'status': 'ok'}
 
     # In explore mode, just remove blunder from task list
     # It is also ok, that there is no blunder to delete
     postgre.blunder.closeBlunderTask(session.userID(), blunder_id, const.tasks.EXPLORE)
 
-    return jsonify({'status': 'ok'})
+    return {'status': 'ok'}
 
 def validateRatedBlunder(blunder_id, user_line, spent_time):
     # In rated mode, anonymous users have nothing to validate, this is correct situation
     if session.isAnonymous():
-        return jsonify({'status': 'ok'})
+        return {'status': 'ok'}
 
-    return jsonify(validate(blunder_id, user_line, spent_time, const.tasks.RATED))
+    return validate(blunder_id, user_line, spent_time, const.tasks.RATED)
 
 def validatePackBlunder(blunder_id, user_line, spent_time):
     # In pack mode, anonymous user can't validate, this is error
     if session.isAnonymous():
-        return jsonify({
+        return {
             'status': 'error',
             'message': "Working with packs in anonymous mode is not supported"
-        })
+        }
 
     result = validate(blunder_id, user_line, spent_time, const.tasks.PACK)
 
@@ -110,9 +110,8 @@ def validatePackBlunder(blunder_id, user_line, spent_time):
     # Remove user asociated packs which are complatelly solved
     postgre.pack.gcHistoryPacks(session.userID())
 
-    return jsonify(result)
+    return result
 
-@app.route('/api/blunder/validate', methods = ['POST'])
 def validateBlunder():
     try:
         blunder_id = request.json['id']
@@ -120,10 +119,10 @@ def validateBlunder():
         spent_time = request.json['spentTime']
         type = request.json['type']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder id, user line, spent time and type required'
-        })
+        }
 
     if type == const.tasks.RATED:
         return validateRatedBlunder(blunder_id, user_line, spent_time)
@@ -132,13 +131,18 @@ def validateBlunder():
     elif type == const.tasks.PACK:
         return validatePackBlunder(blunder_id, user_line, spent_time)
     else:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder type must be explore,rated or pack'
-        })
+        }
+
+@app.route('/api/blunder/validate', methods = ['POST'])
+@wrappers.nullable()
+def validateBlunderWeb():
+    return validateBlunder()
 
 @app.route('/api/mobile/blunder/validate', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def validateBlunderMobile():
     return validateBlunder()

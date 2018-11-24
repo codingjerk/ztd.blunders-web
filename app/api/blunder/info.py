@@ -1,19 +1,17 @@
-from flask import jsonify, request
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain
+from app.utils import wrappers, session, crossdomain
 
-@app.route('/api/blunder/info', methods=['POST'])
-@crossdomain.crossdomain()
 def getBlunderInfo():
     try:
         blunder_id = request.json['blunder_id']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Blunder id required'
-        })
+        }
 
     result = postgre.blunder.getBlunderInfoById(session.userID(), blunder_id)
     if result is None:
@@ -22,13 +20,18 @@ def getBlunderInfo():
             'message': 'Invalid blunder id',
         }
 
-    return jsonify({
+    return {
         'status': 'ok',
         'data': result
-    })
+    }
+
+@app.route('/api/blunder/info', methods=['POST'])
+@wrappers.nullable()
+def getBlunderInfoWeb():
+    return getBlunderInfo()
 
 @app.route('/api/mobile/blunder/info', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def getBlunderInfoMobile():
     return getBlunderInfo()

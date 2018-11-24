@@ -1,8 +1,13 @@
-from flask import jsonify
 
 from app import app
 from app.db import postgre
 
-@app.route('/api/global/blunders-count', methods=['POST'])
+from app.utils import wrappers
+
 def totalBlundersCount():
-    return jsonify(postgre.statistic.getBlundersStatistic())
+    return postgre.statistic.getBlundersStatistic()
+
+@app.route('/api/global/blunders-count', methods=['POST'])
+@wrappers.nullable()
+def totalBlundersCountWeb():
+    return totalBlundersCount()

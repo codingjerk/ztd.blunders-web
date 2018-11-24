@@ -1,13 +1,18 @@
-from flask import jsonify
 
 from app import app
 from app.db import postgre
 
-@app.route('/api/global/users-online', methods=['POST'])
+from app.utils import wrappers
+
 def getUsersOnline():
-    return jsonify({
+    return {
         'status': 'ok',
         'data': {
             "users-online-list" : postgre.statistic.getActiveUsers('1 HOUR')
         }
-    })
+    }
+
+@app.route('/api/global/users-online', methods=['POST'])
+@wrappers.nullable()
+def getUsersOnlineWeb():
+    return getUsersOnline()

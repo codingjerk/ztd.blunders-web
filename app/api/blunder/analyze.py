@@ -1,8 +1,8 @@
-from flask import request, jsonify
+from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import session, crossdomain, const, chess
+from app.utils import wrappers, session, crossdomain, const, chess
 from app.utils.analyze import Engine
 
 def searchForPreanalyzed(blunder_id, data):
@@ -56,22 +56,21 @@ def calcualteWithEngine(blunder_id, blunder_fen, data):
 def isAllCalculated(data):
     return sum('engine' in element for element in data) == len(data)
 
-@app.route('/api/blunder/analyze', methods = ['POST'])
 def analyzeBlunder():
     try:
         blunder_id = request.json['blunder_id']
         line = request.json['line']
     except Exception:
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'blunder_id and line is required'
-        })
+        }
 
     if(session.isAnonymous()):
-        return jsonify({
+        return {
             'status': 'error',
             'message': 'Analyzing in anonymous mode is not supported'
-        })
+        }
 
     blunder = postgre.blunder.getBlunderById(blunder_id)
     if blunder is None:
@@ -98,7 +97,7 @@ def analyzeBlunder():
     if not isAllCalculated(data):
         data = calcualteWithEngine(blunder_id, blunder_fen, data)
 
-    return jsonify({
+    return {
         'status': 'ok',
         'data': {
             'variations': [{
@@ -107,10 +106,15 @@ def analyzeBlunder():
                     'status': element['status']
                 } for element in data ]
         }
-    })
+    }
+
+@app.route('/api/blunder/analyze', methods = ['POST'])
+@wrappers.nullable()
+def analyzeBlunderWeb():
+    return analyzeBlunder()
 
 @app.route('/api/mobile/blunder/analyze', methods = ['POST', 'OPTIONS'])
 @crossdomain.crossdomain()
-@session.tokenize()
+@wrappers.tokenize()
 def analyzeBlunderMobile():
     return analyzeBlunder()
