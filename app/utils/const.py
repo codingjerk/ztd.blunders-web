@@ -22,7 +22,7 @@ class redis(object):
 class fluentd(object):
     label='app'
     host=os.environ.get('FLUENTD_HOST')
-    port=os.environ.get('FLUENTD_PORT')
+    port=int(os.environ.get('FLUENTD_PORT'))
 
 class engine(object):
     path = '/opt/stockfish-8-linux/Linux/stockfish_8_x64'
