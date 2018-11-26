@@ -23,4 +23,8 @@ def getFromCache(type):
     return json.loads(db.get(type).decode("utf-8"))
 
 def setInCache(type, data, expireTime):
-    db.setex(type, json.dumps(data), expireTime)
+    db.setex(
+        name = type,
+        value = json.dumps(data),
+        time = expireTime
+    )
