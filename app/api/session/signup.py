@@ -3,7 +3,9 @@ from flask import request
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import hash, wrappers, session, crossdomain
+from app.utils import hash, wrappers, session, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def validate_user(username, password, email, validation_code):
     # Basic staqtic validations for username, email and email
@@ -39,6 +41,8 @@ def validate_user(username, password, email, validation_code):
 @app.route('/api/session/signup', methods=['POST'])
 @wrappers.nullable()
 def signupPostWeb():
+    logger.info("API Handler session/signup web version")
+
     try:
         username = request.json['username']
         password = request.json['password']
@@ -71,6 +75,8 @@ def signupPostWeb():
 @crossdomain.crossdomain()
 @wrappers.nullable()
 def signupPostMobile():
+    logger.info("API Handler session/signup mobile version")
+
     if 'validation_code' not in request.json:
         return {
             'status': 'error',

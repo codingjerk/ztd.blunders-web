@@ -2,9 +2,13 @@
 from app import app
 from app.db import postgre
 
-from app.utils import wrappers
+from app.utils import wrappers, logger
+
+logger = logger.Logger(__name__)
 
 def getUsersTop():
+    logger.info("API Handler global/users-top")
+
     return {
         'status': 'ok',
         'data': {

@@ -2,10 +2,13 @@ import logging
 import traceback
 import datetime
 
+from app.db import fluentd
+
 from app.utils import session, reference
 
 class Logger:
     __logger = None
+    __fluentd = None
 
     def __init__(self, module):
         self.__module = module
@@ -21,6 +24,8 @@ class Logger:
         self.__logger.addHandler(ch)
         self.__logger.propagate = False
 
+        self.__fluentd = fluentd.Fluentd()
+
     def __external(self, level, message):
         info = {
             "reference_id": reference.Reference().get(),
@@ -32,9 +37,7 @@ class Logger:
             "message": message
         }
 
-        # Here comes integration with external logging system
-
-        #print(info)
+        self.__fluentd.log(info)
 
     def __internal(self, level, message):
         self.__logger.log(level, message, extra = {"reference_id": reference.Reference().get()})

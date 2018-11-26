@@ -2,9 +2,13 @@ from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import wrappers, session, const, crossdomain
+from app.utils import wrappers, session, const, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def voteBlunderComment():
+    logger.info("API Handler comment/vote")
+
     if session.isAnonymous():
         return {
             'status': 'error',

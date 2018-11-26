@@ -2,9 +2,13 @@ from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import wrappers, session, crossdomain
+from app.utils import wrappers, session, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def getBlundersHistory():
+    logger.info("API Handler user/history-blunders")
+
     try:
         username = request.json['username']
         offset = request.json['offset']

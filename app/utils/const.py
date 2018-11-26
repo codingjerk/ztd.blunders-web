@@ -19,6 +19,11 @@ class redis(object):
     port=6379
     db=0
 
+class fluentd(object):
+    label='app'
+    host=os.environ.get('FLUENTD_HOST')
+    port=os.environ.get('FLUENTD_PORT')
+
 class engine(object):
     path = '/opt/stockfish-8-linux/Linux/stockfish_8_x64'
     time = 1000

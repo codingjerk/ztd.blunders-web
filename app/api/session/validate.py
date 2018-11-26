@@ -5,10 +5,14 @@ from random import randint
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import crossdomain, wrappers, const
+from app.utils import crossdomain, wrappers, const, logger
 from app.utils.email import GMailAPIValidation
 
+logger = logger.Logger(__name__)
+
 def validatePost():
+    logger.info("API Handler session/validate")
+
     try:
         email = request.json['email']
         password = request.json['password']

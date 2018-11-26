@@ -2,8 +2,10 @@ from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import wrappers, session, crossdomain, const, chess
+from app.utils import wrappers, session, crossdomain, const, chess, logger
 from app.utils.analyze import Engine
+
+logger = logger.Logger(__name__)
 
 def searchForPreanalyzed(blunder_id, data):
     # TODO: if engine calculation time is longer,
@@ -57,6 +59,8 @@ def isAllCalculated(data):
     return sum('engine' in element for element in data) == len(data)
 
 def analyzeBlunder():
+    logger.info("API Handler blunder/analyze")
+
     try:
         blunder_id = request.json['blunder_id']
         line = request.json['line']

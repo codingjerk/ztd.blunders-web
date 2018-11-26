@@ -2,9 +2,11 @@ from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import wrappers, session, const, chess
+from app.utils import wrappers, session, const, chess, logger
 
 from app.utils import elo, crossdomain
+
+logger = logger.Logger(__name__)
 
 def changeRating(user_id, blunder_id, success):
     if user_id is None:
@@ -113,6 +115,8 @@ def validatePackBlunder(blunder_id, user_line, spent_time):
     return result
 
 def validateBlunder():
+    logger.info("API Handler blunder/validate")
+
     try:
         blunder_id = request.json['id']
         user_line = request.json['line']

@@ -3,9 +3,13 @@ from flask import request
 from app import app
 from app.db import postgre
 
-from app.utils import wrappers
+from app.utils import wrappers, logger
+
+logger = logger.Logger(__name__)
 
 def sendFeedback():
+    logger.info("API Handler feedback/send")
+    
     try:
         message = request.json['message']
     except Exception:

@@ -4,7 +4,9 @@ from flask import request
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import wrappers, session, const, crossdomain
+from app.utils import wrappers, session, const, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 #TODO: What if duplicates in blunder Tasks?
 
@@ -187,6 +189,8 @@ def packSelector(pack_type_name, pack_type_args_user):
     }
 
 def getNewPack():
+    logger.info("API Handler pack/new")
+
     try:
         pack_type_name = request.json['type_name']
         pack_type_args_user = request.json['args'] if 'args' in request.json else {}

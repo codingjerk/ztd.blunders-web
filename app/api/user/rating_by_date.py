@@ -2,9 +2,13 @@ from flask import request
 
 from app import app
 from app.db import postgre
-from app.utils import wrappers, session, crossdomain
+from app.utils import wrappers, session, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def getRatingByDate():
+    logger.info("API Handler user/rating-by-date")
+
     try:
         username = request.json['username']
         interval = request.json['interval']

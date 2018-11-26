@@ -15,12 +15,22 @@ services:
     - 80:80
     links:
     - redis
+    - fluentd
     environment:
     - DB_HOST='127.0.0.1'
     - DB_NAME='chessdb'
     - DB_USER='postgres'
     - DB_PASSWORD='chessdb'
+    - FLUENTD_HOST='fluentd'
+    - FLUENTD_PORT='24224'
     - GMAIL_API_TOKEN=''
+  fluentd:
+    build:
+      context: misc/docker/fluentd
+    restart: always
+    environment:
+    - LOGZIO_TOKEN=
+    - FLUENTD_CONF=fluentd.conf
   redis:
     image: redis
     restart: always

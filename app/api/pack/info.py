@@ -3,9 +3,13 @@ from flask import request
 from app import app
 from app.db import postgre
 from app import utils
-from app.utils import wrappers, session, crossdomain
+from app.utils import wrappers, session, crossdomain, logger
+
+logger = logger.Logger(__name__)
 
 def getPackInfo():
+    logger.info("API Handler pack/info")
+
     try:
         pass
     except Exception:
